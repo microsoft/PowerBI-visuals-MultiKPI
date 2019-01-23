@@ -24,14 +24,14 @@
  *  THE SOFTWARE.
  */
 
-export interface AxisComponentRenderOptions {
+export interface IAxisComponentRenderOptions {
     viewport: IViewport;
     settings: AxisDescriptor;
     series: DataRepresentationSeries;
     y: DataRepresentationAxis;
 }
 
-export class AxisComponent extends BaseComponent<VisualComponentConstructorOptions, AxisComponentRenderOptions> {
+export class AxisComponent extends BaseComponent<VisualComponentConstructorOptions, IAxisComponentRenderOptions> {
     constructor(options: VisualComponentConstructorOptions) {
         super();
 
@@ -42,7 +42,7 @@ export class AxisComponent extends BaseComponent<VisualComponentConstructorOptio
         );
     }
 
-    public render(options: AxisComponentRenderOptions): void {
+    public render(options: IAxisComponentRenderOptions): void {
         const { settings } = options;
 
         if (settings.shouldBeShown()) {
@@ -53,7 +53,7 @@ export class AxisComponent extends BaseComponent<VisualComponentConstructorOptio
         }
     }
 
-    private renderComponent(options: AxisComponentRenderOptions) {
+    private renderComponent(options: IAxisComponentRenderOptions) {
         const {
             y,
             series,

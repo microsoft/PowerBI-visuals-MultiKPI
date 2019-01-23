@@ -24,14 +24,31 @@
  *  THE SOFTWARE.
  */
 
-export class MultiLineComponent extends BaseContainerComponent<VisualComponentConstructorOptions, SparklineComponentRenderOptions, LineComponentRenderOptions> {
-    constructor(options: VisualComponentConstructorOptions) {
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { IVisualComponent } from "../visualComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import {
+    DataRepresentationPointGradientType,
+    IDataRepresentationSeries,
+} from "../../converter/data/dataRepresentation";
+
+import {
+    ILineComponentRenderOptions,
+    LineComponent,
+} from "./lineComponent";
+
+import { ISparklineComponentRenderOptions } from "./sparklineComponent";
+
+export class MultiLineComponent
+    extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, ILineComponentRenderOptions> {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
             "multiLineComponent",
-            "g"
+            "g",
         );
 
         this.constructorOptions = {
@@ -40,7 +57,7 @@ export class MultiLineComponent extends BaseContainerComponent<VisualComponentCo
         };
     }
 
-    public render(options: SparklineComponentRenderOptions): void {
+    public render(options: ISparklineComponentRenderOptions): void {
         this.renderOptions = options;
 
         const {
@@ -53,25 +70,25 @@ export class MultiLineComponent extends BaseContainerComponent<VisualComponentCo
             series.length,
             () => {
                 return new LineComponent(this.constructorOptions);
-            }
+            },
         );
 
         this.forEach(
             this.components,
-            (component: VisualComponent<LineComponentRenderOptions>, componentIndex: number) => {
-                const currentSeries: DataRepresentationSeries = series[componentIndex];
+            (component: IVisualComponent<ILineComponentRenderOptions>, componentIndex: number) => {
+                const currentSeries: IDataRepresentationSeries = series[componentIndex];
 
                 component.render({
-                    points: currentSeries.smoothedPoints,
-                    type: DataRepresentationPointGradientType.line,
-                    color: currentSeries.settings.sparklineChart.color,
-                    thickness: currentSeries.settings.sparklineChart.thickness,
                     alternativeColor: currentSeries.settings.sparklineChart.alternativeColor,
+                    color: currentSeries.settings.sparklineChart.color,
+                    points: currentSeries.smoothedPoints,
+                    thickness: currentSeries.settings.sparklineChart.thickness,
+                    type: DataRepresentationPointGradientType.line,
                     viewport,
                     x: currentSeries.x,
                     y: currentSeries.ySparkline,
                 });
-            }
+            },
         );
     }
 }

@@ -24,22 +24,39 @@
  *  THE SOFTWARE.
  */
 
-export class SparklineGroupComponent extends BaseContainerComponent<VisualComponentConstructorOptions, VisualComponentRenderOptions, SparklineComponentRenderOptions> {
+import { IMargin } from "powerbi-visuals-utils-svgutils";
+
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
+
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { IVisualComponent } from "../visualComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+import { IVisualComponentRenderOptions } from "../visualComponentRenderOptions";
+
+import {
+    ISparklineComponentRenderOptions,
+    SparklineComponent,
+} from "./sparklineComponent";
+
+import { IDataRepresentationSeries } from "../../converter/data/dataRepresentation";
+
+export class SparklineGroupComponent
+    extends BaseContainerComponent<IVisualComponentConstructorOptions, IVisualComponentRenderOptions, ISparklineComponentRenderOptions> {
     private className: string = "sparklineGroupComponent";
 
     private minAmountOfSeries: number = 1;
 
     private padding: IMargin = {
-        top: 5,
-        right: 0,
         bottom: 0,
         left: 8,
+        right: 0,
+        top: 5,
     };
 
     private renderingDelay: number = 10;
     private renderingTimers: number[] = [];
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(options.element, this.className);
@@ -50,7 +67,7 @@ export class SparklineGroupComponent extends BaseContainerComponent<VisualCompon
         };
     }
 
-    public render(options: VisualComponentRenderOptions): void {
+    public render(options: IVisualComponentRenderOptions): void {
         this.renderOptions = options;
 
         const {
@@ -66,7 +83,7 @@ export class SparklineGroupComponent extends BaseContainerComponent<VisualCompon
 
         this.element.style(
             "padding",
-            `${PixelConverter.toString(this.padding.top)} 0 ${PixelConverter.toString(this.padding.bottom)} 0`
+            `${pixelConverter.toString(this.padding.top)} 0 ${pixelConverter.toString(this.padding.bottom)} 0`,
         );
 
         this.initComponents(
@@ -77,7 +94,7 @@ export class SparklineGroupComponent extends BaseContainerComponent<VisualCompon
                     ...this.constructorOptions,
                     id: componentIndex,
                 });
-            }
+            },
         );
 
         const paddingWidth: number = amountOfComponents > this.minAmountOfSeries
@@ -89,8 +106,8 @@ export class SparklineGroupComponent extends BaseContainerComponent<VisualCompon
 
         this.forEach(
             this.components,
-            (component: VisualComponent<SparklineComponentRenderOptions>, componentIndex: number) => {
-                const data: DataRepresentationSeries = series[componentIndex];
+            (component: IVisualComponent<ISparklineComponentRenderOptions>, componentIndex: number) => {
+                const data: IDataRepresentationSeries = series[componentIndex];
 
                 const position: number = data && data.settings.sparkline.position
                     ? data.settings.sparkline.position
@@ -98,25 +115,25 @@ export class SparklineGroupComponent extends BaseContainerComponent<VisualCompon
                         ? data.index
                         : componentIndex;
 
-                this.renderComponent<SparklineComponentRenderOptions>(
+                this.renderComponent<ISparklineComponentRenderOptions>(
                     component,
                     {
-                        position,
                         current: data,
+                        dataRepresentation: options.data,
+                        position,
                         series: [data],
                         viewport: { height, width },
-                        dataRepresentation: options.data,
                     },
                     componentIndex,
                 );
-            }
+            },
         );
     }
 
     private renderComponent<RenderOptions>(
-        component: VisualComponent<RenderOptions>,
+        component: IVisualComponent<RenderOptions>,
         options: RenderOptions,
-        index: number
+        index: number,
     ) {
         if (this.renderingTimers[index]) {
             clearTimeout(this.renderingTimers[index]);
@@ -124,8 +141,7 @@ export class SparklineGroupComponent extends BaseContainerComponent<VisualCompon
 
         this.renderingTimers[index] = setTimeout(
             component.render.bind(component, options),
-            this.renderingDelay
-        );
+            this.renderingDelay,
+        ) as unknown as number;
     }
 }
-f

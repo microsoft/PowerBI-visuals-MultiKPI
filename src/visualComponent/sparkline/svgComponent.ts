@@ -24,21 +24,52 @@
  *  THE SOFTWARE.
  */
 
-export class SvgComponent extends BaseContainerComponent<VisualComponentConstructorOptions, SparklineComponentRenderOptions, VisualComponentRenderOptionsBase> {
+import powerbi from "powerbi-visuals-api";
+import { IMargin } from "powerbi-visuals-utils-svgutils";
+
+import {
+    IDataRepresentationPoint,
+    IDataRepresentationSeries,
+} from "../../converter/data/dataRepresentation";
+
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { IVisualComponent } from "../visualComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import {
+    AxisComponent,
+    IAxisComponentRenderOptions,
+} from "../mainChart/axisComponent";
+
+import { ISparklineComponentRenderOptions } from "./sparklineComponent";
+
+import {
+    DotsComponent,
+    IDotsComponentRenderOptions,
+} from "./dotsComponent";
+
+import { EventName } from "../../event/eventName";
+import { MultiLineComponent } from "./multiLineComponent";
+
+export class SvgComponent extends BaseContainerComponent<
+    IVisualComponentConstructorOptions,
+    ISparklineComponentRenderOptions,
+    {}
+    > {
     private className: string = "svgComponentContainer";
 
-    private multiLineComponent: VisualComponent<SparklineComponentRenderOptions>;
-    private axisComponent: VisualComponent<AxisComponentRenderOptions>;
+    private multiLineComponent: IVisualComponent<ISparklineComponentRenderOptions>;
+    private axisComponent: IVisualComponent<IAxisComponentRenderOptions>;
 
-    private dynamicComponents: VisualComponent<DotsComponentRenderOptions>[] = [];
+    private dynamicComponents: Array<IVisualComponent<IDotsComponentRenderOptions>> = [];
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
             this.className,
-            "svg"
+            "svg",
         );
 
         this.constructorOptions = {
@@ -60,67 +91,33 @@ export class SvgComponent extends BaseContainerComponent<VisualComponentConstruc
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onCurrentDataPointIndexChange}.${this.className}.${this.constructorOptions.id}`,
-            this.onCurrentDataPointIndexChange.bind(this)
+            this.onCurrentDataPointIndexChange.bind(this),
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onCurrentDataPointIndexReset}.${this.className}.${this.constructorOptions.id}`,
-            this.onCurrentDataPointIndexChange.bind(this)
+            this.onCurrentDataPointIndexChange.bind(this),
         );
 
         this.element.on("mouseenter", () => {
             this.constructorOptions.eventDispatcher[EventName.onChartChangeHover](
-                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name
+                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name,
             );
         });
     }
 
-    private onCurrentDataPointIndexChange(index: number): void {
-        if (this.renderOptions
-            && this.renderOptions.series
-            && this.renderOptions.current
-            && index !== undefined
-            && index !== null
-            && !isNaN(index)
-        ) {
-            const points: DataRepresentationPoint[] = [];
-
-            this.renderOptions.series.forEach((series: DataRepresentationSeries) => {
-                if (series
-                    && series.smoothedPoints
-                    && series.smoothedPoints[index]
-                ) {
-                    points.push(series.smoothedPoints[index]);
-                }
-            });
-
-            this.forEach(
-                this.dynamicComponents,
-                (component: VisualComponent<DotsComponentRenderOptions>) => {
-                    component.render({
-                        points,
-                        x: this.renderOptions.current.x,
-                        y: this.renderOptions.current.ySparkline,
-                        viewport: this.renderOptions.viewport,
-                        settings: this.renderOptions.current.settings.sparklineChart,
-                    });
-                }
-            );
-        }
-    }
-
-    public render(options: SparklineComponentRenderOptions): void {
+    public render(options: ISparklineComponentRenderOptions): void {
         const maxThickness: number = !options || !options.series
             ? 0
-            : options.series.reduce((previousValue: number, series: DataRepresentationSeries) => {
+            : options.series.reduce((previousValue: number, series: IDataRepresentationSeries) => {
                 return Math.max(previousValue, series.settings.sparklineChart.getRadius());
             }, 0);
 
         const margin: IMargin = this.getMarginByThickness(maxThickness);
 
-        const viewport: IViewport = {
-            width: Math.max(0, options.viewport.width - margin.left - margin.right),
+        const viewport: powerbi.IViewport = {
             height: Math.max(0, options.viewport.height - margin.top - margin.bottom),
+            width: Math.max(0, options.viewport.width - margin.left - margin.right),
         };
 
         this.renderOptions = {
@@ -139,16 +136,16 @@ export class SvgComponent extends BaseContainerComponent<VisualComponentConstruc
 
         this.axisComponent.render({
             series: this.renderOptions.current,
+            settings: this.renderOptions.current.settings.sparklineYAxis,
             viewport: this.renderOptions.viewport,
             y: this.renderOptions.current.ySparkline,
-            settings: this.renderOptions.current.settings.sparklineYAxis,
         });
 
         this.onCurrentDataPointIndexChange(
             this.renderOptions
             && this.renderOptions.current
             && this.renderOptions.current.current
-            && this.renderOptions.current.current.index
+            && this.renderOptions.current.current.index,
         );
     }
 
@@ -158,5 +155,39 @@ export class SvgComponent extends BaseContainerComponent<VisualComponentConstruc
 
         this.axisComponent = null;
         this.multiLineComponent = null;
+    }
+
+    private onCurrentDataPointIndexChange(index: number): void {
+        if (this.renderOptions
+            && this.renderOptions.series
+            && this.renderOptions.current
+            && index !== undefined
+            && index !== null
+            && !isNaN(index)
+        ) {
+            const points: IDataRepresentationPoint[] = [];
+
+            this.renderOptions.series.forEach((series: IDataRepresentationSeries) => {
+                if (series
+                    && series.smoothedPoints
+                    && series.smoothedPoints[index]
+                ) {
+                    points.push(series.smoothedPoints[index]);
+                }
+            });
+
+            this.forEach(
+                this.dynamicComponents,
+                (component: IVisualComponent<IDotsComponentRenderOptions>) => {
+                    component.render({
+                        points,
+                        settings: this.renderOptions.current.settings.sparklineChart,
+                        viewport: this.renderOptions.viewport,
+                        x: this.renderOptions.current.x,
+                        y: this.renderOptions.current.ySparkline,
+                    });
+                },
+            );
+        }
     }
 }

@@ -24,27 +24,54 @@
  *  THE SOFTWARE.
  */
 
-export interface SparklineComponentRenderOptions {
-    series: DataRepresentationSeries[];
-    current: DataRepresentationSeries;
-    dataRepresentation: DataRepresentation;
-    viewport: IViewport;
+
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
+
+import powerbi from "powerbi-visuals-api";
+
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { IVisualComponent } from "../visualComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import {
+    IDataRepresentation,
+    IDataRepresentationPoint,
+    IDataRepresentationSeries,
+    ViewportSize,
+} from "../../converter/data/dataRepresentation";
+
+import { DataFormatter } from "../../converter/data/dataFormatter";
+
+import { EventName } from "../../event/eventName";
+
+import { SubtitleComponentRenderOptions } from "../subtitleComponent";
+
+import { SubtitleDescriptor } from "../../settings/descriptors/subtitleDescriptor";
+
+import { SubtitleComponent } from "../subtitleComponent";
+import { PlotComponent } from "./plotComponent";
+
+export interface ISparklineComponentRenderOptions {
+    series: IDataRepresentationSeries[];
+    current: IDataRepresentationSeries;
+    dataRepresentation: IDataRepresentation;
+    viewport: powerbi.IViewport;
     position: number;
 }
 
-export class SparklineComponent extends BaseContainerComponent<VisualComponentConstructorOptions, SparklineComponentRenderOptions, any> {
+export class SparklineComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, any> {
     private className: string = "sparklineComponent";
 
-    private topLabelComponent: VisualComponent<SubtitleComponentRenderOptions>;
-    private plotComponent: VisualComponent<any>;
-    private bottomLabelComponent: VisualComponent<SubtitleComponentRenderOptions>;
+    private topLabelComponent: IVisualComponent<SubtitleComponentRenderOptions>;
+    private plotComponent: IVisualComponent<any>;
+    private bottomLabelComponent: IVisualComponent<SubtitleComponentRenderOptions>;
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
-            this.className
+            this.className,
         );
 
         this.constructorOptions = {
@@ -53,28 +80,97 @@ export class SparklineComponent extends BaseContainerComponent<VisualComponentCo
         };
 
         this.element.on("click", () => {
-            d3.event.preventDefault();
-            d3.event.stopPropagation();
-            d3.event.stopImmediatePropagation();
+            const event: MouseEvent = require("d3").event;
+
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
 
             this.constructorOptions.eventDispatcher[EventName.onChartChangeClick](
-                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name
+                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name,
             );
         });
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onCurrentDataPointIndexChange}.${this.className}.${options.id}`,
-            this.onCurrentDataPointIndexChange.bind(this)
+            this.onCurrentDataPointIndexChange.bind(this),
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onCurrentDataPointIndexReset}.${this.className}.${options.id}`,
-            this.onCurrentDataPointIndexChange.bind(this)
+            this.onCurrentDataPointIndexChange.bind(this),
         );
     }
 
+    public initialize(): void {
+        this.topLabelComponent = new SubtitleComponent(this.constructorOptions);
+        this.plotComponent = new PlotComponent(this.constructorOptions);
+        this.bottomLabelComponent = new SubtitleComponent(this.constructorOptions);
+
+        this.components = [
+            this.topLabelComponent,
+            this.plotComponent,
+            this.bottomLabelComponent,
+        ];
+    }
+
+    public render(options: ISparklineComponentRenderOptions) {
+        this.renderOptions = options;
+
+        const {
+            current,
+            series,
+            viewport,
+            position,
+        } = this.renderOptions;
+
+        this.updateSize(viewport.width, viewport.height);
+
+        this.updateElementOrder(this.element, position);
+
+        this.element.attr(
+            "title",
+            current && current.formattedTooltip || null,
+        );
+
+        if (current && series) {
+            if (!this.components.length) {
+                this.initialize();
+            }
+
+            this.renderComponent(this.renderOptions);
+        } else {
+            this.destroyComponents();
+        }
+    }
+
+    public renderComponent(options: ISparklineComponentRenderOptions) {
+        const {
+            current,
+            dataRepresentation: {
+                viewportSize,
+            },
+        } = options;
+
+        this.renderOptions = options;
+
+        this.renderTopLabel(current.name, viewportSize, current.settings.sparklineLabel);
+        this.renderBottomLabel(current.current.y, viewportSize, current.settings.sparklineValue);
+        this.renderPlot(options);
+    }
+
+    public destroy(): void {
+        super.destroy();
+
+        this.topLabelComponent = null;
+        this.plotComponent = null;
+        this.bottomLabelComponent = null;
+
+        this.components = [];
+    }
+
     private onCurrentDataPointIndexChange(index: number): void {
-        const current: DataRepresentationPoint = this.renderOptions
+        const current: IDataRepresentationPoint = this.renderOptions
             && this.renderOptions.current
             && this.renderOptions.current.points
             && this.renderOptions.current.points[index];
@@ -93,68 +189,10 @@ export class SparklineComponent extends BaseContainerComponent<VisualComponentCo
         }
     }
 
-    public initialize(): void {
-        this.topLabelComponent = new SubtitleComponent(this.constructorOptions);
-        this.plotComponent = new PlotComponent(this.constructorOptions);
-        this.bottomLabelComponent = new SubtitleComponent(this.constructorOptions);
-
-        this.components = [
-            this.topLabelComponent,
-            this.plotComponent,
-            this.bottomLabelComponent,
-        ];
-    }
-
-    public render(options: SparklineComponentRenderOptions) {
-        this.renderOptions = options;
-
-        const {
-            current,
-            series,
-            viewport,
-            position,
-        } = this.renderOptions;
-
-        this.updateSize(viewport.width, viewport.height);
-
-        this.updateElementOrder(this.element, position);
-
-        this.element.attr(
-            "title",
-            current && current.formattedTooltip || null
-        );
-
-        if (current && series) {
-            if (!this.components.length) {
-                this.initialize();
-            }
-
-            this.renderComponent(this.renderOptions);
-        } else {
-            this.destroyComponents();
-        }
-    }
-
-    public renderComponent(options: SparklineComponentRenderOptions) {
-        const {
-            current,
-            viewport,
-            dataRepresentation: {
-                viewportSize,
-            },
-        } = options;
-
-        this.renderOptions = options;
-
-        this.renderTopLabel(current.name, viewportSize, current.settings.sparklineLabel);
-        this.renderBottomLabel(current.current.y, viewportSize, current.settings.sparklineValue);
-        this.renderPlot(options);
-    }
-
     private renderTopLabel(
         name: string,
         viewportSize: ViewportSize,
-        settings: SubtitleDescriptor
+        settings: SubtitleDescriptor,
     ): void {
         const fontSize: number = this.getFontSizeByViewportSize(viewportSize);
 
@@ -167,12 +205,12 @@ export class SparklineComponent extends BaseContainerComponent<VisualComponentCo
     private renderBottomLabel(
         value: number,
         viewportSize: ViewportSize,
-        settings: SubtitleDescriptor
+        settings: SubtitleDescriptor,
     ): void {
         const fontSize: number = this.getFontSizeByViewportSize(viewportSize);
         const actualValueKPIFontSize: number = fontSize * this.getActualValueKPIFactorByViewportSize(viewportSize);
 
-        const formatter: IValueFormatter = DataFormatter.getValueFormatter(
+        const formatter: valueFormatter.IValueFormatter = DataFormatter.getValueFormatter(
             value,
             settings,
         );
@@ -183,10 +221,10 @@ export class SparklineComponent extends BaseContainerComponent<VisualComponentCo
         this.bottomLabelComponent.render({ settings });
     }
 
-    private renderPlot(options: SparklineComponentRenderOptions): void {
-        const plotComponentViewport: IViewport = this.getReducedViewport(
+    private renderPlot(options: ISparklineComponentRenderOptions): void {
+        const plotComponentViewport: powerbi.IViewport = this.getReducedViewport(
             { ...options.viewport },
-            [this.topLabelComponent, this.bottomLabelComponent]
+            [this.topLabelComponent, this.bottomLabelComponent],
         );
 
         this.plotComponent.render({
@@ -231,33 +269,26 @@ export class SparklineComponent extends BaseContainerComponent<VisualComponentCo
         }
     }
 
-    private getReducedViewport(viewport: IViewport, components: VisualComponent<any>[]): IViewport {
-        return components.reduce<IViewport>((previousViewport: IViewport, component: VisualComponent<any>): IViewport => {
-            const componentViewport: IViewport = component.getViewport();
+    private getReducedViewport(viewport: powerbi.IViewport, components: Array<IVisualComponent<any>>): powerbi.IViewport {
+        return components.reduce<powerbi.IViewport>((
+            previousViewport: powerbi.IViewport,
+            component: IVisualComponent<any>,
+        ): powerbi.IViewport => {
+            const componentViewport: powerbi.IViewport = component.getViewport();
 
             return {
-                width: previousViewport.width,
                 height: previousViewport.height - componentViewport.height,
+                width: previousViewport.width,
             };
         }, viewport);
-    }
-
-    public destroy(): void {
-        super.destroy();
-
-        this.topLabelComponent = null;
-        this.plotComponent = null;
-        this.bottomLabelComponent = null;
-
-        this.components = [];
     }
 
     private destroyComponents(): void {
         this.forEach(
             this.components.splice(0, this.components.length),
-            (component: VisualComponent<VisualComponentRenderOptionsBase>) => {
+            (component: IVisualComponent<{}>) => {
                 component.destroy();
-            }
+            },
         );
 
         this.topLabelComponent = null;

@@ -24,36 +24,60 @@
  *  THE SOFTWARE.
  */
 
-export interface LineComponentRenderOptions {
-    viewport: IViewport;
-    x: DataRepresentationAxis;
-    y: DataRepresentationAxis;
+import {
+    area,
+    Area,
+    line,
+    Line,
+    Selection,
+} from "d3";
+
+import powerbi from "powerbi-visuals-api";
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
+
+import { BaseComponent } from "../baseComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import {
+    DataRepresentationPointGradientType,
+    IDataRepresentationAxis,
+    IDataRepresentationPoint,
+} from "../../converter/data/dataRepresentation";
+
+import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
+import { EventName } from "../../event/eventName";
+
+export interface ILineComponentRenderOptions {
+    viewport: powerbi.IViewport;
+    x: IDataRepresentationAxis;
+    y: IDataRepresentationAxis;
     color: string;
     thickness: number;
     alternativeColor: string;
-    points: DataRepresentationPoint[];
+    points: IDataRepresentationPoint[];
     type: DataRepresentationPointGradientType;
 }
 
-export interface LineComponentGradient {
+export interface ILineComponentGradient {
     color: string;
     offset: string;
 }
 
-export class LineComponent extends BaseComponent<VisualComponentConstructorOptions, LineComponentRenderOptions> {
+export class LineComponent extends BaseComponent<IVisualComponentConstructorOptions, ILineComponentRenderOptions> {
     private className: string = "lineComponent";
-    private lineSelector: ClassAndSelector = this.getSelectorWithPrefix("line");
+    private lineSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("line");
 
     private gradientId: string = `${this.className}_gradient${this.getId()}`;
-    private gradientSelection: D3.Selection;
+    private gradientSelection: Selection<any, any, any, any>;
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
             this.className,
-            "g"
+            "g",
         );
 
         this.gradientSelection = this.element
@@ -68,13 +92,26 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onCurrentDataPointIndexChange}.${this.className}.${this.constructorOptions.id}`,
-            this.onCurrentDataPointIndexChange.bind(this)
+            this.onCurrentDataPointIndexChange.bind(this),
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onCurrentDataPointIndexReset}.${this.className}.${this.constructorOptions.id}`,
-            this.onCurrentDataPointIndexChange.bind(this)
+            this.onCurrentDataPointIndexChange.bind(this),
         );
+    }
+
+    public render(options: ILineComponentRenderOptions): void {
+        this.renderOptions = options;
+
+        this.renderComponent(this.renderOptions);
+    }
+
+    public destroy(): void {
+        this.gradientSelection.remove();
+        this.gradientSelection = null;
+
+        super.destroy();
     }
 
     private onCurrentDataPointIndexChange(index: number): void {
@@ -82,7 +119,7 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
             return;
         }
 
-        const point: DataRepresentationPoint = this.renderOptions.points[index];
+        const point: IDataRepresentationPoint = this.renderOptions.points[index];
 
         if (!point) {
             return;
@@ -102,17 +139,17 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
         const offset: number = xPosition / viewport.width * 100;
         const offsetInPercent: string = `${offset}%`;
 
-        const gradients: LineComponentGradient[] = offset === 100
+        const gradients: ILineComponentGradient[] = offset === 100
             ? [
                 {
                     color,
-                    offset: "100%"
-                }
+                    offset: "100%",
+                },
             ]
             : [
                 {
                     color: alternativeColor,
-                    offset: "0%"
+                    offset: "0%",
                 },
                 {
                     color: alternativeColor,
@@ -131,13 +168,7 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
         this.updateGradient(gradients);
     }
 
-    public render(options: LineComponentRenderOptions): void {
-        this.renderOptions = options;
-
-        this.renderComponent(this.renderOptions);
-    }
-
-    private renderComponent(options: LineComponentRenderOptions): void {
+    private renderComponent(options: ILineComponentRenderOptions): void {
         const {
             x,
             y,
@@ -147,7 +178,7 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
 
         this.updateGradient([{
             color,
-            offset: "100%"
+            offset: "100%",
         }]);
 
         const xScale: DataRepresentationScale = x.scale
@@ -158,100 +189,90 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
             .copy()
             .range([viewport.height, 0]);
 
-        const lineSelection: D3.UpdateSelection = this.element
-            .selectAll(this.lineSelector.selector)
+        const lineSelection = this.element
+            .selectAll(this.lineSelector.selectorName)
             .data([options]);
-
-        lineSelection.enter()
-            .append("svg:path")
-            .classed(this.lineSelector.class, true);
-
-        lineSelection
-            .attr("d", (options: LineComponentRenderOptions) => {
-                switch (options.type) {
-                    case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(options.points);
-                    }
-                    case DataRepresentationPointGradientType.line:
-                    default: {
-                        return this.getLine(xScale, yScale)(options.points);
-                    }
-                }
-            })
-            .style({
-                "stroke": (options: LineComponentRenderOptions) => {
-                    switch (options.type) {
-                        case DataRepresentationPointGradientType.area: {
-                            return null;
-                        }
-                        case DataRepresentationPointGradientType.line:
-                        default: {
-                            return this.getGradientUrl();
-                        }
-                    }
-                },
-                "stroke-width": (options: LineComponentRenderOptions) => {
-                    switch (options.type) {
-                        case DataRepresentationPointGradientType.area: {
-                            return null;
-                        }
-                        case DataRepresentationPointGradientType.line:
-                        default: {
-                            return PixelConverter.toString(options.thickness);
-                        }
-                    }
-                },
-                "fill": (options: LineComponentRenderOptions) => {
-                    switch (options.type) {
-                        case DataRepresentationPointGradientType.area: {
-                            return this.getGradientUrl();
-                        }
-                        case DataRepresentationPointGradientType.line:
-                        default: {
-                            return null;
-                        }
-                    }
-                },
-            });
 
         lineSelection
             .exit()
             .remove();
+
+        lineSelection.enter()
+            .append("svg:path")
+            .classed(this.lineSelector.className, true)
+            .merge(lineSelection)
+            .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
+                switch (lineRenderOptions.type) {
+                    case DataRepresentationPointGradientType.area: {
+                        return this.getArea(xScale, yScale, viewport)(lineRenderOptions.points);
+                    }
+                    case DataRepresentationPointGradientType.line:
+                    default: {
+                        return this.getLine(xScale, yScale)(lineRenderOptions.points);
+                    }
+                }
+            })
+            .style("fill", (lineRenderOptions: ILineComponentRenderOptions) => {
+                switch (lineRenderOptions.type) {
+                    case DataRepresentationPointGradientType.area: {
+                        return this.getGradientUrl();
+                    }
+                    case DataRepresentationPointGradientType.line:
+                    default: {
+                        return null;
+                    }
+                }
+            })
+            .style("stroke", (lineRenderOptions: ILineComponentRenderOptions) => {
+                switch (lineRenderOptions.type) {
+                    case DataRepresentationPointGradientType.area: {
+                        return null;
+                    }
+                    case DataRepresentationPointGradientType.line:
+                    default: {
+                        return this.getGradientUrl();
+                    }
+                }
+            })
+            .style("stroke-width", (lineRenderOptions: ILineComponentRenderOptions) => {
+                switch (lineRenderOptions.type) {
+                    case DataRepresentationPointGradientType.area: {
+                        return null;
+                    }
+                    case DataRepresentationPointGradientType.line:
+                    default: {
+                        return pixelConverter.toString(lineRenderOptions.thickness);
+                    }
+                }
+            });
     }
 
     private getLine(
         xScale: DataRepresentationScale,
         yScale: DataRepresentationScale,
-    ): D3.Svg.Line {
-        return d3.svg.line()
-            .x((dataPoint: DataRepresentationPoint) => {
-                return xScale.scale(dataPoint.x);
+    ): Line<IDataRepresentationPoint> {
+        return line<IDataRepresentationPoint>()
+            .x((data: IDataRepresentationPoint) => {
+                return xScale.scale(data.x);
             })
-            .y((dataPoint: DataRepresentationPoint) => {
-                return yScale.scale(dataPoint.y);
+            .y((data: IDataRepresentationPoint) => {
+                return yScale.scale(data.y);
             });
     }
 
     private getArea(
         xScale: DataRepresentationScale,
         yScale: DataRepresentationScale,
-        viewport: IViewport,
-    ): D3.Svg.Area {
-        return d3.svg.area()
-            .x((dataPoint: DataRepresentationPoint) => {
+        viewport: powerbi.IViewport,
+    ): Area<IDataRepresentationPoint> {
+        return area<IDataRepresentationPoint>()
+            .x((dataPoint: IDataRepresentationPoint) => {
                 return xScale.scale(dataPoint.x);
             })
             .y0(viewport.height)
-            .y1((dataPoint: DataRepresentationPoint) => {
+            .y1((dataPoint: IDataRepresentationPoint) => {
                 return yScale.scale(dataPoint.y);
             });
-    }
-
-    public destroy(): void {
-        this.gradientSelection.remove();
-        this.gradientSelection = null;
-
-        super.destroy();
     }
 
     private getGradientUrl(): string {
@@ -260,29 +281,26 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
         return `url(${href}#${this.gradientId})`;
     }
 
-    private updateGradient(gradients: LineComponentGradient[]): void {
+    private updateGradient(gradients: ILineComponentGradient[]): void {
         if (!this.gradientSelection) {
             return;
         }
 
-        const stopSelection: D3.UpdateSelection = this.gradientSelection
+        const stopSelection: Selection<any, ILineComponentGradient, any, any> = this.gradientSelection
             .selectAll("stop")
             .data(gradients);
 
         stopSelection
-            .enter()
-            .append("stop");
-
-        stopSelection
-            .attr("offset", (gradient: LineComponentGradient) => gradient.offset)
-            .style({
-                "stop-color": (gradient: LineComponentGradient) => gradient.color,
-                "stop-opacity": 1
-            });
-
-        stopSelection
             .exit()
             .remove();
+
+        stopSelection
+            .enter()
+            .append("stop")
+            .merge(stopSelection)
+            .attr("offset", (gradient: ILineComponentGradient) => gradient.offset)
+            .style("stop-color", (gradient: ILineComponentGradient) => gradient.color)
+            .style("stop-opacity", 1);
     }
 
     private getId(): string {
@@ -307,4 +325,3 @@ export class LineComponent extends BaseComponent<VisualComponentConstructorOptio
         return concatenatedGeneratedId;
     }
 }
-

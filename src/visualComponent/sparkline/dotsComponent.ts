@@ -24,28 +24,45 @@
  *  THE SOFTWARE.
  */
 
-export interface DotsComponentRenderOptions {
-    viewport: IViewport;
-    x: DataRepresentationAxis;
-    y: DataRepresentationAxis;
-    points: DataRepresentationPoint[];
+import { Selection } from "d3-selection";
+
+import powerbi from "powerbi-visuals-api";
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
+
+import {
+    IDataRepresentationAxis,
+    IDataRepresentationPoint,
+} from "../../converter/data/dataRepresentation";
+
+import { SparklineChartDescriptor } from "../../settings/descriptors/sparkline/sparklineChartDescriptor";
+
+import { BaseComponent } from "../baseComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
+
+export interface IDotsComponentRenderOptions {
+    viewport: powerbi.IViewport;
+    x: IDataRepresentationAxis;
+    y: IDataRepresentationAxis;
+    points: IDataRepresentationPoint[];
     settings: SparklineChartDescriptor;
 }
 
-export class DotsComponent extends BaseComponent<VisualComponentConstructorOptions, DotsComponentRenderOptions> {
-    private dotSelector: ClassAndSelector = this.getSelectorWithPrefix("dot");
+export class DotsComponent extends BaseComponent<IVisualComponentConstructorOptions, IDotsComponentRenderOptions> {
+    private dotSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("dot");
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
             "dotsComponent",
-            "g"
+            "g",
         );
     }
 
-    public render(options: DotsComponentRenderOptions): void {
+    public render(options: IDotsComponentRenderOptions): void {
         const {
             x,
             y,
@@ -62,26 +79,23 @@ export class DotsComponent extends BaseComponent<VisualComponentConstructorOptio
             .copy()
             .range([viewport.height, 0]);
 
-        const dotSelection: D3.UpdateSelection = this.element
-            .selectAll(this.dotSelector.selector)
+        const dotSelection: Selection<any, IDataRepresentationPoint, any, any> = this.element
+            .selectAll(this.dotSelector.selectorName)
             .data(points);
-
-        dotSelection
-            .enter()
-            .append("circle")
-            .classed(this.dotSelector.class, true);
-
-        dotSelection
-            .attr({
-                cx: (point: DataRepresentationPoint) => xScale.scale(point.x),
-                cy: (point: DataRepresentationPoint) => yScale.scale(point.y),
-                r: settings.getRadius(),
-            })
-            .style("fill", settings.color);
 
         dotSelection
             .exit()
             .remove();
+
+        dotSelection
+            .enter()
+            .append("circle")
+            .classed(this.dotSelector.className, true)
+            .merge(dotSelection)
+            .attr("cx", (point: IDataRepresentationPoint) => xScale.scale(point.x))
+            .attr("cy", (point: IDataRepresentationPoint) => yScale.scale(point.y))
+            .attr("r", settings.getRadius())
+            .style("fill", settings.color);
     }
 
     public clear(): void {

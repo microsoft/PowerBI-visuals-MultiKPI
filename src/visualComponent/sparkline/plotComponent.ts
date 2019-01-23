@@ -24,13 +24,24 @@
  *  THE SOFTWARE.
  */
 
-export class PlotComponent extends BaseContainerComponent<VisualComponentConstructorOptions, SparklineComponentRenderOptions, SparklineComponentRenderOptions> {
-    constructor(options: VisualComponentConstructorOptions) {
+import powerbi from "powerbi-visuals-api";
+
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { ISparklineComponentRenderOptions } from "./sparklineComponent";
+
+import { IVisualComponent } from "../visualComponent";
+
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+import { SvgComponent } from "./svgComponent";
+
+export class PlotComponent
+    extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, ISparklineComponentRenderOptions> {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
-            "plot"
+            "plot",
         );
 
         this.constructorOptions = {
@@ -44,25 +55,25 @@ export class PlotComponent extends BaseContainerComponent<VisualComponentConstru
         ];
     }
 
-    public render(options: SparklineComponentRenderOptions): void {
+    public render(options: ISparklineComponentRenderOptions): void {
         const { viewport } = options;
 
         this.updateSize(viewport.width, viewport.height);
 
-        const componentViewport: IViewport = { ...viewport };
+        const componentViewport: powerbi.IViewport = { ...viewport };
 
         this.forEach(
             this.components,
-            (component: VisualComponent<SparklineComponentRenderOptions>) => {
+            (component: IVisualComponent<ISparklineComponentRenderOptions>) => {
                 component.render({
                     ...options,
                     viewport: { ...componentViewport },
                 });
 
-                const margins: IViewport = component.getViewport();
+                const margins: powerbi.IViewport = component.getViewport();
 
                 componentViewport.height -= margins.height;
-            }
+            },
         );
     }
 }
