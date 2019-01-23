@@ -24,7 +24,17 @@
  *  THE SOFTWARE.
  */
 
-export type DataRepresentationAxisScale = D3.Scale.TimeScale | D3.Scale.LinearScale;
+import {
+    scaleLinear,
+    ScaleLinear,
+    scaleTime,
+    ScaleTime,
+} from "d3-scale";
+
+import { DataRepresentationAxisValueType } from "../data/dataRepresentation";
+
+export type DataRepresentationAxisScale = ScaleTime<DataRepresentationAxisValueType, number>
+    | ScaleLinear<DataRepresentationAxisValueType, number>;
 
 export enum DataRepresentationTypeEnum {
     None,
@@ -47,18 +57,18 @@ export class DataRepresentationScale {
 
     public domain(
         values: DataRepresentationAxisValueType[],
-        type: DataRepresentationTypeEnum
+        type: DataRepresentationTypeEnum,
     ): DataRepresentationScale {
         let scale: DataRepresentationAxisScale;
 
         if (values && values.length) {
             switch (type) {
                 case DataRepresentationTypeEnum.DateType: {
-                    scale = d3.time.scale();
+                    scale = scaleTime();
                     break;
                 }
                 case DataRepresentationTypeEnum.NumberType: {
-                    scale = d3.scale.linear();
+                    scale = scaleLinear();
                     break;
                 }
             }

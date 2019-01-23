@@ -27,6 +27,8 @@
 import { Dispatch } from "d3-dispatch";
 import powerbi from "powerbi-visuals-api";
 
+import { ScaleService } from "../services/scaleService";
+import { Settings } from "../settings/settings";
 import { IVisualComponentBaseConstructorOptions } from "./visualComponentBaseConstructorOptions";
 
 export interface IVisualComponentConstructorOptions extends IVisualComponentBaseConstructorOptions {

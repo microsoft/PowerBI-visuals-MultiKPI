@@ -40,7 +40,7 @@ export enum DataRepresentationPointGradientType {
     area = "area",
 }
 
-export type DataRepresentationAxisValueType = Date | number | string;
+export type DataRepresentationAxisValueType = Date | number;
 
 export interface IDataRepresentationAxis {
     min: DataRepresentationAxisValueType;

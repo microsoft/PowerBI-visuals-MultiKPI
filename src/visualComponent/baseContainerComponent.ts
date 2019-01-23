@@ -24,51 +24,54 @@
  *  THE SOFTWARE.
  */
 
+import { BaseComponent } from "./baseComponent";
+import { IVisualComponent } from "./visualComponent";
+
 export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptionsType, ComponentsRenderOptions>
     extends BaseComponent<ConstructorOptionsType, RenderOptionsType> {
 
-    protected components: VisualComponent<ComponentsRenderOptions>[] = [];
+    protected components: Array<IVisualComponent<ComponentsRenderOptions>> = [];
 
-    public clear(components: VisualComponent<ComponentsRenderOptions>[] = this.components): void {
+    public clear(components: Array<IVisualComponent<ComponentsRenderOptions>> = this.components): void {
         this.forEach(
             components,
-            (component: VisualComponent<ComponentsRenderOptions>) => {
+            (component: IVisualComponent<ComponentsRenderOptions>) => {
                 component.clear();
-            }
+            },
         );
 
         super.clear();
     }
 
-    public destroy(components: VisualComponent<any>[] = this.components): void {
+    public destroy(components: Array<IVisualComponent<ComponentsRenderOptions>> = this.components): void {
         this.forEach(
             components.splice(0, components.length),
-            (component: VisualComponent<any>) => {
+            (component: IVisualComponent<any>) => {
                 component.destroy();
-            }
+            },
         );
 
         super.destroy();
     }
 
-    protected forEach<ComponentsRenderOptions>(
-        components: VisualComponent<ComponentsRenderOptions>[],
+    protected forEach<ForEachComponentsRenderOptions>(
+        components: Array<IVisualComponent<ForEachComponentsRenderOptions>>,
         iterator: (
-            component: VisualComponent<ComponentsRenderOptions>,
-            index: number
-        ) => void
+            component: IVisualComponent<ForEachComponentsRenderOptions>,
+            index: number,
+        ) => void,
     ): void {
-        components.forEach((component: VisualComponent<ComponentsRenderOptions>, index: number) => {
+        components.forEach((component: IVisualComponent<ForEachComponentsRenderOptions>, index: number) => {
             if (component) {
                 iterator(component, index);
             }
         });
     }
 
-    protected initComponents<ComponentsRenderOptions>(
-        components: VisualComponent<ComponentsRenderOptions>[],
+    protected initComponents<InitComponentsRenderOptions>(
+        components: Array<IVisualComponent<InitComponentsRenderOptions>>,
         expectedAmountOfComponents: number,
-        initComponent: (index: number) => VisualComponent<ComponentsRenderOptions>
+        initComponent: (index: number) => IVisualComponent<InitComponentsRenderOptions>,
     ): void {
         if (!components) {
             return;
@@ -76,7 +79,7 @@ export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptio
 
         components
             .splice(expectedAmountOfComponents)
-            .forEach((component: VisualComponent<ComponentsRenderOptions>) => {
+            .forEach((component: IVisualComponent<InitComponentsRenderOptions>) => {
                 component.clear();
                 component.destroy();
             });

@@ -24,40 +24,80 @@
  *  THE SOFTWARE.
  */
 
+import powerbi from "powerbi-visuals-api";
 
+import {
+    changeStartDateColumn,
+    dateColumn,
+    tooltipColumn,
+    valueColumn,
+    warningStateColumn,
+} from "../../columns/columns";
+
+import { AxisDescriptor } from "../../settings/descriptors/axisDescriptor";
+import { BaseDescriptor } from "../../settings/descriptors/baseDescriptor";
+import { SeriesSettings } from "../../settings/seriesSettings";
+import { Settings } from "../../settings/settings";
+import { IConverter } from "../converter";
+
+import {
+    IDataRepresentation,
+    IDataRepresentationAxis,
+    IDataRepresentationPoint,
+    IDataRepresentationSeries,
+    ViewportSize,
+} from "../data/dataRepresentation";
+
+import { SmoothDataConverter } from "./dataSmooth";
+
+import {
+    DataRepresentationScale,
+    DataRepresentationTypeEnum,
+} from "../data/dataRepresentationScale";
+
+import { createVarianceConverter } from "../variance/varianceConverter";
+
+import { DataFormatter } from "../data/dataFormatter";
 
 export interface IColumnGroup {
     name: string;
     values: any[];
-    columns: Array<DataViewValueColumn | DataViewCategoryColumn>;
+    columns: Array<powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn>;
 }
 
 export interface IColumnGroupByRole {
     [columnName: string]: IColumnGroup;
 }
 
-export interface IDataConverterOptions {
-    dataView: DataView;
-    settings: Settings;
-    viewport: IViewport;
+export interface IDataConverterConstructorOptions {
+    colorPalette: powerbi.extensibility.IColorPalette;
+    createSelectionIdBuilder: () => powerbi.visuals.ISelectionIdBuilder;
 }
 
-export class DataConverter implements Converter<IDataConverterOptions, DataRepresentation> {
+export interface IDataConverterOptions {
+    dataView: powerbi.DataView;
+    settings: Settings;
+    viewport: powerbi.IViewport;
+}
+
+export class DataConverter implements IConverter<IDataConverterOptions, IDataRepresentation> {
     private increasedDomainValueInPercentage: number = 0.01;
 
-    private smoothConverter: Converter<DataRepresentationPoint[], DataRepresentationPoint[]> = new SmoothDataConverter();
+    private smoothConverter: IConverter<IDataRepresentationPoint[], IDataRepresentationPoint[]> = new SmoothDataConverter();
 
-    public convert(options: IDataConverterOptions): DataRepresentation {
+    constructor(private constructorOptions: IDataConverterConstructorOptions) { }
+
+    public convert(options: IDataConverterOptions): IDataRepresentation {
         const {
             dataView,
             settings,
             viewport,
         } = options;
 
-        const dataRepresentation: DataRepresentation = this.getDefaultData(settings.kpi.percentCalcDate);
+        const dataRepresentation: IDataRepresentation = this.getDefaultData(settings.kpi.percentCalcDate);
 
         if (this.isDataViewValid(dataView)) {
-            const columns: (DataViewValueColumn | DataViewCategoryColumn)[] = [
+            const columns: Array<powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn> = [
                 ...this.getColumns(dataView.categorical.categories),
                 ...this.getColumns(dataView.categorical.values),
             ];
@@ -69,7 +109,7 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
                     dataRepresentation,
                     columnGroupByRole,
                     settings,
-                    dataView.categorical.values
+                    dataView.categorical.values,
                 );
             });
 
@@ -82,19 +122,19 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
     }
 
     public findClosestDataPointByDate(
-        dataPoints: DataRepresentationPoint[],
+        dataPoints: IDataRepresentationPoint[],
         date: Date,
-        defaultDataPoint: DataRepresentationPoint
-    ): DataRepresentationPoint {
+        defaultDataPoint: IDataRepresentationPoint,
+    ): IDataRepresentationPoint {
         if (!dataPoints || !date || !(date instanceof Date)) {
             return defaultDataPoint;
         }
 
         const dateTime: number = date.getTime();
 
-        let closestDataPoint: DataRepresentationPoint;
+        let closestDataPoint: IDataRepresentationPoint;
 
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             const currentTime: number = dataPoint.x.getTime();
 
             if (currentTime === dateTime) {
@@ -112,11 +152,48 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
         return closestDataPoint || defaultDataPoint;
     }
 
-    private getColumns<Type>(columns: Type[]): Type[] {
-        return columns.map(column => column);
+    public isDataViewValid(dataView: powerbi.DataView): boolean {
+        return !!(dataView
+            && dataView.categorical
+            && dataView.categorical.categories
+            && dataView.categorical.categories[0]
+            && dataView.categorical.categories[0].values
+            && dataView.categorical.categories[0].values.length
+            && dataView.categorical.values
+            && dataView.categorical.values.length
+        );
     }
 
-    private getViewportSize(viewport: IViewport): ViewportSize {
+    protected getColumnGroupByRole(
+        columns: Array<powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn>,
+        index: number,
+    ): IColumnGroupByRole {
+        const columnGroups: IColumnGroupByRole = {};
+
+        columns.forEach((column: powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn, valueIndex: number) => {
+            Object.keys(column.source.roles)
+                .forEach((roleName: string) => {
+                    if (!columnGroups[roleName]) {
+                        columnGroups[roleName] = {
+                            columns: [],
+                            name: roleName,
+                            values: [],
+                        };
+                    }
+
+                    columnGroups[roleName].values.push(column.values[index]);
+                    columnGroups[roleName].columns.push(column);
+                });
+        });
+
+        return columnGroups;
+    }
+
+    private getColumns<Type>(columns: Type[]): Type[] {
+        return columns.map((column) => column); // TODO: Why is it using map to create a copy of array?
+    }
+
+    private getViewportSize(viewport: powerbi.IViewport): ViewportSize {
         if (viewport.height < 120 || viewport.width < 120) {
             return ViewportSize.tiny;
         } else if (viewport.height < 180 || viewport.width < 300) {
@@ -134,36 +211,24 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
         return ViewportSize.enormous;
     }
 
-    public isDataViewValid(dataView: DataView): boolean {
-        return !!(dataView
-            && dataView.categorical
-            && dataView.categorical.categories
-            && dataView.categorical.categories[0]
-            && dataView.categorical.categories[0].values
-            && dataView.categorical.categories[0].values.length
-            && dataView.categorical.values
-            && dataView.categorical.values.length
-        );
-    }
-
-    private getDefaultData(defaultPercentCalcDate?: Date): DataRepresentation {
+    private getDefaultData(defaultPercentCalcDate?: Date): IDataRepresentation {
         return {
+            dateDifference: 0,
+            latestDate: new Date(),
+            percentCalcDate: defaultPercentCalcDate,
             series: [],
             sortedSeries: [],
-            warningState: NaN,
             viewport: { width: 0, height: 0 },
             viewportSize: ViewportSize.tiny,
-            latestDate: new Date(),
-            dateDifference: 0,
-            percentCalcDate: defaultPercentCalcDate,
+            warningState: NaN,
         };
     }
 
     private processData(
-        dataRepresentation: DataRepresentation,
+        dataRepresentation: IDataRepresentation,
         columnGroupByRole: IColumnGroupByRole,
         settings: Settings,
-        valuesColumn: DataViewValueColumns
+        valuesColumn: powerbi.DataViewValueColumns,
     ): void {
         const dateColumnGroup: IColumnGroup = columnGroupByRole[dateColumn.name];
         const valueColumnGroup: IColumnGroup = columnGroupByRole[valueColumn.name];
@@ -182,12 +247,16 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
 
         const tooltipColumnGroup: IColumnGroup = columnGroupByRole[tooltipColumn.name];
 
-        valueColumnGroup.columns.forEach((column: DataViewValueColumn, columnIndex: number) => {
+        const {
+            createSelectionIdBuilder,
+        } = this.constructorOptions;
+
+        valueColumnGroup.columns.forEach((column: powerbi.DataViewValueColumn, columnIndex: number) => {
             const x: Date = dateColumnGroup.values[0] as Date;
 
             if (x instanceof Date && x !== undefined && x !== null) {
                 if (!dataRepresentation.series[columnIndex]) {
-                    const selectionId: ISelectionId = SelectionIdBuilder.builder()
+                    const selectionId: powerbi.visuals.ISelectionId = createSelectionIdBuilder()
                         .withSeries(valuesColumn, column)
                         .withMeasure(column.source.queryName)
                         .createSelectionId();
@@ -210,41 +279,42 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
                     seriesSettings.sparklineValue.setColumnFormat(column.source.format);
                     seriesSettings.sparklineYAxis.setColumnFormat(column.source.format);
 
-                    const series: DataRepresentationSeries = {
-                        selectionId,
+                    const series: IDataRepresentationSeries = {
+                        current: undefined,
+                        dateDifference: undefined,
+                        formattedDate: "",
+                        formattedTooltip: undefined,
+                        formattedVariance: "",
                         index: dataRepresentation.series.length,
-                        settings: seriesSettings,
                         name: column.source.displayName,
                         points: [],
+                        selectionId,
+                        settings: seriesSettings,
                         smoothedPoints: [],
-                        current: undefined,
                         x: {
-                            min: undefined,
-                            max: undefined,
-                            initialMin: undefined,
                             initialMax: undefined,
+                            initialMin: undefined,
+                            max: undefined,
+                            min: undefined,
                             scale: DataRepresentationScale.create(),
                         },
                         y: {
-                            min: undefined,
-                            max: undefined,
-                            initialMin: undefined,
                             initialMax: undefined,
+                            initialMin: undefined,
+                            max: undefined,
+                            min: undefined,
                             scale: DataRepresentationScale.create(),
                         },
                         ySparkline: {
-                            min: undefined,
-                            max: undefined,
-                            initialMin: undefined,
                             initialMax: undefined,
+                            initialMin: undefined,
+                            max: undefined,
+                            min: undefined,
                             scale: DataRepresentationScale.create(),
                         },
-                        variance: undefined,
-                        formattedVariance: "",
-                        formattedDate: "",
-                        dateDifference: undefined,
-                        formattedTooltip: undefined,
+
                         tooltip: undefined,
+                        variance: undefined,
                     };
 
                     dataRepresentation.series.push(series);
@@ -253,10 +323,10 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
 
                 const y: number = valueColumnGroup.values[columnIndex] || 0;
 
-                const dataPoint: DataRepresentationPoint = {
+                const dataPoint: IDataRepresentationPoint = {
+                    index: dataRepresentation.series[columnIndex].points.length,
                     x,
                     y,
-                    index: dataRepresentation.series[columnIndex].points.length,
                 };
 
                 dataRepresentation.latestDate = x;
@@ -266,32 +336,32 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
 
                 dataRepresentation.series[columnIndex].x.min = this.getMin(
                     dataRepresentation.series[columnIndex].x.min,
-                    x
+                    x,
                 );
 
                 dataRepresentation.series[columnIndex].x.max = this.getMax(
                     dataRepresentation.series[columnIndex].x.max,
-                    x
+                    x,
                 );
 
                 dataRepresentation.series[columnIndex].y.min = this.getMin(
                     dataRepresentation.series[columnIndex].y.min,
-                    y
+                    y,
                 );
 
                 dataRepresentation.series[columnIndex].y.max = this.getMax(
                     dataRepresentation.series[columnIndex].y.max,
-                    y
+                    y,
                 );
 
                 dataRepresentation.series[columnIndex].ySparkline.min = this.getMin(
                     dataRepresentation.series[columnIndex].ySparkline.min,
-                    y
+                    y,
                 );
 
                 dataRepresentation.series[columnIndex].ySparkline.max = this.getMax(
                     dataRepresentation.series[columnIndex].ySparkline.max,
-                    y
+                    y,
                 );
 
                 const tooltip: string = tooltipColumnGroup
@@ -322,8 +392,8 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
         }
     }
 
-    private postProcessData(dataRepresentation: DataRepresentation, settings: Settings): void {
-        dataRepresentation.series.forEach((series: DataRepresentationSeries, seriesIndex: number) => {
+    private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
+        dataRepresentation.series.forEach((series: IDataRepresentationSeries, seriesIndex: number) => {
             series.x.initialMin = series.x.min;
             series.x.initialMax = series.x.max;
 
@@ -335,7 +405,7 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
 
             series.x.scale.domain(
                 [series.x.min, series.x.max],
-                DataRepresentationTypeEnum.DateType
+                DataRepresentationTypeEnum.DateType,
             );
 
             this.applyScale(series.y, series.settings.yAxis);
@@ -347,13 +417,13 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
 
             this.applyScale(series.ySparkline, series.settings.sparklineYAxis);
 
-            const startDataPoint: DataRepresentationPoint = this.findClosestDataPointByDate(
+            const startDataPoint: IDataRepresentationPoint = this.findClosestDataPointByDate(
                 series.points,
                 dataRepresentation.percentCalcDate,
-                series.points[0]
+                series.points[0],
             );
 
-            const endDataPoint: DataRepresentationPoint = series.points[series.points.length - 1];
+            const endDataPoint: IDataRepresentationPoint = series.points[series.points.length - 1];
 
             series.variance = createVarianceConverter()
                 .convert({
@@ -376,7 +446,7 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
         dataRepresentation.dateDifference = this.getDaysBetween(dataRepresentation.latestDate, new Date());
     }
 
-    private getFormattedTooltip(series: DataRepresentationSeries): string {
+    private getFormattedTooltip(series: IDataRepresentationSeries): string {
         const { settings: { tooltip } } = series;
 
         if (!tooltip.isShown) {
@@ -401,8 +471,8 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
     }
 
     private applyScale(
-        axis: DataRepresentationAxis,
-        axisDescriptor: AxisDescriptor
+        axis: IDataRepresentationAxis,
+        axisDescriptor: AxisDescriptor,
     ) {
         if ((!isNaN(axisDescriptor.min as number) && axisDescriptor.min !== null)
             || (!isNaN(axisDescriptor.defaultMin as number) && axisDescriptor.defaultMin !== null)) {
@@ -426,7 +496,7 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
 
         axis.scale.domain(
             [axis.min, axis.max],
-            DataRepresentationTypeEnum.NumberType
+            DataRepresentationTypeEnum.NumberType,
         );
     }
 
@@ -454,27 +524,5 @@ export class DataConverter implements Converter<IDataConverterOptions, DataRepre
         return value > originalValue
             ? value
             : originalValue;
-    }
-
-    protected getColumnGroupByRole(columns: (DataViewCategoryColumn | DataViewValueColumn)[], index: number): IColumnGroupByRole {
-        const columnGroups: IColumnGroupByRole = {};
-
-        columns.forEach((column: DataViewCategoryColumn | DataViewValueColumn, valueIndex: number) => {
-            Object.keys(column.source.roles)
-                .forEach((roleName: string) => {
-                    if (!columnGroups[roleName]) {
-                        columnGroups[roleName] = {
-                            name: roleName,
-                            values: [],
-                            columns: []
-                        };
-                    }
-
-                    columnGroups[roleName].values.push(column.values[index]);
-                    columnGroups[roleName].columns.push(column);
-                });
-        });
-
-        return columnGroups;
     }
 }
