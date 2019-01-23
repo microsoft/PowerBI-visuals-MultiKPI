@@ -1,0 +1,379 @@
+/*
+ *  Power BI Visualizations
+ *
+ *  Copyright (c) Microsoft Corporation
+ *  All rights reserved.
+ *  MIT License
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the ""Software""), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+
+@regularFontFamily: wf_standard-font, helvetica, arial, sans-serif;
+
+@font-face {
+    font-family: 'MultiKPIGlyph';
+    src: data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.eot') format('embedded-opentype'),
+        data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.woff') format('woff'),
+        data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.ttf') format('truetype'),
+        data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.svg') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.multiKpi_tiny {
+    font-size: 7px;
+}
+
+.multiKpi_small {
+    font-size: 10px;
+}
+
+.multiKpi_medium {
+    font-size: 12px;
+}
+
+.multiKpi_normal {
+    font-size: 20px;
+}
+
+.multiKpi_big {
+    font-size: 26px;
+}
+
+.multiKpi_huge {
+    font-size: 34px;
+}
+
+.multiKpi_enormous {
+    font-size: 40px;
+}
+
+.multiKpi_multiKpi {
+    .multiKpi_glyphIcon {
+        font-family: MultiKPIGlyph;
+        font-weight: normal;
+        font-style: normal;
+        display: inline-block;
+        position: relative;
+        line-height: 1.5em;
+    }
+
+    .displayFlex {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+    }
+
+    .justifyContentSpaceBetween {
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+    }
+
+    .justifyContentStart {
+        -webkit-box-pack: start;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+    }
+
+    .flexDirectionColumn {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+    }
+
+    .justifyContentSpaceAround {
+        -ms-flex-pack: distribute;
+        justify-content: space-around;
+    }
+
+    .textOverflowButNotHidden {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        text-align: left;
+    }
+
+    .textOverflow {
+        overflow: hidden;
+
+        .textOverflowButNotHidden();
+    }
+
+    .flexOrder(@order) {
+        -webkit-box-ordinal-group: @order + 1;
+        -ms-flex-order: @order;
+        order: @order
+    }
+
+    .flexGrow(@index) {
+        -webkit-box-flex: @index;
+        -ms-flex-positive: @index;
+        flex-grow: @index;
+    }
+
+    .alignItemsBaseline {
+        -webkit-box-align: baseline;
+        -ms-flex-align: baseline;
+        align-items: baseline;
+    }
+
+    .displayFlex();
+    .flexDirectionColumn();
+
+    .multiKpi_mainChartComponent {
+        -webkit-tap-highlight-color: transparent;
+
+        position: relative;
+
+        .multiKpi_chartComponent {
+            pointer-events: none;
+        }
+
+        .multiKpi_verticalLineComponent {
+            .multiKpi_verticalLine {
+                stroke-width: 1px;
+                stroke: #666;
+                pointer-events: none;
+            }
+        }
+
+        .multiKpi_chartLabelBaseComponent {
+            position: absolute;
+            top: 5%;
+            left: 34px;
+            width: 80.5%;
+            height: 86%;
+
+            pointer-events: none;
+
+            .displayFlex();
+            .flexDirectionColumn();
+
+            .multiKpi_chartLabelBaseComponent_header {
+                font-size: 1.4em;
+
+                @height: 27%;
+
+                min-height: @height;
+                height: @height;
+            }
+
+            .multiKpi_chartLabelBaseComponent_body {
+                .displayFlex();
+                .alignItemsBaseline();
+
+                @height: 54%;
+
+                min-height: @height;
+                height: @height;
+
+                font-size: 2.6em;
+
+                .multiKpi_chartLabelBaseComponent_items {
+                    padding-right: 12px;
+                }
+            }
+
+            .multiKpi_chartLabelBaseComponent_footer {
+                font-size: 1.2em;
+            }
+
+            .multiKpi_chartLabelBaseComponent_header,
+            .multiKpi_chartLabelBaseComponent_body {
+                .textOverflow();
+            }
+
+            .multiKpi_chartLabelBaseComponent_footer {
+                .textOverflowButNotHidden();
+            }
+
+            .multiKpi_chartLabelBaseComponent_body_variance_na {
+                font-size: 0.7em;
+            }
+        }
+
+        .multiKpi_hoverLabelComponent {
+            .multiKpi_chartLabelBaseComponent_footer {
+                .displayFlex();
+                .justifyContentSpaceBetween();
+
+                font-size: 1.4em;
+            }
+        }
+
+        .mouseover-capture-rect {
+            fill: white;
+            stroke: none;
+        }
+
+        .zero-axis {
+            stroke-width: 1;
+            stroke: #aaa;
+            fill: none;
+        }
+
+        .axis.medium,
+        .axis.large {
+            text {
+                font-size: 1.5em;
+            }
+        }
+    }
+
+    .multiKpi_sparklineComponent {
+        .multiKpi_plot {
+            overflow: hidden;
+        }
+    }
+
+    .multiKpi_chartComponent,
+    .multiKpi_svgComponentContainer {
+        overflow: visible;
+    }
+
+    .multiKpi_sparklineGroupComponent {
+        .displayFlex();
+        .justifyContentSpaceBetween();
+    }
+
+    .multiKpi_lineComponent {
+        .multiKpi_line {
+            shape-rendering: geometricprecision;
+            fill: transparent;
+        }
+    }
+
+    .multiKpi_subtitleComponent {
+        .multiKpi_subtitle {
+            .textOverflow();
+        }
+    }
+
+    .multiKpi_subtitleWarningComponent {
+        .displayFlex();
+
+        margin-top: 1px;
+
+        .multiKpi_warning {
+            .multiKpi_glyphIcon();
+            .flexOrder(1);
+
+            &::before {
+                content: '\E715';
+            }
+
+            color: rgb(232, 17, 35) !important;
+        }
+
+        .multiKpi_subtitle {
+            .flexOrder(2);
+        }
+
+        .multiKpi_dataAge {
+            .multiKpi_glyphIcon();
+            .flexOrder(3);
+            .flexGrow(1);
+
+            text-align: right;
+
+            &::before {
+                content: '\E70F';
+            }
+
+            color: rgb(53, 153, 184) !important;
+        }
+    }
+
+    .multiKpi_axisComponent {
+        @axisColor: #4F4F4F;
+
+        .tick {
+            line {
+                stroke: none;
+                display: none;
+            }
+        }
+
+        path {
+            stroke-width: 1px;
+            stroke: @axisColor;
+            fill: none;
+        }
+    }
+
+    .hidden {
+        display: none;
+    }
+}
+
+.multiKpi_printMode {
+    @blackColor: black;
+
+    .forceColor {
+        color: @blackColor !important;
+    }
+
+    .forceFill {
+        fill: @blackColor !important;
+    }
+
+    .forceStroke {
+        stroke: @blackColor !important;
+    }
+
+
+    .multiKpi_chartLabelBaseComponent_header,
+    .multiKpi_chartLabelBaseComponent_body,
+    .multiKpi_chartLabelBaseComponent_footer {
+        .multiKpi_chartLabelBaseComponent_items {
+            .forceColor();
+        }
+    }
+
+    .multiKpi_subtitle {
+        .forceColor();
+    }
+
+    .multiKpi_sparklineComponent {
+        .multiKpi_lineComponent {
+            .multiKpi_line {
+                .forceStroke();
+            }
+        }
+
+        .multiKpi_dotsComponent {
+            .multiKpi_dot {
+                .forceFill();
+            }
+        }
+    }
+
+    .multiKpi_axisComponent {
+        .tick {
+            text {
+                .forceFill();
+            }
+        }
+
+        path {
+            .forceStroke();
+        }
+    }
+}
