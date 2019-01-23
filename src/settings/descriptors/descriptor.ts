@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-export interface Descriptor {
+export interface IDescriptor {
     parse?(): void;
     setDefault?(): void;
 }

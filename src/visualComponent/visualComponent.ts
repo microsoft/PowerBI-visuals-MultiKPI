@@ -24,29 +24,16 @@
  *  THE SOFTWARE.
  */
 
-export interface VisualComponent<RenderOptionsType> {
-    /**
-     * Renders the component
-     */
-    render(options: RenderOptionsType): void;
+import powerbi from "powerbi-visuals-api";
 
-    /**
-     * Remove its DOM elements
-     */
-    clear(): void;
-
-    /**
-     * Cleans its internal state up
-     */
-    destroy(): void;
-
-    hide?(): void;
-
-    show?(): void;
-
-    toggle?(): void;
-
+export interface IVisualComponent<RenderOptionsType> {
     isShown?: boolean;
 
-    getViewport?(): IViewport;
+    render(options: RenderOptionsType): void;
+    clear(): void;
+    destroy(): void;
+    hide?(): void;
+    show?(): void;
+    toggle?(): void;
+    getViewport?(): powerbi.IViewport;
 }

@@ -24,26 +24,33 @@
  *  THE SOFTWARE.
  */
 
-export interface DataOrderConverterOptions {
-    data: DataRepresentation;
+import { IConverter } from "../converter";
+
+import {
+    IDataRepresentation,
+    IDataRepresentationSeries,
+} from "./dataRepresentation";
+
+export interface IDataOrderConverterOptions {
+    data: IDataRepresentation;
     firstSeriesName: string;
 }
 
-export class DataOrderConverter implements Converter<DataOrderConverterOptions, DataRepresentation> {
-    public convert(options: DataOrderConverterOptions): DataRepresentation {
+export class DataOrderConverter implements IConverter<IDataOrderConverterOptions, IDataRepresentation> {
+    public convert(options: IDataOrderConverterOptions): IDataRepresentation {
         const { data, firstSeriesName } = options;
 
         let selectedSeriesIndex: number = -1;
 
-        const series: DataRepresentationSeries[] = data.series.map((
-            series: DataRepresentationSeries,
-            seriesIndex: number
+        const series: IDataRepresentationSeries[] = data.series.map((
+            seriesItem: IDataRepresentationSeries,
+            seriesIndex: number,
         ) => {
-            if (series.name === firstSeriesName) {
+            if (seriesItem.name === firstSeriesName) {
                 selectedSeriesIndex = seriesIndex;
             }
 
-            return series;
+            return seriesItem;
         });
 
         if (selectedSeriesIndex >= 0) {
@@ -56,32 +63,3 @@ export class DataOrderConverter implements Converter<DataOrderConverterOptions, 
         };
     }
 }
-
-export class DataOrderConverterWithDuplicates implements Converter<DataOrderConverterOptions, DataRepresentation> {
-    public convert(options: DataOrderConverterOptions): DataRepresentation {
-        const { data, firstSeriesName } = options;
-
-        let selectedSeriesIndex: number = -1;
-
-        const series: DataRepresentationSeries[] = data.series.map((
-            series: DataRepresentationSeries,
-            seriesIndex: number
-        ) => {
-            if (series.name === firstSeriesName) {
-                selectedSeriesIndex = seriesIndex;
-            }
-
-            return series;
-        });
-
-        if (selectedSeriesIndex >= 0) {
-            series[0] = series[selectedSeriesIndex];
-        }
-
-        return {
-            ...data,
-            series,
-        };
-    }
-}
-

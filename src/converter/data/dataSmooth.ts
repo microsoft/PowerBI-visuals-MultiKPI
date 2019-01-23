@@ -24,18 +24,21 @@
  *  THE SOFTWARE.
  */
 
-export interface SmoothConstructorOptions {
+import { IConverter } from "../converter";
+import { IDataRepresentationPoint } from "../data/dataRepresentation";
+
+export interface ISmoothConstructorOptions {
     bandwidth?: number;
     robustnessIters?: number;
     accuracy?: number;
 }
 
-export class SmoothDataConverter implements Converter<DataRepresentationPoint[], DataRepresentationPoint[]> {
+export class SmoothDataConverter implements IConverter<IDataRepresentationPoint[], IDataRepresentationPoint[]> {
     private bandwidth: number = 0.1;
     private robustnessIters: number = 2;
     private accuracy: number = 1e-12;
 
-    constructor(options?: SmoothConstructorOptions) {
+    constructor(options?: ISmoothConstructorOptions) {
         if (options) {
             this.bandwidth = options.bandwidth || this.bandwidth;
             this.robustnessIters = options.robustnessIters || this.robustnessIters;
@@ -43,12 +46,12 @@ export class SmoothDataConverter implements Converter<DataRepresentationPoint[],
         }
     }
 
-    public convert(points: DataRepresentationPoint[]): DataRepresentationPoint[] {
+    public convert(points: IDataRepresentationPoint[]): IDataRepresentationPoint[] {
         const length = points.length;
 
         const bandwidthInPoints = Math.floor(this.bandwidth * length);
 
-        const resultPoints: DataRepresentationPoint[] = [];
+        const resultPoints: IDataRepresentationPoint[] = [];
         const residuals: number[] = [];
         const robustnessWeights: number[] = [];
 
@@ -147,7 +150,7 @@ export class SmoothDataConverter implements Converter<DataRepresentationPoint[],
             }
 
             for (let i: number = 0; i < length; i++) {
-                let arg: number = residuals[i] / (6 * medianResidual);
+                const arg: number = residuals[i] / (6 * medianResidual);
                 robustnessWeights[i] = (arg >= 1) ? 0 : ((w = 1 - arg * arg) * w);
             }
         }
@@ -164,9 +167,9 @@ export class SmoothDataConverter implements Converter<DataRepresentationPoint[],
     }
 
     private science_stats_loessUpdateBandwidthInterval(
-        points: DataRepresentationPoint[],
+        points: IDataRepresentationPoint[],
         i: number,
-        bandwidthInterval: number[]
+        bandwidthInterval: number[],
     ) {
         const left: number = bandwidthInterval[0];
         const right: number = bandwidthInterval[1];
@@ -185,4 +188,3 @@ export class SmoothDataConverter implements Converter<DataRepresentationPoint[],
         }
     }
 }
-

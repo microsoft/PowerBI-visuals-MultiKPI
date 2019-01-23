@@ -24,14 +24,16 @@
  *  THE SOFTWARE.
  */
 
+import powerbi from "powerbi-visuals-api";
+
 export class ScaleService {
     constructor(private rootElement: HTMLElement) { }
 
-    public getScale(): IViewport {
+    public getScale(): powerbi.IViewport {
         if (!this.rootElement) {
             return {
+                height: 1,
                 width: 1,
-                height: 1
             };
         }
 
@@ -51,8 +53,8 @@ export class ScaleService {
         }
 
         return {
+            height: rect.height / clientHeight,
             width: rect.width / clientWidth,
-            height: rect.height / clientHeight
         };
     }
 

@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import { SubtitleDescriptor } from "./subtitleDescriptor";
+
 export class SubtitleWarningDescriptor extends SubtitleDescriptor {
     public warningText: string = "Warning Message";
     public staleDataText: string = "";

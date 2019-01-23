@@ -24,14 +24,17 @@
  *  THE SOFTWARE.
  */
 
-export interface VarianceConverterOptions {
-    firstDataPoint: DataRepresentationPoint;
-    secondDataPoint: DataRepresentationPoint;
+import { IConverter } from "../converter";
+import { IDataRepresentationPoint } from "../data/dataRepresentation";
+
+export interface IVarianceConverterOptions {
+    firstDataPoint: IDataRepresentationPoint;
+    secondDataPoint: IDataRepresentationPoint;
 }
 
-export class VarianceConverter implements Converter<VarianceConverterOptions, number> {
-    public convert(options: VarianceConverterOptions): number {
-        const { secondDataPoint, firstDataPoint, } = options;
+export class VarianceConverter implements IConverter<IVarianceConverterOptions, number> {
+    public convert(options: IVarianceConverterOptions): number {
+        const { secondDataPoint, firstDataPoint } = options;
 
         return this.getPercentChange(firstDataPoint.y, secondDataPoint.y);
     }
@@ -41,7 +44,7 @@ export class VarianceConverter implements Converter<VarianceConverterOptions, nu
             return NaN;
         }
 
-        let diff: number = endValue - startValue;
+        const diff: number = endValue - startValue;
         let percentChange: number = Math.abs(diff / startValue);
 
         if (endValue < startValue) {
@@ -52,20 +55,12 @@ export class VarianceConverter implements Converter<VarianceConverterOptions, nu
     }
 }
 
-let varianceConverter: Converter<VarianceConverterOptions, number>;
+let varianceConverter: IConverter<IVarianceConverterOptions, number>;
 
-export function createVarianceConverter(): Converter<VarianceConverterOptions, number> {
+export function createVarianceConverter(): IConverter<IVarianceConverterOptions, number> {
     if (!varianceConverter) {
         varianceConverter = new VarianceConverter();
     }
 
     return varianceConverter;
-}
-
-export class VarianceChecker {
-    public static isVarianceValid(variance: number): boolean {
-        return isFinite(variance)
-            && variance !== undefined
-            && variance !== null;
-    }
 }

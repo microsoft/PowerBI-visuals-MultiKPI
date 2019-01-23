@@ -24,8 +24,39 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { IConverter } from "../converter";
 
-export interface IVisualComponentBaseConstructorOptions {
-    element?: Selection<any, any, any, any>;
+import {
+    IDataRepresentation,
+    IDataRepresentationSeries,
+} from "./dataRepresentation";
+
+import { IDataOrderConverterOptions } from "./dataOrderConverter";
+
+export class DataOrderConverterWithDuplicates implements IConverter<IDataOrderConverterOptions, IDataRepresentation> {
+    public convert(options: IDataOrderConverterOptions): IDataRepresentation {
+        const { data, firstSeriesName } = options;
+
+        let selectedSeriesIndex: number = -1;
+
+        const series: IDataRepresentationSeries[] = data.series.map((
+            seriesItem: IDataRepresentationSeries,
+            seriesIndex: number,
+        ) => {
+            if (seriesItem.name === firstSeriesName) {
+                selectedSeriesIndex = seriesIndex;
+            }
+
+            return seriesItem;
+        });
+
+        if (selectedSeriesIndex >= 0) {
+            series[0] = series[selectedSeriesIndex];
+        }
+
+        return {
+            ...data,
+            series,
+        };
+    }
 }

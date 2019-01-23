@@ -24,14 +24,18 @@
  *  THE SOFTWARE.
  */
 
+import { BaseDescriptor } from "../baseDescriptor";
+import { IDescriptor } from "../descriptor";
+import { GridDescriptor } from "../gridDescriptor";
+
 export class SparklineDescriptor
     extends BaseDescriptor
-    implements Descriptor {
+    implements IDescriptor {
+
+    public position: number = undefined;
 
     private minPosition: number = 1;
     private maxPosition: number = GridDescriptor.MaxColumns + 1;
-
-    public position: number = undefined;
 
     public parse() {
         this.position = isNaN(this.position) || this.position === null
@@ -40,8 +44,8 @@ export class SparklineDescriptor
                 this.minPosition,
                 Math.min(
                     this.maxPosition,
-                    this.position
-                )
+                    this.position,
+                ),
             );
     }
 }

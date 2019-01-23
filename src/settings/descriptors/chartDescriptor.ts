@@ -24,10 +24,10 @@
  *  THE SOFTWARE.
  */
 
-export class ChartDescriptor implements Descriptor {
-    private minThickness: number = 0.25;
-    private maxThickness: number = 25;
+import { DataRepresentationPointGradientType } from "../../converter/data/dataRepresentation";
+import { IDescriptor } from "./descriptor";
 
+export class ChartDescriptor implements IDescriptor {
     public chartType: DataRepresentationPointGradientType = DataRepresentationPointGradientType.area;
     public color: string = "#c8d9ec";
     public alternativeColor: string = "#f1f5fa";
@@ -35,13 +35,16 @@ export class ChartDescriptor implements Descriptor {
 
     public shouldRenderZeroLine: boolean = false;
 
+    private minThickness: number = 0.25;
+    private maxThickness: number = 25;
+
     public parse(): void {
         this.thickness = Math.max(
             this.minThickness,
             Math.min(
                 this.maxThickness,
-                this.thickness
-            )
+                this.thickness,
+            ),
         );
     }
 }

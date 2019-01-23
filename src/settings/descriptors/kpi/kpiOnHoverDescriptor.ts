@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import { KpiBaseDescriptor } from "./kpiBaseDescriptor";
+
 export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
     public isCurrentValueShown: boolean = true;
     public currentValueFontSize: number = 11;
@@ -48,4 +50,3 @@ export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
         }
     }
 }
-

@@ -24,6 +24,9 @@
  *  THE SOFTWARE.
  */
 
+import { DataRepresentationAxisValueType } from "../../converter/data/dataRepresentation";
+import { TextFormattingDescriptor } from "./textFormattingDescriptor";
+
 export class AxisDescriptor extends TextFormattingDescriptor {
     public axisLabelX: number = 3;
     public axisLabelY: number = 6;

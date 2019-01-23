@@ -24,10 +24,15 @@
  *  THE SOFTWARE.
  */
 
-export interface VisualComponentConstructorOptions extends VisualComponentBaseConstructorOptions {
-    getSettings?: () => Settings;
-    style?: IVisualStyle;
-    eventDispatcher?: D3.Dispatch;
-    scaleService?: ScaleService;
+import { Dispatch } from "d3-dispatch";
+import powerbi from "powerbi-visuals-api";
+
+import { IVisualComponentBaseConstructorOptions } from "./visualComponentBaseConstructorOptions";
+
+export interface IVisualComponentConstructorOptions extends IVisualComponentBaseConstructorOptions {
+    eventDispatcher?: Dispatch<any>; // TODO
     id?: number | string;
+    scaleService?: ScaleService;
+    style?: powerbi.extensibility.IColorPalette; // TODO: must be renamed
+    getSettings?: () => Settings;
 }

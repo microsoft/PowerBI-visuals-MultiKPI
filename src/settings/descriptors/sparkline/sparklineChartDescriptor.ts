@@ -24,15 +24,17 @@
  *  THE SOFTWARE.
  */
 
-export class SparklineChartDescriptor extends BaseDescriptor {
-    private minThickness: number = 0.25;
-    private maxThickness: number = 25;
+import { BaseDescriptor } from "../baseDescriptor";
 
+export class SparklineChartDescriptor extends BaseDescriptor {
     public color: string = "#217cc9";
     public alternativeColor: string = "#c7def1";
     public shouldInterpolate: boolean = true;
     public thickness: number = 1;
     public dotRadiusFactor: number = 2;
+
+    private minThickness: number = 0.25;
+    private maxThickness: number = 25;
 
     public getRadius(): number {
         return this.thickness * this.dotRadiusFactor;
@@ -43,8 +45,8 @@ export class SparklineChartDescriptor extends BaseDescriptor {
             this.minThickness,
             Math.min(
                 this.maxThickness,
-                this.thickness
-            )
+                this.thickness,
+            ),
         );
     }
 }

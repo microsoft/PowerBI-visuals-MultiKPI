@@ -24,10 +24,11 @@
  *  THE SOFTWARE.
  */
 
-export class TextFormattingDescriptor extends NumericDescriptor {
-    private minFontSize: number = 4;
-    private maxFontSize: number = 72;
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
+import { NumericDescriptor } from "./numericDescriptor";
+
+export class TextFormattingDescriptor extends NumericDescriptor {
     public autoAdjustFontSize: boolean = false;
     public autoFontSizeValue: number = 8;
     public fontSize: number = 8;
@@ -39,6 +40,9 @@ export class TextFormattingDescriptor extends NumericDescriptor {
     public fontFamily: string = `"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif`;
 
     public color: string = "#666666";
+
+    private minFontSize: number = 4;
+    private maxFontSize: number = 72;
 
     public parse(): void {
         super.parse();
@@ -55,9 +59,13 @@ export class TextFormattingDescriptor extends NumericDescriptor {
             this.minFontSize,
             Math.min(
                 this.maxFontSize,
-                this.fontSize
-            )
+                this.fontSize,
+            ),
         );
+    }
+
+    public getFontSizeInPx(fontSize: number): number {
+        return pixelConverter.fromPointToPixel(fontSize);
     }
 
     public get fontSizePx(): string {
@@ -65,7 +73,7 @@ export class TextFormattingDescriptor extends NumericDescriptor {
             return undefined;
         }
 
-        return PixelConverter.toString(this.fontSizeInPx);
+        return pixelConverter.toString(this.fontSizeInPx);
     }
 
     public get fontSizeInPx(): number {
@@ -81,12 +89,8 @@ export class TextFormattingDescriptor extends NumericDescriptor {
             this.minFontSize,
             Math.min(
                 this.maxFontSize,
-                fontSize
-            )
+                fontSize,
+            ),
         );
-    }
-
-    public getFontSizeInPx(fontSize: number): number {
-        return PixelConverter.fromPointToPixel(fontSize);
     }
 }

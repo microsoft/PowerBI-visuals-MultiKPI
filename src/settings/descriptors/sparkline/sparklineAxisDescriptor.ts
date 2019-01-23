@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import { AxisDescriptor } from "../axisDescriptor";
+
 export class SparklineAxisDescriptor extends AxisDescriptor {
     public shouldInheritValues: boolean = false;
 }

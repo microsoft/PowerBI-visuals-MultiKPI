@@ -24,15 +24,18 @@
  *  THE SOFTWARE.
  */
 
+import { IDescriptor } from "./descriptor";
+import { FormatDescriptor } from "./formatDescriptor";
+
 export class NumericDescriptor
     extends FormatDescriptor
-    implements Descriptor {
-
-    protected minPrecision: number = 0;
-    protected maxPrecision: number = 17;
+    implements IDescriptor {
 
     public displayUnits: number = 0;
     public precision: number = 0;
+
+    protected minPrecision: number = 0;
+    protected maxPrecision: number = 17;
 
     public parse() {
         this.precision = this.getValidPrecision(this.precision);
@@ -45,17 +48,20 @@ export class NumericDescriptor
 
         return Math.min(
             Math.max(this.minPrecision, precision),
-            this.maxPrecision);
+            this.maxPrecision,
+        );
     }
 
     protected hideNumericProperties(): void {
         Object.defineProperties(this, {
             displayUnits: {
-                enumerable: false
+                configurable: true,
+                enumerable: false,
             },
             precision: {
-                enumerable: false
-            }
+                configurable: true,
+                enumerable: false,
+            },
         });
     }
 }

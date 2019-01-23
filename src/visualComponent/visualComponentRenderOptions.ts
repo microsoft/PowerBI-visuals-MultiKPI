@@ -24,8 +24,10 @@
  *  THE SOFTWARE.
  */
 
-export interface VisualComponentRenderOptions extends VisualComponentRenderOptionsBase {
+import powerbi from "powerbi-visuals-api";
+
+export interface IVisualComponentRenderOptions {
     settings: Settings;
-    viewport: IViewport;
+    viewport: powerbi.IViewport;
     data: DataRepresentation;
 }

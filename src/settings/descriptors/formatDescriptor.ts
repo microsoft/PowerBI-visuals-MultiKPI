@@ -24,19 +24,12 @@
  *  THE SOFTWARE.
  */
 
+import { BaseDescriptor } from "./baseDescriptor";
+
 export class FormatDescriptor extends BaseDescriptor {
     public format: string = undefined;
     public defaultFormat: string = undefined;
     public columnFormat: string = undefined;
-
-    protected hideFormatProperty(): void {
-        Object.defineProperty(
-            this,
-            "format", {
-                enumerable: false
-            }
-        );
-    }
 
     public getFormat(): string {
         return this.format || this.columnFormat || this.defaultFormat;
@@ -56,5 +49,15 @@ export class FormatDescriptor extends BaseDescriptor {
         }
 
         return super.getValueByPropertyName(propertyName);
+    }
+
+    protected hideFormatProperty(): void {
+        Object.defineProperty(
+            this,
+            "format", {
+                configurable: true,
+                enumerable: false,
+            },
+        );
     }
 }

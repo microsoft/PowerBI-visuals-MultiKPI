@@ -24,48 +24,49 @@
  *  THE SOFTWARE.
  */
 
-    export class KpiBaseDescriptor extends TextFormattingDescriptor {
-        public isSeriesNameShown: boolean = true;
-        public seriesNameFontSize: number = 11;
-        public seriesNameColor: string = "#217CC9";
+import { TextFormattingDescriptor } from "../textFormattingDescriptor";
 
-        public isValueShown: boolean = true;
-        public valueFontSize: number = 11;
-        public valueColor: string = "#217CC9";
+export class KpiBaseDescriptor extends TextFormattingDescriptor {
+    public isSeriesNameShown: boolean = true;
+    public seriesNameFontSize: number = 11;
+    public seriesNameColor: string = "#217CC9";
 
-        public isVarianceShown: boolean = true;
-        public varianceFontSize: number = 11;
-        public varianceNotAvailableFontSize: number = 9;
-        public varianceColor: string = "#217CC9";
-        public varianceNotAvailableColor: string = "#4F4F4F";
+    public isValueShown: boolean = true;
+    public valueFontSize: number = 11;
+    public valueColor: string = "#217CC9";
 
-        public isDateShown: boolean = true;
-        public dateFontSize: number = 11;
-        public dateColor: string = "#217CC9";
+    public isVarianceShown: boolean = true;
+    public varianceFontSize: number = 11;
+    public varianceNotAvailableFontSize: number = 9;
+    public varianceColor: string = "#217CC9";
+    public varianceNotAvailableColor: string = "#4F4F4F";
 
-        constructor() {
-            super();
+    public isDateShown: boolean = true;
+    public dateFontSize: number = 11;
+    public dateColor: string = "#217CC9";
 
-            this.fontFamily = "wf_standard-font, helvetica, arial, sans-serif";
-            this.fontSize = undefined;
-        }
+    constructor() {
+        super();
 
-        public parse() {
-            super.parse();
-
-            if (this.autoAdjustFontSize) {
-                delete this.seriesNameFontSize;
-                delete this.valueFontSize;
-                delete this.varianceFontSize;
-                delete this.dateFontSize;
-                delete this.varianceNotAvailableFontSize;
-            } else {
-                 this.seriesNameFontSize = this.getValidFontSize(this.seriesNameFontSize);
-                 this.valueFontSize = this.getValidFontSize(this.valueFontSize);
-                 this.varianceFontSize = this.getValidFontSize(this.varianceFontSize);
-                 this.dateFontSize = this.getValidFontSize(this.dateFontSize);
-                 this.varianceNotAvailableFontSize = this.getValidFontSize(this.varianceNotAvailableFontSize);
-            }
-        }
+        this.fontFamily = "wf_standard-font, helvetica, arial, sans-serif";
+        this.fontSize = undefined;
     }
 
+    public parse() {
+        super.parse();
+
+        if (this.autoAdjustFontSize) {
+            delete this.seriesNameFontSize;
+            delete this.valueFontSize;
+            delete this.varianceFontSize;
+            delete this.dateFontSize;
+            delete this.varianceNotAvailableFontSize;
+        } else {
+            this.seriesNameFontSize = this.getValidFontSize(this.seriesNameFontSize);
+            this.valueFontSize = this.getValidFontSize(this.valueFontSize);
+            this.varianceFontSize = this.getValidFontSize(this.varianceFontSize);
+            this.dateFontSize = this.getValidFontSize(this.dateFontSize);
+            this.varianceNotAvailableFontSize = this.getValidFontSize(this.varianceNotAvailableFontSize);
+        }
+    }
+}

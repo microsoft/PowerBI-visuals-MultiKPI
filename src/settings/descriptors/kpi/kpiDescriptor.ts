@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import { KpiBaseDescriptor } from "./kpiBaseDescriptor";
+
 export class KpiDescriptor extends KpiBaseDescriptor {
     public percentCalcDateStr: string = null;
 

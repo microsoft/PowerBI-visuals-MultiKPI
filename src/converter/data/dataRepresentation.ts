@@ -24,7 +24,12 @@
  *  THE SOFTWARE.
  */
 
-export interface DataRepresentationPoint {
+import powerbi from "powerbi-visuals-api";
+
+import { SeriesSettings } from "../../settings/seriesSettings";
+import { DataRepresentationScale } from "./dataRepresentationScale";
+
+export interface IDataRepresentationPoint {
     x: Date;
     y: number;
     index: number;
@@ -37,7 +42,7 @@ export enum DataRepresentationPointGradientType {
 
 export type DataRepresentationAxisValueType = Date | number | string;
 
-export interface DataRepresentationAxis {
+export interface IDataRepresentationAxis {
     min: DataRepresentationAxisValueType;
     initialMin: DataRepresentationAxisValueType;
     max: DataRepresentationAxisValueType;
@@ -45,22 +50,22 @@ export interface DataRepresentationAxis {
     scale: DataRepresentationScale;
 }
 
-export interface DataRepresentationSeries {
+export interface IDataRepresentationSeries {
     name: string;
     index: number;
-    points: DataRepresentationPoint[];
-    smoothedPoints: DataRepresentationPoint[];
-    current: DataRepresentationPoint;
-    x: DataRepresentationAxis;
-    y: DataRepresentationAxis;
-    ySparkline: DataRepresentationAxis;
+    points: IDataRepresentationPoint[];
+    smoothedPoints: IDataRepresentationPoint[];
+    current: IDataRepresentationPoint;
+    x: IDataRepresentationAxis;
+    y: IDataRepresentationAxis;
+    ySparkline: IDataRepresentationAxis;
     variance: number;
     formattedVariance: string;
     formattedDate: string;
     dateDifference: number;
     tooltip: string;
     formattedTooltip: string;
-    selectionId: ISelectionId;
+    selectionId: powerbi.visuals.ISelectionId;
     settings: SeriesSettings;
 }
 
@@ -74,15 +79,15 @@ export enum ViewportSize {
     enormous = "enormous",
 }
 
-export interface DataRepresentation {
-    series: DataRepresentationSeries[];
-    sortedSeries: DataRepresentationSeries[];
+export interface IDataRepresentation {
+    series: IDataRepresentationSeries[];
+    sortedSeries: IDataRepresentationSeries[];
 
     warningState: number;
     latestDate: Date;
     dateDifference: number;
     percentCalcDate: Date;
 
-    viewport: IViewport;
+    viewport: powerbi.IViewport;
     viewportSize: ViewportSize;
 }

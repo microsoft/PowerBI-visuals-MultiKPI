@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import { BaseDescriptor } from "./baseDescriptor";
+
 export class TooltipDescriptor extends BaseDescriptor {
     public label: string = undefined;
     public showDateDifference: boolean = true;

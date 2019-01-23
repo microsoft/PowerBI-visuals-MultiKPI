@@ -24,6 +24,23 @@
  *  THE SOFTWARE.
  */
 
+import { SettingsBase } from "./settingsBase";
+
+import { AxisDescriptor } from "./descriptors/axisDescriptor";
+import { BaseDescriptor } from "./descriptors/BaseDescriptor";
+import { ChartDescriptor } from "./descriptors/chartDescriptor";
+import { FormatDescriptor } from "./descriptors/formatDescriptor";
+import { GridDescriptor } from "./descriptors/gridDescriptor";
+import { KpiDescriptor } from "./descriptors/kpi/kpiDescriptor";
+import { KpiOnHoverDescriptor } from "./descriptors/kpi/kpiOnHoverDescriptor";
+import { NumericDescriptor } from "./descriptors/numericDescriptor";
+import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
+import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
+import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
+import { SubtitleAlignment, SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
+import { SubtitleWarningDescriptor } from "./descriptors/subtitleWarningDescriptor";
+import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
+
 export class Settings extends SettingsBase {
     public date: FormatDescriptor = new FormatDescriptor();
     public values: NumericDescriptor = new NumericDescriptor();
@@ -32,7 +49,7 @@ export class Settings extends SettingsBase {
     public tooltip: TooltipDescriptor = new TooltipDescriptor();
     public kpi: KpiDescriptor = new KpiDescriptor();
     public kpiOnHover: KpiOnHoverDescriptor = new KpiOnHoverDescriptor();
-    public grid: GridDescriptor = new GridDescriptor;
+    public grid: GridDescriptor = new GridDescriptor();
     public sparkline: SparklineDescriptor = new SparklineDescriptor();
     public sparklineLabel: SubtitleDescriptor = new SubtitleDescriptor();
     public sparklineChart: SparklineChartDescriptor = new SparklineChartDescriptor();

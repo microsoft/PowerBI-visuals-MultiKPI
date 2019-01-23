@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import { TextFormattingDescriptor } from "./textFormattingDescriptor";
+
 export enum SubtitleAlignment {
     left = "left",
     center = "center",

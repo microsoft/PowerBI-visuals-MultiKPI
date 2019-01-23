@@ -30,19 +30,19 @@ export enum DataRepresentationTypeEnum {
     None,
     DateType,
     NumberType,
-    StringType
+    StringType,
 }
 
 export class DataRepresentationScale {
+    public static create(): DataRepresentationScale {
+        return new DataRepresentationScale();
+    }
+
     private baseScale: DataRepresentationAxisScale;
     private internalType: DataRepresentationTypeEnum;
 
     private constructor(scale: DataRepresentationAxisScale = null) {
         this.baseScale = scale;
-    }
-
-    public static create(): DataRepresentationScale {
-        return new DataRepresentationScale();
     }
 
     public domain(

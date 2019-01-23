@@ -24,4 +24,10 @@
  *  THE SOFTWARE.
  */
 
-export interface VisualComponentRenderOptionsBase { }
+export class VarianceChecker {
+    public static isVarianceValid(variance: number): boolean {
+        return isFinite(variance)
+            && variance !== undefined
+            && variance !== null;
+    }
+}

@@ -24,19 +24,22 @@
  *  THE SOFTWARE.
  */
 
-export class GridDescriptor implements Descriptor {
+import { IDescriptor } from "./descriptor";
+
+export class GridDescriptor implements IDescriptor {
     public static MaxColumns: number = 15;
-    private minColumns: number = 1;
 
     public columns: number = undefined;
     public toggleSparklineOnHover: boolean = true;
+
+    private minColumns: number = 1;
 
     public parse() {
         this.columns = isNaN(this.columns)
             ? this.columns
             : Math.max(
                 Math.min(this.columns, GridDescriptor.MaxColumns),
-                this.minColumns
+                this.minColumns,
             );
     }
 }

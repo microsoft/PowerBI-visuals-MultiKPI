@@ -24,43 +24,51 @@
  *  THE SOFTWARE.
  */
 
-// powerbi.extensibility.utils.dataview
-export class SettingsBase extends DataViewObjectsParser {
-    public static parseSettings(options: DataView): SettingsBase {
+import powerbi from "powerbi-visuals-api";
+
+import {
+    dataViewObjects,
+    dataViewObjectsParser,
+} from "powerbi-visuals-utils-dataviewutils";
+
+import { IDescriptor } from "./descriptors/descriptor";
+
+export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
+    public static parseSettings(options: powerbi.DataView): SettingsBase {
         const settings: SettingsBase = this.parse<SettingsBase>(options);
 
         Object.keys(settings).forEach((descriptorName: string) => {
-            if ((settings[descriptorName] as Descriptor).parse) {
-                (settings[descriptorName] as Descriptor).parse();
+            if ((settings[descriptorName] as IDescriptor).parse) {
+                (settings[descriptorName] as IDescriptor).parse();
             }
         });
 
         return settings;
     }
 
-    public parse(dataView: DataView): SettingsBase {
+    public parse(dataView: powerbi.DataView): SettingsBase {
         return this.parseObjects(dataView
             && dataView.metadata
-            && dataView.metadata.objects
+            && dataView.metadata.objects,
         );
     }
 
-    public parseObjects(objects: DataViewObjects): SettingsBase {
+    public parseObjects(objects: powerbi.DataViewObjects): SettingsBase {
         if (objects) {
-            let properties: DataViewProperties = this.getProperties();
+            const properties: dataViewObjectsParser.DataViewProperties = this.getProperties();
 
-            for (let objectName in properties) {
-                for (let propertyName in properties[objectName]) {
+            for (const objectName in properties) {
+                for (const propertyName in properties[objectName]) {
                     const defaultValue: any = this[objectName][propertyName];
 
-                    this[objectName][propertyName] = DataViewObjects.getCommonValue(
+                    this[objectName][propertyName] = dataViewObjects.DataViewObjects.getCommonValue(
                         objects,
                         properties[objectName][propertyName],
                         defaultValue);
                 }
 
-                if ((this[objectName] as Descriptor).parse) {
-                    (this[objectName] as Descriptor).parse();
+                if ((this[objectName] as IDescriptor).parse) {
+                    (this[objectName] as IDescriptor).parse();
                 }
             }
         }

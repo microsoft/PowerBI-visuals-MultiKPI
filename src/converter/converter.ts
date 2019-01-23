@@ -24,6 +24,6 @@
  *  THE SOFTWARE.
  */
 
-export interface Converter<ConverterOptionsType, DataType> {
+export interface IConverter<ConverterOptionsType, DataType> {
     convert(options: ConverterOptionsType): DataType;
 }

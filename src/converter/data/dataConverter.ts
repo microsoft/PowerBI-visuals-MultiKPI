@@ -24,28 +24,30 @@
  *  THE SOFTWARE.
  */
 
-export interface ColumnGroup {
+
+
+export interface IColumnGroup {
     name: string;
     values: any[];
-    columns: (DataViewValueColumn | DataViewCategoryColumn)[];
+    columns: Array<DataViewValueColumn | DataViewCategoryColumn>;
 }
 
-export interface ColumnGroupByRole {
-    [columnName: string]: ColumnGroup;
+export interface IColumnGroupByRole {
+    [columnName: string]: IColumnGroup;
 }
 
-export interface DataConverterOptions {
+export interface IDataConverterOptions {
     dataView: DataView;
     settings: Settings;
     viewport: IViewport;
 }
 
-export class DataConverter implements Converter<DataConverterOptions, DataRepresentation> {
+export class DataConverter implements Converter<IDataConverterOptions, DataRepresentation> {
     private increasedDomainValueInPercentage: number = 0.01;
 
     private smoothConverter: Converter<DataRepresentationPoint[], DataRepresentationPoint[]> = new SmoothDataConverter();
 
-    public convert(options: DataConverterOptions): DataRepresentation {
+    public convert(options: IDataConverterOptions): DataRepresentation {
         const {
             dataView,
             settings,
@@ -61,7 +63,7 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
             ];
 
             dataView.categorical.categories[0].values.forEach((_, index: number) => {
-                const columnGroupByRole: ColumnGroupByRole = this.getColumnGroupByRole(columns, index);
+                const columnGroupByRole: IColumnGroupByRole = this.getColumnGroupByRole(columns, index);
 
                 this.processData(
                     dataRepresentation,
@@ -77,6 +79,37 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
         dataRepresentation.viewportSize = this.getViewportSize(viewport);
 
         return dataRepresentation;
+    }
+
+    public findClosestDataPointByDate(
+        dataPoints: DataRepresentationPoint[],
+        date: Date,
+        defaultDataPoint: DataRepresentationPoint
+    ): DataRepresentationPoint {
+        if (!dataPoints || !date || !(date instanceof Date)) {
+            return defaultDataPoint;
+        }
+
+        const dateTime: number = date.getTime();
+
+        let closestDataPoint: DataRepresentationPoint;
+
+        for (let dataPoint of dataPoints) {
+            const currentTime: number = dataPoint.x.getTime();
+
+            if (currentTime === dateTime) {
+                closestDataPoint = dataPoint;
+
+                break;
+            }
+            else if (currentTime < dateTime) {
+                closestDataPoint = dataPoint;
+            } else {
+                break;
+            }
+        }
+
+        return closestDataPoint || defaultDataPoint;
     }
 
     private getColumns<Type>(columns: Type[]): Type[] {
@@ -128,12 +161,12 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
 
     private processData(
         dataRepresentation: DataRepresentation,
-        columnGroupByRole: ColumnGroupByRole,
+        columnGroupByRole: IColumnGroupByRole,
         settings: Settings,
         valuesColumn: DataViewValueColumns
     ): void {
-        const dateColumnGroup: ColumnGroup = columnGroupByRole[dateColumn.name];
-        const valueColumnGroup: ColumnGroup = columnGroupByRole[valueColumn.name];
+        const dateColumnGroup: IColumnGroup = columnGroupByRole[dateColumn.name];
+        const valueColumnGroup: IColumnGroup = columnGroupByRole[valueColumn.name];
 
         if (!dateColumnGroup
             || !dateColumnGroup.columns
@@ -147,7 +180,7 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
 
         settings.date.setColumnFormat(dateColumnGroup.columns[0].source.format);
 
-        const tooltipColumnGroup: ColumnGroup = columnGroupByRole[tooltipColumn.name];
+        const tooltipColumnGroup: IColumnGroup = columnGroupByRole[tooltipColumn.name];
 
         valueColumnGroup.columns.forEach((column: DataViewValueColumn, columnIndex: number) => {
             const x: Date = dateColumnGroup.values[0] as Date;
@@ -270,13 +303,13 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
             }
         });
 
-        const warningColumnGroup: ColumnGroup = columnGroupByRole[warningStateColumn.name];
+        const warningColumnGroup: IColumnGroup = columnGroupByRole[warningStateColumn.name];
 
         if (warningColumnGroup) {
             dataRepresentation.warningState = warningColumnGroup.values[0];
         }
 
-        const changeStartDateColumnGroup: ColumnGroup = columnGroupByRole[changeStartDateColumn.name];
+        const changeStartDateColumnGroup: IColumnGroup = columnGroupByRole[changeStartDateColumn.name];
 
         if (changeStartDateColumnGroup) {
             const date: Date = changeStartDateColumnGroup
@@ -341,37 +374,6 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
         });
 
         dataRepresentation.dateDifference = this.getDaysBetween(dataRepresentation.latestDate, new Date());
-    }
-
-    public findClosestDataPointByDate(
-        dataPoints: DataRepresentationPoint[],
-        date: Date,
-        defaultDataPoint: DataRepresentationPoint
-    ): DataRepresentationPoint {
-        if (!dataPoints || !date || !(date instanceof Date)) {
-            return defaultDataPoint;
-        }
-
-        const dateTime: number = date.getTime();
-
-        let closestDataPoint: DataRepresentationPoint;
-
-        for (let dataPoint of dataPoints) {
-            const currentTime: number = dataPoint.x.getTime();
-
-            if (currentTime === dateTime) {
-                closestDataPoint = dataPoint;
-
-                break;
-            }
-            else if (currentTime < dateTime) {
-                closestDataPoint = dataPoint;
-            } else {
-                break;
-            }
-        }
-
-        return closestDataPoint || defaultDataPoint;
     }
 
     private getFormattedTooltip(series: DataRepresentationSeries): string {
@@ -454,8 +456,8 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
             : originalValue;
     }
 
-    protected getColumnGroupByRole(columns: (DataViewCategoryColumn | DataViewValueColumn)[], index: number): ColumnGroupByRole {
-        const columnGroups: ColumnGroupByRole = {};
+    protected getColumnGroupByRole(columns: (DataViewCategoryColumn | DataViewValueColumn)[], index: number): IColumnGroupByRole {
+        const columnGroups: IColumnGroupByRole = {};
 
         columns.forEach((column: DataViewCategoryColumn | DataViewValueColumn, valueIndex: number) => {
             Object.keys(column.source.roles)
@@ -474,40 +476,5 @@ export class DataConverter implements Converter<DataConverterOptions, DataRepres
         });
 
         return columnGroups;
-    }
-}
-
-export class DataFormatter {
-    public static getFormattedVariance(variance: number): string {
-        if (!VarianceChecker.isVarianceValid(variance)) {
-            return "N/A";
-        }
-
-        return valueFormatter
-            .create({
-                format: "+0.00%;-0.00%;0.00%",
-                precision: 2,
-                value: variance,
-            })
-            .format(variance);
-    }
-
-    public static getFormattedDate(date: Date, format: string = valueFormatter.DefaultDateFormat): string {
-        return valueFormatter
-            .create({ format })
-            .format(date);
-    }
-
-    public static getFormattedValue(value: number, settings: NumericDescriptor): string {
-        return this.getValueFormatter(value, settings).format(value);
-    }
-
-    public static getValueFormatter(value: number, settings: NumericDescriptor): IValueFormatter {
-        return valueFormatter.create({
-            format: settings.getFormat(),
-            value: settings.displayUnits || value,
-            precision: settings.precision,
-            displayUnitSystemType: 2,
-        });
     }
 }
