@@ -24,14 +24,21 @@
  *  THE SOFTWARE.
  */
 
-@regularFontFamily: wf_standard-font, helvetica, arial, sans-serif;
+.multiKpi_multiKpi,
+.multiKpi_multiKpi * {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 
 @font-face {
     font-family: 'MultiKPIGlyph';
-    src: data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.eot') format('embedded-opentype'),
-        data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.woff') format('woff'),
-        data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.ttf') format('truetype'),
-        data-uri('../../../../../../Externals/StyleLibrary/asset-powerbi-font/fonts/PowerVisuals.svg') format('svg');
+    src: data-uri('../fonts/PowerVisuals.eot') format('embedded-opentype'),
+        data-uri('../fonts/PowerVisuals.woff') format('woff'),
+        data-uri('../fonts/PowerVisuals.ttf') format('truetype'),
+        data-uri('../fonts/PowerVisuals.svg') format('svg');
     font-weight: normal;
     font-style: normal;
 }
