@@ -24,23 +24,35 @@
  *  THE SOFTWARE.
  */
 
-export interface SubtitleWarningComponentRenderOptions extends SubtitleComponentRenderOptions {
+import { Selection } from "d3-selection";
+
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
+
+import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarningDescriptor";
+import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
+
+import {
+    ISubtitleComponentRenderOptions,
+    SubtitleComponent,
+} from "./subtitleComponent";
+
+export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
     dateDifference: number;
     settings: SubtitleWarningDescriptor;
 }
 
 export class SubtitleWarningComponent extends SubtitleComponent {
-    private warningSelector: ClassAndSelector = this.getSelectorWithPrefix("warning");
-    private dataAgeSelector: ClassAndSelector = this.getSelectorWithPrefix("dataAge");
+    private warningSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("warning");
+    private dataAgeSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("dataAge");
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super(options);
 
         this.element.classed(this.getClassNameWithPrefix("subtitleWarningComponent"), true);
     }
 
-    public render(options: SubtitleWarningComponentRenderOptions): void {
+    public render(options: ISubtitleWarningComponentRenderOptions): void {
         const {
             settings,
             warningState,
@@ -49,7 +61,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
         this.renderIcon(
             warningState > 0 ? settings.warningText : null,
-            this.warningSelector
+            this.warningSelector,
         );
 
         super.render(options);
@@ -62,21 +74,21 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     private renderIcon(
         title: string,
-        selector: ClassAndSelector,
+        selector: CssConstants.ClassAndSelector,
     ): void {
-        const iconSelection: D3.UpdateSelection = this.element
-            .selectAll(selector.selector)
+        const iconSelection: Selection<any, string, any, any> = this.element
+            .selectAll(selector.selectorName)
             .data(title ? [title] : []);
-
-        iconSelection
-            .enter()
-            .append("div")
-            .classed(selector.class, true);
-
-        iconSelection.attr("title", (title: string) => title);
 
         iconSelection
             .exit()
             .remove();
+
+        iconSelection
+            .enter()
+            .append("div")
+            .classed(selector.className, true)
+            .merge(iconSelection)
+            .attr("title", (titleData: string) => titleData);
     }
 }

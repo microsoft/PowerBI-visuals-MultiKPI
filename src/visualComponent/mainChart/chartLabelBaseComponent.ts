@@ -24,92 +24,98 @@
  *  THE SOFTWARE.
  */
 
-export interface RenderGroup {
+import { Selection } from "d3-selection";
+
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
+
+import { BaseComponent } from "../baseComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+export interface IRenderGroup {
     data: string;
     isShown: boolean;
     color?: string;
-    selector?: ClassAndSelector;
+    selector?: CssConstants.ClassAndSelector;
     fontSizeInPt?: number;
 }
 
-export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseComponent<VisualComponentConstructorOptions, RenderOptions> {
+export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseComponent<IVisualComponentConstructorOptions, RenderOptions> {
+    protected headerSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_header`);
+    protected bodySelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_body`);
+    protected footerSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_footer`);
+
+    protected varianceNotAvailableSelector: CssConstants.ClassAndSelector
+        = this.getSelectorWithPrefix(`${this.className}_body_variance_na`);
+
     private className: string = "chartLabelBaseComponent";
+    private itemSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_items`);
 
-    private itemSelector: ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_items`);
-
-    protected headerSelector: ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_header`);
-    protected bodySelector: ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_body`);
-    protected footerSelector: ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_footer`);
-
-    protected varianceNotAvailableSelector: ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_body_variance_na`);
-
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
-            this.className
+            this.className,
         );
 
         this.constructorOptions = {
             ...options,
-            element: this.element
+            element: this.element,
         };
     }
 
     protected renderGroup(
-        selector: ClassAndSelector,
-        data: RenderGroup[],
+        selector: CssConstants.ClassAndSelector,
+        renderGroupDate: IRenderGroup[],
     ): void {
-        const selection: D3.UpdateSelection = this.element
-            .selectAll(selector.selector)
-            .data([data]);
+        const selection: Selection<any, IRenderGroup[], any, any> = this.element
+            .selectAll(selector.selectorName)
+            .data([renderGroupDate]);
 
         selection
+            .exit()
+            .remove();
+
+        const mergedSelection = selection
             .enter()
             .append("div")
-            .classed(selector.class, true);
+            .classed(selector.className, true)
+            .merge(selection);
 
-        const itemSelection: D3.UpdateSelection = selection
-            .selectAll(this.itemSelector.selector)
-            .data((data: RenderGroup[]) => {
-                return data.filter((renderGroup: RenderGroup) => {
+        const itemSelection: Selection<any, IRenderGroup, any, any> = mergedSelection
+            .selectAll(this.itemSelector.selectorName)
+            .data((data: IRenderGroup[]) => {
+                return data.filter((renderGroup: IRenderGroup) => {
                     return renderGroup && renderGroup.isShown;
                 });
             });
 
         itemSelection
-            .enter()
-            .append("div");
+            .exit()
+            .remove();
 
         itemSelection
-            .attr("class", (data: RenderGroup) => {
-                const baseSelector: string = this.itemSelector.class;
+            .enter()
+            .append("div")
+            .merge(itemSelection)
+            .attr("class", (data: IRenderGroup) => {
+                const baseSelector: string = this.itemSelector.className;
 
                 return data.selector
-                    ? `${baseSelector} ${data.selector.class}`
+                    ? `${baseSelector} ${data.selector.className}`
                     : baseSelector;
             })
-            .text((data: RenderGroup) => data.data)
-            .style({
-                "color": (data: RenderGroup) => data.color,
-                "font-size": (data: RenderGroup) => {
-                    if (!data.fontSizeInPt || isNaN(data.fontSizeInPt)) {
-                        return null;
-                    }
+            .text((data: IRenderGroup) => data.data)
+            .style("color", (data: IRenderGroup) => data.color)
+            .style("font-size", (data: IRenderGroup) => {
+                if (!data.fontSizeInPt || isNaN(data.fontSizeInPt)) {
+                    return null;
+                }
 
-                    const fontSizeInPx: number = PixelConverter.fromPointToPixel(data.fontSizeInPt);
+                const fontSizeInPx: number = pixelConverter.fromPointToPixel(data.fontSizeInPt);
 
-                    return PixelConverter.toString(fontSizeInPx);
-                },
+                return pixelConverter.toString(fontSizeInPx);
             });
-
-        itemSelection
-            .exit()
-            .remove();
-
-        selection
-            .exit()
-            .remove();
     }
 }

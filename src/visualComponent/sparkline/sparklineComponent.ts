@@ -24,7 +24,6 @@
  *  THE SOFTWARE.
  */
 
-
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
 import powerbi from "powerbi-visuals-api";
@@ -44,7 +43,7 @@ import { DataFormatter } from "../../converter/data/dataFormatter";
 
 import { EventName } from "../../event/eventName";
 
-import { SubtitleComponentRenderOptions } from "../subtitleComponent";
+import { ISubtitleComponentRenderOptions } from "../subtitleComponent";
 
 import { SubtitleDescriptor } from "../../settings/descriptors/subtitleDescriptor";
 
@@ -62,9 +61,9 @@ export interface ISparklineComponentRenderOptions {
 export class SparklineComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, any> {
     private className: string = "sparklineComponent";
 
-    private topLabelComponent: IVisualComponent<SubtitleComponentRenderOptions>;
+    private topLabelComponent: IVisualComponent<ISubtitleComponentRenderOptions>;
     private plotComponent: IVisualComponent<any>;
-    private bottomLabelComponent: IVisualComponent<SubtitleComponentRenderOptions>;
+    private bottomLabelComponent: IVisualComponent<ISubtitleComponentRenderOptions>;
 
     constructor(options: IVisualComponentConstructorOptions) {
         super();

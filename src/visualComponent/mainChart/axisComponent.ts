@@ -24,15 +24,36 @@
  *  THE SOFTWARE.
  */
 
+import { axisRight } from "d3-axis";
+import { ScaleLinear } from "d3-scale";
+import { select as d3Select } from "d3-selection";
+
+import powerbi from "powerbi-visuals-api";
+
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
+
+import {
+    DataRepresentationAxisValueType,
+    IDataRepresentationAxis,
+    IDataRepresentationSeries,
+} from "../../converter/data/dataRepresentation";
+
+import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
+
+import { AxisDescriptor } from "../../settings/descriptors/axisDescriptor";
+
+import { BaseComponent } from "../baseComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
 export interface IAxisComponentRenderOptions {
-    viewport: IViewport;
+    viewport: powerbi.IViewport;
     settings: AxisDescriptor;
-    series: DataRepresentationSeries;
-    y: DataRepresentationAxis;
+    series: IDataRepresentationSeries;
+    y: IDataRepresentationAxis;
 }
 
-export class AxisComponent extends BaseComponent<VisualComponentConstructorOptions, IAxisComponentRenderOptions> {
-    constructor(options: VisualComponentConstructorOptions) {
+export class AxisComponent extends BaseComponent<IVisualComponentConstructorOptions, IAxisComponentRenderOptions> {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
@@ -71,36 +92,30 @@ export class AxisComponent extends BaseComponent<VisualComponentConstructorOptio
 
         const domain: number[] = yScale.getDomain() as number[];
 
-        const axisValueFormatter: IValueFormatter = valueFormatter.create({
-            format: settings.getFormat(),
-            value: settings.displayUnits || domain[1] || domain[0],
-            precision: settings.precision,
+        const axisValueFormatter: valueFormatter.IValueFormatter = valueFormatter.valueFormatter.create({
             displayUnitSystemType: 2,
+            format: settings.getFormat(),
+            precision: settings.precision,
+            value: settings.displayUnits || domain[1] || domain[0],
         });
 
-        const yAxis = d3.svg.axis()
-            .scale(yScale.getScale())
+        const yAxis = axisRight(yScale.getScale() as ScaleLinear<number, number>) // TODO: This is a place for potential issue
             .tickValues(domain)
             .tickFormat((value: number) => {
                 return axisValueFormatter.format(value);
-            })
-            .orient("right");
+            });
 
         this.element.call(yAxis);
 
         this.element
             .selectAll(".tick text")
-            .each(function (_, elementIndex: number) {
-                d3.select(this)
-                    .attr({
-                        x: settings.axisLabelX,
-                        y: elementIndex
-                            ? settings.axisLabelY
-                            : -settings.axisLabelY
-                    })
-                    .style({
-                        fill: settings.color,
-                    });
+            .each(function enumerateEachTextTick(_, elementIndex: number) {
+                d3Select(this)
+                    .attr("x", settings.axisLabelX)
+                    .attr("y", elementIndex
+                        ? settings.axisLabelY
+                        : -settings.axisLabelY)
+                    .style("fill", settings.color);
             });
 
         this.updateFormatting(this.element, settings);

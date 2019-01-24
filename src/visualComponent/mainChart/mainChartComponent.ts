@@ -24,21 +24,42 @@
  *  THE SOFTWARE.
  */
 
-export class MainChartComponent extends BaseContainerComponent<VisualComponentConstructorOptions, VisualComponentRenderOptions, any> {
-    private chart: VisualComponent<ChartComponentRenderOptions>;
-    private chartLabel: VisualComponent<ChartLabelComponentRenderOptions>;
+import { Dispatch } from "d3-dispatch";
+import { mouse as d3Mouse } from "d3-selection";
 
-    constructor(options: VisualComponentConstructorOptions) {
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+import { IVisualComponentRenderOptions } from "../visualComponentRenderOptions";
+
+import { IVisualComponent } from "../visualComponent";
+
+import { EventName } from "../../event/eventName";
+
+import {
+    ChartComponent,
+    IChartComponentRenderOptions,
+} from "./chartComponent";
+
+import {
+    ChartLabelComponent,
+    IChartLabelComponentRenderOptions,
+} from "./chartLabelComponent";
+
+export class MainChartComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, IVisualComponentRenderOptions, any> {
+    private chart: IVisualComponent<IChartComponentRenderOptions>;
+    private chartLabel: IVisualComponent<IChartLabelComponentRenderOptions>;
+
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
-            "mainChartComponent"
+            "mainChartComponent",
         );
 
         this.constructorOptions = {
             ...options,
-            element: this.element
+            element: this.element,
         };
 
         this.chart = new ChartComponent(this.constructorOptions);
@@ -52,49 +73,15 @@ export class MainChartComponent extends BaseContainerComponent<VisualComponentCo
         this.initMouseEvents();
     }
 
-    private initMouseEvents(): void {
-        const eventDispatcher: D3.Dispatch = this.constructorOptions.eventDispatcher;
-
-        const onMouseMove = function (e: any) {
-            d3.event.preventDefault();
-            d3.event.stopPropagation();
-            d3.event.stopImmediatePropagation();
-
-            eventDispatcher[EventName.onMouseMove](d3.mouse(this));
-        };
-
-        this.element.on("mousemove", onMouseMove);
-        this.element.on("touchmove", onMouseMove);
-        this.element.on("touchstart", onMouseMove);
-
-        const onMouseOut = function (e: any) {
-            d3.event.preventDefault();
-            d3.event.stopPropagation();
-            d3.event.stopImmediatePropagation();
-
-            eventDispatcher[EventName.onMouseOut]();
-            eventDispatcher[EventName.onChartChangeStop]();
-            eventDispatcher[EventName.onChartViewReset]();
-        };
-
-        this.element.on("mouseout", onMouseOut);
-        this.element.on("mouseleave", onMouseOut);
-        this.element.on("touchleave", onMouseOut);
-
-        this.element.on("mouseenter", () => {
-            this.constructorOptions.eventDispatcher[EventName.onChartChangeStop]();
-        });
-    }
-
-    public render(options: VisualComponentRenderOptions): void {
+    public render(options: IVisualComponentRenderOptions): void {
         const { viewport } = options;
 
         this.updateSize(viewport.width, viewport.height);
 
-        const data: ChartComponentRenderOptions = {
-            viewport,
+        const data: IChartComponentRenderOptions = {
             series: options.data.series[0],
             settings: options.settings,
+            viewport,
             viewportSize: options.data.viewportSize,
         };
 
@@ -102,14 +89,52 @@ export class MainChartComponent extends BaseContainerComponent<VisualComponentCo
 
         this.element.attr(
             "title",
-            data.series && data.series.formattedTooltip || null
+            data.series && data.series.formattedTooltip || null,
         );
 
         this.chartLabel.render({
-            viewport,
-            series: data.series,
-            kpiSettings: options.settings.kpi,
             dateSettings: options.settings.date,
+            kpiSettings: options.settings.kpi,
+            series: data.series,
+            viewport,
+        });
+    }
+
+    private initMouseEvents(): void {
+        const eventDispatcher: Dispatch<any> = this.constructorOptions.eventDispatcher;
+
+        function onMouseMove(e: any) {
+            const event: MouseEvent = require("d3").event;
+
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            eventDispatcher[EventName.onMouseMove](d3Mouse(this));
+        }
+
+        this.element.on("mousemove", onMouseMove);
+        this.element.on("touchmove", onMouseMove);
+        this.element.on("touchstart", onMouseMove);
+
+        function onMouseOut(e: any) {
+            const event: MouseEvent = require("d3").event;
+
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            eventDispatcher[EventName.onMouseOut]();
+            eventDispatcher[EventName.onChartChangeStop]();
+            eventDispatcher[EventName.onChartViewReset]();
+        }
+
+        this.element.on("mouseout", onMouseOut);
+        this.element.on("mouseleave", onMouseOut);
+        this.element.on("touchleave", onMouseOut);
+
+        this.element.on("mouseenter", () => {
+            this.constructorOptions.eventDispatcher[EventName.onChartChangeStop]();
         });
     }
 }

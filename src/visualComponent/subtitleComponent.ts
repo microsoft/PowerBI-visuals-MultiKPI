@@ -24,30 +24,42 @@
  *  THE SOFTWARE.
  */
 
-export interface SubtitleComponentRenderOptions {
+import { Selection } from "d3-selection";
+
+import powerbi from "powerbi-visuals-api";
+
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
+import { pixelConverter } from "powerbi-visuals-utils-typeutils";
+
+import { SubtitleDescriptor } from "../settings/descriptors/subtitleDescriptor";
+
+import { BaseComponent } from "./baseComponent";
+import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
+
+export interface ISubtitleComponentRenderOptions {
     settings: SubtitleDescriptor;
 }
 
-export class SubtitleComponent extends BaseComponent<VisualComponentConstructorOptions, SubtitleComponentRenderOptions> {
+export class SubtitleComponent extends BaseComponent<IVisualComponentConstructorOptions, ISubtitleComponentRenderOptions> {
+    protected subtitleSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("subtitle");
+
     private className: string = "subtitleComponent";
 
-    protected subtitleSelector: ClassAndSelector = this.getSelectorWithPrefix("subtitle");
-
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
-            this.className
+            this.className,
         );
 
         this.constructorOptions = {
             ...options,
-            element: this.element
+            element: this.element,
         };
     }
 
-    public render(options: SubtitleComponentRenderOptions): void {
+    public render(options: ISubtitleComponentRenderOptions): void {
         const { settings } = options;
 
         if (settings.shouldBeShown()) {
@@ -58,38 +70,7 @@ export class SubtitleComponent extends BaseComponent<VisualComponentConstructorO
         }
     }
 
-    private renderComponent(settings: SubtitleDescriptor): void {
-        const subtitleSelection: D3.UpdateSelection = this.element
-            .selectAll(this.subtitleSelector.selector)
-            .data(settings.shouldBeShown() ? [[]] : []);
-
-        subtitleSelection
-            .enter()
-            .append("div")
-            .classed(this.subtitleSelector.class, true);
-
-        subtitleSelection
-            .text(settings.titleText)
-            .style("text-align", settings.alignment);
-
-        this.updateFormatting(this.element, settings);
-
-        this.element.style({
-            "background-color": settings.background,
-            "padding-top": settings.paddingTop ?
-                PixelConverter.toString(settings.paddingTop)
-                : null,
-            "padding-bottom": settings.paddingBottom
-                ? PixelConverter.toString(settings.paddingBottom)
-                : null,
-        });
-
-        subtitleSelection
-            .exit()
-            .remove();
-    }
-
-    public getViewport(): IViewport {
+    public getViewport(): powerbi.IViewport {
         const height: number = this.element && this.isShown
             ? $(this.element.node()).height()
             : 0;
@@ -98,5 +79,36 @@ export class SubtitleComponent extends BaseComponent<VisualComponentConstructorO
             height,
             width: this.width,
         };
+    }
+
+    private renderComponent(settings: SubtitleDescriptor): void {
+        const subtitleSelection: Selection<any, any, any, any> = this.element
+            .selectAll(this.subtitleSelector.selectorName)
+            .data(settings.shouldBeShown() ? [[]] : []);
+
+        subtitleSelection
+            .exit()
+            .remove();
+
+        subtitleSelection
+            .enter()
+            .append("div")
+            .classed(this.subtitleSelector.className, true)
+            .merge(subtitleSelection)
+            .text(settings.titleText)
+            .style("text-align", settings.alignment);
+
+        this.updateFormatting(this.element, settings);
+
+        this.element
+            .style("background-color", settings.background)
+            .style("padding-top", settings.paddingTop ?
+                pixelConverter.toString(settings.paddingTop)
+                : null,
+            )
+            .style("padding-bottom", settings.paddingBottom
+                ? pixelConverter.toString(settings.paddingBottom)
+                : null,
+            );
     }
 }

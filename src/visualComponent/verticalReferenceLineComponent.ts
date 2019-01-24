@@ -24,29 +24,50 @@
  *  THE SOFTWARE.
  */
 
-export interface VerticalReferenceLineComponentRenderOptions extends VisualComponentRenderOptionsBase {
+import powerbi from "powerbi-visuals-api";
+
+import { Selection } from "d3-selection";
+
+import { CssConstants } from "powerbi-visuals-utils-svgutils";
+
+import { BaseComponent } from "./baseComponent";
+
+import {
+    IDataRepresentationPoint,
+    IDataRepresentationSeries,
+} from "../converter/data/dataRepresentation";
+
+import { FormatDescriptor } from "../settings/descriptors/formatDescriptor";
+import { KpiDescriptor } from "../settings/descriptors/kpi/kpiDescriptor";
+
+import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
+
+import { DataRepresentationScale } from "../converter/data/dataRepresentationScale";
+
+export interface IVerticalReferenceLineComponentRenderOptions {
     offset: number;
-    viewport: IViewport;
-    series: DataRepresentationSeries;
-    dataPoint: DataRepresentationPoint;
+    viewport: powerbi.IViewport;
+    series: IDataRepresentationSeries;
+    dataPoint: IDataRepresentationPoint;
     kpiSettings: KpiDescriptor;
     dateSettings: FormatDescriptor;
 }
 
-export class VerticalReferenceLineComponent extends BaseComponent<VisualComponentConstructorOptions, VerticalReferenceLineComponentRenderOptions> {
-    private lineSelector: ClassAndSelector = this.getSelectorWithPrefix("verticalLine");
+export class VerticalReferenceLineComponent
+    extends BaseComponent<IVisualComponentConstructorOptions, IVerticalReferenceLineComponentRenderOptions> {
+    private lineSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("verticalLine");
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
             "verticalLineComponent",
-            "g"
+            "g",
         );
     }
 
-    public render(options: VerticalReferenceLineComponentRenderOptions): void {
+    public render(options: IVerticalReferenceLineComponentRenderOptions): void {
         const {
             offset,
             viewport,
@@ -60,25 +81,22 @@ export class VerticalReferenceLineComponent extends BaseComponent<VisualComponen
 
         const xPosition: number = xScale.scale(dataPoint && dataPoint.x);
 
-        const lineSelection: D3.UpdateSelection = this.element
-            .selectAll(this.lineSelector.selector)
+        const lineSelection: Selection<any, IDataRepresentationPoint, any, any> = this.element
+            .selectAll(this.lineSelector.selectorName)
             .data(dataPoint ? [dataPoint] : []);
-
-        lineSelection
-            .enter()
-            .append("line")
-            .classed(this.lineSelector.class, true);
-
-        lineSelection
-            .attr({
-                x1: xPosition,
-                x2: xPosition,
-                y1: 0,
-                y2: viewport.height,
-            });
 
         lineSelection
             .exit()
             .remove();
+
+        lineSelection
+            .enter()
+            .append("line")
+            .classed(this.lineSelector.className, true)
+            .merge(lineSelection)
+            .attr("x1", xPosition)
+            .attr("x2", xPosition)
+            .attr("y1", 0)
+            .attr("y2", viewport.height);
     }
 }

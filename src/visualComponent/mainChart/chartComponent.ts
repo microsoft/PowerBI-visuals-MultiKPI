@@ -24,42 +24,90 @@
  *  THE SOFTWARE.
  */
 
-export interface ZeroLineRenderOptions {
-    series: DataRepresentationSeries;
+import { bisector } from "d3-array";
+import { Selection } from "d3-selection";
+import { line } from "d3-shape";
+
+import powerbi from "powerbi-visuals-api";
+
+import { IMargin } from "powerbi-visuals-utils-svgutils";
+
+import {
+    IDataRepresentationPoint,
+    IDataRepresentationSeries,
+    ViewportSize,
+} from "../../converter/data/dataRepresentation";
+
+import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
+
+import { ChartDescriptor } from "../../settings/descriptors/chartDescriptor";
+import { Settings } from "../../settings/settings";
+
+import {
+    ILineComponentRenderOptions,
+    LineComponent,
+} from "../sparkline/lineComponent";
+
+import {
+    AxisComponent,
+    IAxisComponentRenderOptions,
+} from "./axisComponent";
+
+import { BaseContainerComponent } from "../baseContainerComponent";
+import { IVisualComponent } from "../visualComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import { IHoverLabelComponentRenderOptions } from "./hoverLabelComponent";
+
+import { EventName } from "../../event/eventName";
+
+import {
+    IVerticalReferenceLineComponentRenderOptions,
+    VerticalReferenceLineComponent,
+} from "../verticalReferenceLineComponent";
+
+import { HoverLabelComponent } from "./hoverLabelComponent";
+
+export interface IZeroLineRenderOptions {
+    series: IDataRepresentationSeries;
     chart: ChartDescriptor;
-    viewport: IViewport;
+    viewport: powerbi.IViewport;
 }
 
-export interface ChartComponentRenderOptions extends VisualComponentRenderOptionsBase {
-    series: DataRepresentationSeries;
-    viewport: IViewport;
+export interface IChartComponentRenderOptions {
+    series: IDataRepresentationSeries;
+    viewport: powerbi.IViewport;
     settings: Settings;
     viewportSize: ViewportSize;
 }
 
-export interface ChartComponentInnerRenderOptions extends LineComponentRenderOptions {
+export interface IChartComponentInnerRenderOptions extends ILineComponentRenderOptions {
     settings: ChartDescriptor;
 }
 
-export class ChartComponent extends BaseContainerComponent<VisualComponentConstructorOptions, ChartComponentRenderOptions, VisualComponentRenderOptionsBase> {
-    private dataBisector: Function = d3.bisector((d: DataRepresentationPoint) => { return d.x; }).left;
+export class ChartComponent extends BaseContainerComponent<
+    IVisualComponentConstructorOptions,
+    IChartComponentRenderOptions,
+    {}
+    > {
+    private dataBisector = bisector((d: IDataRepresentationPoint) => d.x).left;
 
     private className: string = "chartComponent";
 
-    private zeroLineSelection: D3.Selection;
+    private zeroLineSelection: Selection<any, any, any, any>;
 
-    private axisComponent: VisualComponent<AxisComponentRenderOptions>;
-    private lineComponent: VisualComponent<LineComponentRenderOptions>;
+    private axisComponent: IVisualComponent<IAxisComponentRenderOptions>;
+    private lineComponent: IVisualComponent<ILineComponentRenderOptions>;
 
-    private dynamicComponents: VisualComponent<HoverLabelComponentRenderOptions>[] = [];
+    private dynamicComponents: Array<IVisualComponent<IHoverLabelComponentRenderOptions>> = [];
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(
             options.element,
             this.className,
-            "svg"
+            "svg",
         );
 
         this.constructorOptions = {
@@ -97,16 +145,16 @@ export class ChartComponent extends BaseContainerComponent<VisualComponentConstr
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onMouseOut}.${this.className}`,
             () => {
-                const latestDataPoint: DataRepresentationPoint = this.renderOptions
+                const latestDataPoint: IDataRepresentationPoint = this.renderOptions
                     && this.renderOptions.series
                     && this.renderOptions.series.points
                     && this.renderOptions.series.points[this.renderOptions.series.points.length - 1];
 
                 this.constructorOptions.eventDispatcher[EventName.onCurrentDataPointIndexReset](latestDataPoint
                     ? latestDataPoint.index
-                    : NaN
+                    : NaN,
                 );
-            }
+            },
         );
 
         this.constructorOptions.eventDispatcher.on(
@@ -120,10 +168,71 @@ export class ChartComponent extends BaseContainerComponent<VisualComponentConstr
         );
     }
 
+    public render(options: IChartComponentRenderOptions): void {
+        this.renderOptions = options;
+
+        const {
+            series,
+            settings,
+            viewport,
+        } = options;
+
+        this.hideComponents();
+        this.updateSize(viewport.width, viewport.height);
+
+        if (!series) {
+            this.hide();
+        } else {
+            this.show();
+        }
+
+        this.renderZeroLine({
+            chart: settings.chart,
+            series,
+            viewport,
+        });
+
+        this.lineComponent.render({
+            alternativeColor: settings.chart.alternativeColor,
+            color: settings.chart.color,
+            points: series.points,
+            thickness: settings.chart.thickness,
+            type: settings.chart.chartType,
+            viewport,
+            x: series.x,
+            y: series.y,
+        });
+
+        const margin: IMargin = this.getMarginByThickness(settings.chart.thickness);
+
+        this.updateMargin(this.element, margin);
+
+        this.axisComponent.render({
+            series,
+            settings: series.settings.yAxis,
+            viewport,
+            y: series.y,
+        });
+    }
+
+    public destroy(): void {
+        super.destroy(this.dynamicComponents);
+
+        this.zeroLineSelection.remove();
+
+        super.destroy();
+
+        this.dynamicComponents = null;
+        this.components = null;
+        this.dataBisector = null;
+        this.lineComponent = null;
+        this.axisComponent = null;
+    }
+
     private hideComponents(): void {
         this.forEach(
             this.dynamicComponents,
-            (component: VisualComponent<any>) => {
+            (component: IVisualComponent<any>) => {
                 component.hide();
             });
     }
@@ -133,7 +242,7 @@ export class ChartComponent extends BaseContainerComponent<VisualComponentConstr
             return NaN;
         }
 
-        let areaScale: IViewport = this.constructorOptions.scaleService.getScale();
+        const areaScale: powerbi.IViewport = this.constructorOptions.scaleService.getScale();
 
         const width: number = this.width;
 
@@ -159,79 +268,29 @@ export class ChartComponent extends BaseContainerComponent<VisualComponentConstr
             return;
         }
 
-        const dataPoint: DataRepresentationPoint = this.renderOptions.series.points[index];
+        const dataPoint: IDataRepresentationPoint = this.renderOptions.series.points[index];
 
-        const data: HoverLabelComponentRenderOptions = {
+        const data: IHoverLabelComponentRenderOptions = {
             dataPoint,
-            viewport: {
-                width: this.width,
-                height: this.height,
-            },
-            series: this.renderOptions.series,
-            offset: 0,
-            kpiSettings: this.renderOptions.settings.kpi,
             dateSettings: this.renderOptions.settings.date,
             kpiOnHoverSettings: this.renderOptions.settings.kpiOnHover,
+            kpiSettings: this.renderOptions.settings.kpi,
+            offset: 0,
+            series: this.renderOptions.series,
+            viewport: { width: this.width, height: this.height },
         };
 
         this.forEach(
             this.dynamicComponents,
-            (component: VisualComponent<VerticalReferenceLineComponentRenderOptions>) => {
+            (component: IVisualComponent<IVerticalReferenceLineComponentRenderOptions>) => {
                 component.show();
 
                 component.render(data);
-            }
+            },
         );
     }
 
-    public render(options: ChartComponentRenderOptions): void {
-        this.renderOptions = options;
-
-        const {
-            series,
-            settings,
-            viewport,
-        } = options;
-
-        this.hideComponents();
-        this.updateSize(viewport.width, viewport.height);
-
-        if (!series) {
-            this.hide();
-        } else {
-            this.show();
-        }
-
-        this.renderZeroLine({
-            series,
-            viewport,
-            chart: settings.chart,
-        });
-
-        this.lineComponent.render({
-            viewport,
-            x: series.x,
-            y: series.y,
-            points: series.points,
-            color: settings.chart.color,
-            type: settings.chart.chartType,
-            thickness: settings.chart.thickness,
-            alternativeColor: settings.chart.alternativeColor,
-        });
-
-        const margin: IMargin = this.getMarginByThickness(settings.chart.thickness);
-
-        this.updateMargin(this.element, margin);
-
-        this.axisComponent.render({
-            series,
-            viewport,
-            y: series.y,
-            settings: series.settings.yAxis,
-        });
-    }
-
-    private renderZeroLine(options: ZeroLineRenderOptions) {
+    private renderZeroLine(options: IZeroLineRenderOptions) {
         const {
             series,
             chart,
@@ -247,32 +306,16 @@ export class ChartComponent extends BaseContainerComponent<VisualComponentConstr
             .range([viewport.height, 0]);
 
         if (chart.shouldRenderZeroLine) {
-            let axisLine = d3.svg.line()
-                .x((d: DataRepresentationPoint) => xScale.scale(d.x))
+            const axisLine = line<IDataRepresentationPoint>()
+                .x((d: IDataRepresentationPoint) => xScale.scale(d.x))
                 .y(() => yScale.scale(0));
 
             this.zeroLineSelection
                 .datum(series.points)
                 .classed("hidden", false)
-                .attr({
-                    "d": axisLine as any
-                });
+                .attr("d", axisLine);
         } else {
             this.zeroLineSelection.classed("hidden", true);
         }
-    }
-
-    public destroy(): void {
-        super.destroy(this.dynamicComponents);
-
-        this.zeroLineSelection.remove();
-
-        super.destroy();
-
-        this.dynamicComponents = null;
-        this.components = null;
-        this.dataBisector = null;
-        this.lineComponent = null;
-        this.axisComponent = null;
     }
 }

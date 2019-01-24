@@ -24,21 +24,37 @@
  *  THE SOFTWARE.
  */
 
-export interface HoverLabelComponentRenderOptions extends VerticalReferenceLineComponentRenderOptions {
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
+
+import { ChartLabelBaseComponent } from "./chartLabelBaseComponent";
+
+import { createVarianceConverter } from "../../converter/variance/varianceConverter";
+
+import { DataFormatter } from "../../converter/data/dataFormatter";
+import { IDataRepresentationPoint } from "../../converter/data/dataRepresentation";
+
+import { VarianceChecker } from "../../converter/variance/varianceChecker";
+
+import { IVerticalReferenceLineComponentRenderOptions } from "../verticalReferenceLineComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import { KpiOnHoverDescriptor } from "../../settings/descriptors/kpi/kpiOnHoverDescriptor";
+
+export interface IHoverLabelComponentRenderOptions extends IVerticalReferenceLineComponentRenderOptions {
     kpiOnHoverSettings: KpiOnHoverDescriptor;
 }
 
-export class HoverLabelComponent extends ChartLabelBaseComponent<HoverLabelComponentRenderOptions> {
-    constructor(options: VisualComponentConstructorOptions) {
+export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComponentRenderOptions> {
+    constructor(options: IVisualComponentConstructorOptions) {
         super(options);
 
         this.element.classed(
             this.getClassNameWithPrefix("hoverLabelComponent"),
-            true
+            true,
         );
     }
 
-    public render(options: HoverLabelComponentRenderOptions) {
+    public render(options: IHoverLabelComponentRenderOptions) {
         const {
             series,
             dataPoint,
@@ -56,7 +72,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<HoverLabelCompo
             this.show();
         }
 
-        const latestDataPoint: DataRepresentationPoint = series.points[series.points.length - 1];
+        const latestDataPoint: IDataRepresentationPoint = series.points[series.points.length - 1];
 
         const variance: number = createVarianceConverter()
             .convert({
@@ -64,19 +80,19 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<HoverLabelCompo
                 secondDataPoint: latestDataPoint,
             });
 
-        const formatter: IValueFormatter = DataFormatter.getValueFormatter(
+        const formatter: valueFormatter.IValueFormatter = DataFormatter.getValueFormatter(
             latestDataPoint.y,
-            series.settings.values
+            series.settings.values,
         );
 
         this.renderGroup(
             this.headerSelector,
             [
                 {
-                    data: series.name,
                     color: kpiOnHoverSettings.seriesNameColor,
-                    isShown: kpiOnHoverSettings.isSeriesNameShown,
+                    data: series.name,
                     fontSizeInPt: kpiOnHoverSettings.seriesNameFontSize,
+                    isShown: kpiOnHoverSettings.isSeriesNameShown,
                 },
             ],
 
@@ -88,24 +104,24 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<HoverLabelCompo
             this.bodySelector,
             [
                 {
-                    data: formatter.format(latestDataPoint.y),
                     color: kpiOnHoverSettings.valueColor,
-                    isShown: kpiOnHoverSettings.isValueShown,
+                    data: formatter.format(latestDataPoint.y),
                     fontSizeInPt: kpiOnHoverSettings.valueFontSize,
+                    isShown: kpiOnHoverSettings.isValueShown,
                 },
                 {
-                    data: `(${DataFormatter.getFormattedVariance(variance)})`,
-                    selector: isVarianceValid || !kpiOnHoverSettings.autoAdjustFontSize
-                        ? undefined
-                        : this.varianceNotAvailableSelector,
                     color: isVarianceValid
                         ? kpiOnHoverSettings.varianceColor
                         : kpiOnHoverSettings.varianceNotAvailableColor,
-                    isShown: kpiOnHoverSettings.isVarianceShown,
+                    data: `(${DataFormatter.getFormattedVariance(variance)})`,
                     fontSizeInPt: isVarianceValid
                         ? kpiOnHoverSettings.varianceFontSize
                         : kpiOnHoverSettings.varianceNotAvailableFontSize,
-                }
+                    isShown: kpiOnHoverSettings.isVarianceShown,
+                    selector: isVarianceValid || !kpiOnHoverSettings.autoAdjustFontSize
+                        ? undefined
+                        : this.varianceNotAvailableSelector,
+                },
             ],
         );
 
@@ -113,16 +129,16 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<HoverLabelCompo
             this.footerSelector,
             [
                 {
-                    data: formatter.format(dataPoint.y),
-                    isShown: kpiOnHoverSettings.isCurrentValueShown,
-                    fontSizeInPt: kpiOnHoverSettings.currentValueFontSize,
                     color: kpiOnHoverSettings.currentValueColor,
+                    data: formatter.format(dataPoint.y),
+                    fontSizeInPt: kpiOnHoverSettings.currentValueFontSize,
+                    isShown: kpiOnHoverSettings.isCurrentValueShown,
                 },
                 {
-                    data: DataFormatter.getFormattedDate(dataPoint.x, dateSettings.getFormat()),
-                    isShown: kpiOnHoverSettings.isDateShown,
-                    fontSizeInPt: kpiOnHoverSettings.dateFontSize,
                     color: kpiOnHoverSettings.dateColor,
+                    data: DataFormatter.getFormattedDate(dataPoint.x, dateSettings.getFormat()),
+                    fontSizeInPt: kpiOnHoverSettings.dateFontSize,
+                    isShown: kpiOnHoverSettings.isDateShown,
                 },
             ],
         );

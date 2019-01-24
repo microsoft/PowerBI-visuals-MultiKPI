@@ -24,36 +24,51 @@
  *  THE SOFTWARE.
  */
 
-export interface ChartLabelComponentRenderOptions extends VisualComponentRenderOptionsBase {
+import powerbi from "powerbi-visuals-api";
+
+import { FormatDescriptor } from "../../settings/descriptors/formatDescriptor";
+import { KpiDescriptor } from "../../settings/descriptors/kpi/kpiDescriptor";
+
+import { IDataRepresentationSeries } from "../../converter/data/dataRepresentation";
+
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+
+import { ChartLabelBaseComponent } from "./chartLabelBaseComponent";
+
+import { DataFormatter } from "../../converter/data/dataFormatter";
+import { VarianceChecker } from "../../converter/variance/varianceChecker";
+import { EventName } from "../../event/eventName";
+
+export interface IChartLabelComponentRenderOptions {
     dateSettings: FormatDescriptor;
     kpiSettings: KpiDescriptor;
-    series: DataRepresentationSeries;
-    viewport: IViewport;
+    series: IDataRepresentationSeries;
+    viewport: powerbi.IViewport;
 }
 
-export class ChartLabelComponent extends ChartLabelBaseComponent<ChartLabelComponentRenderOptions> {
+export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComponentRenderOptions> {
     private componentClassName: string = "chartLabelComponent";
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super(options);
 
         this.element.classed(
             this.getClassNameWithPrefix(this.componentClassName),
-            true
+            true,
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onMouseMove}.${this.componentClassName}`,
-            this.hide.bind(this)
+            this.hide.bind(this),
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onMouseOut}.${this.componentClassName}`,
-            this.show.bind(this)
+            this.show.bind(this),
         );
     }
 
-    public render(options: ChartLabelComponentRenderOptions): void {
+    public render(options: IChartLabelComponentRenderOptions): void {
         const {
             series,
             kpiSettings,
@@ -75,12 +90,12 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<ChartLabelCompo
             this.headerSelector,
             [
                 {
-                    data: series.name,
-                    isShown: kpiSettings.isSeriesNameShown,
-                    fontSizeInPt: kpiSettings.seriesNameFontSize,
                     color: kpiSettings.seriesNameColor,
-                }
-            ]
+                    data: series.name,
+                    fontSizeInPt: kpiSettings.seriesNameFontSize,
+                    isShown: kpiSettings.isSeriesNameShown,
+                },
+            ],
         );
 
         const isVarianceValid: boolean = VarianceChecker.isVarianceValid(series.variance);
@@ -89,37 +104,37 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<ChartLabelCompo
             this.bodySelector,
             [
                 {
-                    data: DataFormatter.getFormattedValue(value, series.settings.values),
-                    isShown: kpiSettings.isValueShown,
-                    fontSizeInPt: kpiSettings.valueFontSize,
                     color: kpiSettings.valueColor,
+                    data: DataFormatter.getFormattedValue(value, series.settings.values),
+                    fontSizeInPt: kpiSettings.valueFontSize,
+                    isShown: kpiSettings.isValueShown,
                 },
                 {
-                    data: `(${series.formattedVariance})`,
-                    selector: isVarianceValid || !kpiSettings.autoAdjustFontSize
-                        ? undefined
-                        : this.varianceNotAvailableSelector,
                     color: isVarianceValid
                         ? kpiSettings.varianceColor
                         : kpiSettings.varianceNotAvailableColor,
-                    isShown: kpiSettings.isVarianceShown,
+                    data: `(${series.formattedVariance})`,
                     fontSizeInPt: isVarianceValid
                         ? kpiSettings.varianceFontSize
                         : kpiSettings.varianceNotAvailableFontSize,
-                }
-            ]
+                    isShown: kpiSettings.isVarianceShown,
+                    selector: isVarianceValid || !kpiSettings.autoAdjustFontSize
+                        ? undefined
+                        : this.varianceNotAvailableSelector,
+                },
+            ],
         );
 
         this.renderGroup(
             this.footerSelector,
             [
                 {
-                    data: `${series.dateDifference} days`,
-                    isShown: kpiSettings.isDateShown,
-                    fontSizeInPt: kpiSettings.dateFontSize,
                     color: kpiSettings.dateColor,
-                }
-            ]
+                    data: `${series.dateDifference} days`,
+                    fontSizeInPt: kpiSettings.dateFontSize,
+                    isShown: kpiSettings.isDateShown,
+                },
+            ],
         );
     }
 }

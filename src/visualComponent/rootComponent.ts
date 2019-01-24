@@ -24,18 +24,38 @@
  *  THE SOFTWARE.
  */
 
-export class RootComponent extends BaseContainerComponent<VisualComponentConstructorOptions, VisualComponentRenderOptions, any> {
+import powerbi from "powerbi-visuals-api";
+
+import { mouse as d3Mouse } from "d3-selection";
+
+import { BaseContainerComponent } from "./baseContainerComponent";
+
+import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
+
+import { ISubtitleWarningComponentRenderOptions } from "./subtitleWarningComponent";
+import { IVisualComponent } from "./visualComponent";
+import { IVisualComponentRenderOptions } from "./visualComponentRenderOptions";
+
+import { EventName } from "../event/eventName";
+
+import { MainChartComponent } from "./mainChart/mainChartComponent";
+import { SparklineGroupComponent } from "./sparkline/sparklineGroupComponent";
+import { SubtitleWarningComponent } from "./subtitleWarningComponent";
+
+import { ViewportSize } from "../converter/data/dataRepresentation";
+
+export class RootComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, IVisualComponentRenderOptions, any> {
     private className: string = "multiKpi";
 
     private printModeClassName: string = this.getClassNameWithPrefix("printMode");
 
-    private mainChartComponent: VisualComponent<VisualComponentRenderOptions>;
-    private sparklineGroupComponent: VisualComponent<VisualComponentRenderOptions>;
-    private subtitleComponent: VisualComponent<SubtitleWarningComponentRenderOptions>;
+    private mainChartComponent: IVisualComponent<IVisualComponentRenderOptions>;
+    private sparklineGroupComponent: IVisualComponent<IVisualComponentRenderOptions>;
+    private subtitleComponent: IVisualComponent<ISubtitleWarningComponentRenderOptions>;
 
     private isPrintModeActivated: boolean = false;
 
-    private mainChartComponentViewport: IViewport;
+    private mainChartComponentViewport: powerbi.IViewport;
 
     private onChartChangeDelay: number = 300;
     private onChartChangeTimer: number = null;
@@ -43,7 +63,7 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
     private currentlyHoveringChartName: string = undefined;
     private startCoordinates: [number, number];
 
-    constructor(options: VisualComponentConstructorOptions) {
+    constructor(options: IVisualComponentConstructorOptions) {
         super();
 
         this.initElement(options.element, this.className);
@@ -51,7 +71,7 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
         this.constructorOptions = {
             ...options,
-            element: this.element
+            element: this.element,
         };
 
         this.mainChartComponent = new MainChartComponent(this.constructorOptions);
@@ -66,85 +86,36 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onChartChangeClick}.${this.className}`,
-            this.onChartChangeClickHandler.bind(this)
+            this.onChartChangeClickHandler.bind(this),
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onChartChangeHover}.${this.className}`,
-            this.onChartChangeHoverHandler.bind(this)
+            this.onChartChangeHoverHandler.bind(this),
         );
 
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onChartChangeStop}.${this.className}`,
-            this.clearHoverValues.bind(this)
+            this.clearHoverValues.bind(this),
         );
 
         this.element.on("mousemove", this.mousemoveHandler.bind(this));
 
         this.element.on(
             "mouseout",
-            this.onChartViewReset.bind(this)
+            this.onChartViewReset.bind(this),
         );
         this.element.on(
             "mouseleave",
-            this.onChartViewReset.bind(this)
+            this.onChartViewReset.bind(this),
         );
         this.element.on(
             "touchleave",
-            this.onChartViewReset.bind(this)
+            this.onChartViewReset.bind(this),
         );
     }
 
-    private mousemoveHandler(): void {
-        d3.event.preventDefault();
-        d3.event.stopPropagation();
-        d3.event.stopImmediatePropagation();
-
-        if (!this.startCoordinates) {
-            return;
-        }
-
-        const coordinates: [number, number] = d3.mouse(this.element.node()) as [number, number];
-        const delay: number = this.getOnChartChangeDelay(coordinates);
-
-        if (delay) {
-            this.clearOnChartChangeTimer();
-
-            this.onChartChangeTimer = setTimeout(
-                this.applyCurrentlyHoveringChartName.bind(
-                    this,
-                    this.currentlyHoveringChartName,
-                    coordinates,
-                ),
-                delay
-            );
-        } else {
-            this.applyCurrentlyHoveringChartName(
-                this.currentlyHoveringChartName,
-                coordinates,
-            );
-        }
-    }
-
-    private getOnChartChangeDelay([x, y]): number {
-        const scale: IViewport = this.constructorOptions.scaleService.getScale();
-
-        const scaledX: number = x / scale.width;
-        const scaledY: number = y / scale.height;
-
-        const isCursorInRegion: boolean = this.startCoordinates
-            && this.mainChartComponentViewport
-            && scaledY > this.mainChartComponentViewport.height
-            && scaledX >= 0
-            && scaledX < this.mainChartComponentViewport.width
-            && y < this.startCoordinates[1];
-
-        return isCursorInRegion
-            ? this.onChartChangeDelay
-            : 0;
-    }
-
-    public render(options: VisualComponentRenderOptions) {
+    public render(options: IVisualComponentRenderOptions) {
         const previousViewportSize: ViewportSize = this.renderOptions
             && this.renderOptions.data
             && this.renderOptions.data.viewportSize;
@@ -164,7 +135,7 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
         this.updateFontSizeAccordingToViewportSize(
             options.data.viewportSize,
-            previousViewportSize
+            previousViewportSize,
         );
 
         if (this.isExecutedInPhantomJs()) {
@@ -174,25 +145,84 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
         }
     }
 
-    private renderComponent(options: VisualComponentRenderOptions): void {
+    public destroy(): void {
+        super.destroy();
+
+        this.mainChartComponent = null;
+        this.sparklineGroupComponent = null;
+        this.subtitleComponent = null;
+    }
+
+    private mousemoveHandler(): void {
+        const event: MouseEvent = require("d3").event;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        if (!this.startCoordinates) {
+            return;
+        }
+
+        const coordinates: [number, number] = d3Mouse(this.element.node()) as [number, number];
+        const delay: number = this.getOnChartChangeDelay(coordinates);
+
+        if (delay) {
+            this.clearOnChartChangeTimer();
+
+            this.onChartChangeTimer = setTimeout(
+                this.applyCurrentlyHoveringChartName.bind(
+                    this,
+                    this.currentlyHoveringChartName,
+                    coordinates,
+                ),
+                delay,
+            ) as unknown as number;
+        } else {
+            this.applyCurrentlyHoveringChartName(
+                this.currentlyHoveringChartName,
+                coordinates,
+            );
+        }
+    }
+
+    private getOnChartChangeDelay([x, y]): number {
+        const scale: powerbi.IViewport = this.constructorOptions.scaleService.getScale();
+
+        const scaledX: number = x / scale.width;
+        const scaledY: number = y / scale.height;
+
+        const isCursorInRegion: boolean = this.startCoordinates
+            && this.mainChartComponentViewport
+            && scaledY > this.mainChartComponentViewport.height
+            && scaledX >= 0
+            && scaledX < this.mainChartComponentViewport.width
+            && y < this.startCoordinates[1];
+
+        return isCursorInRegion
+            ? this.onChartChangeDelay
+            : 0;
+    }
+
+    private renderComponent(options: IVisualComponentRenderOptions): void {
         const {
             data,
             settings,
         } = options;
 
         this.subtitleComponent.render({
+            dateDifference: data.dateDifference,
             settings: settings.subtitle,
             warningState: data.warningState,
-            dateDifference: data.dateDifference,
         });
 
         const subtitleComponentHeight: number = this.subtitleComponent.getViewport().height;
 
         const viewportFactor: number = this.getViewportFactorByViewportSize(data.viewportSize);
 
-        const viewport: IViewport = {
-            width: options.viewport.width,
+        const viewport: powerbi.IViewport = {
             height: options.viewport.height / viewportFactor,
+            width: options.viewport.width,
         };
 
         this.mainChartComponent.render({
@@ -210,7 +240,7 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
             ...options,
             data: {
                 ...options.data,
-                series: options.data.series.slice(1)
+                series: options.data.series.slice(1),
             },
             viewport: {
                 height,
@@ -229,21 +259,13 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
     private updateFontSizeAccordingToViewportSize(
         viewportSize: ViewportSize,
-        previousViewportSize: ViewportSize
+        previousViewportSize: ViewportSize,
     ): void {
         if (previousViewportSize) {
             this.element.classed(this.getClassNameWithPrefix(previousViewportSize), false);
         }
 
         this.element.classed(this.getClassNameWithPrefix(viewportSize), true);
-    }
-
-    public destroy(): void {
-        super.destroy();
-
-        this.mainChartComponent = null;
-        this.sparklineGroupComponent = null;
-        this.subtitleComponent = null;
     }
 
     private turnOnPrintMode(): void {
@@ -284,7 +306,9 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
             window.addEventListener("beforeprint", this.turnOnPrintMode.bind(this));
             window.addEventListener("afterprint", this.turnOffPrintMode.bind(this));
         }
-        catch (_) { } // No need to handle this exception as CVs do not have any logger so far
+        catch (_) {
+            // No need to handle this exception as CVs do not have any logger so far
+        }
     }
 
     /**
@@ -313,7 +337,7 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
     private onChartChangeHoverHandler(
         seriesName: string,
-        coordinates: number[]
+        coordinates: number[],
     ): void {
         const toggleSparklineOnHover: boolean = this.renderOptions
             && this.renderOptions.settings
@@ -330,7 +354,7 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
             this.startCoordinates = (coordinates
                 ? coordinates
-                : d3.mouse(this.element.node())) as [number, number];
+                : d3Mouse(this.element.node())) as [number, number];
 
             if (!this.constructorOptions
                 || !this.constructorOptions.eventDispatcher
@@ -362,13 +386,15 @@ export class RootComponent extends BaseContainerComponent<VisualComponentConstru
 
             this.onChartChangeHoverHandler(
                 currentlyHoveringChartName,
-                positions as [number, number]
+                positions as [number, number],
             );
         }
     }
 
     private onChartViewReset(): void {
-        if (d3.event.target !== this.element.node()) {
+        const event: MouseEvent = require("d3").event;
+
+        if (event.target !== this.element.node()) {
             return;
         }
 
