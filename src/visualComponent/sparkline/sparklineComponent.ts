@@ -85,7 +85,9 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             event.stopPropagation();
             event.stopImmediatePropagation();
 
-            this.constructorOptions.eventDispatcher[EventName.onChartChangeClick](
+            this.constructorOptions.eventDispatcher.call(
+                EventName.onChartChangeClick,
+                undefined,
                 this.renderOptions && this.renderOptions.current && this.renderOptions.current.name,
             );
         });

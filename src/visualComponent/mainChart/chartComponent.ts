@@ -139,7 +139,11 @@ export class ChartComponent extends BaseContainerComponent<
             .on(`${EventName.onMouseMove}.${this.className}`, ([leftPosition]) => {
                 const index: number = this.getDataPointIndexByPosition(leftPosition);
 
-                this.constructorOptions.eventDispatcher[EventName.onCurrentDataPointIndexChange](index);
+                this.constructorOptions.eventDispatcher.call(
+                    EventName.onCurrentDataPointIndexChange,
+                    undefined,
+                    index,
+                );
             });
 
         this.constructorOptions.eventDispatcher.on(
@@ -150,9 +154,12 @@ export class ChartComponent extends BaseContainerComponent<
                     && this.renderOptions.series.points
                     && this.renderOptions.series.points[this.renderOptions.series.points.length - 1];
 
-                this.constructorOptions.eventDispatcher[EventName.onCurrentDataPointIndexReset](latestDataPoint
-                    ? latestDataPoint.index
-                    : NaN,
+                this.constructorOptions.eventDispatcher.call(
+                    EventName.onCurrentDataPointIndexReset,
+                    undefined,
+                    latestDataPoint
+                        ? latestDataPoint.index
+                        : NaN,
                 );
             },
         );

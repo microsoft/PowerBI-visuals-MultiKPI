@@ -332,7 +332,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             return;
         }
 
-        this.constructorOptions.eventDispatcher[EventName.onChartChange](seriesName);
+        this.constructorOptions.eventDispatcher.call(EventName.onChartChange, undefined, seriesName);
     }
 
     private onChartChangeHoverHandler(
@@ -362,7 +362,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
                 return;
             }
 
-            this.constructorOptions.eventDispatcher[EventName.onChartViewChange](seriesName);
+            this.constructorOptions.eventDispatcher.call(EventName.onChartViewChange, undefined, seriesName);
         } else if (this.currentChartName && this.currentChartName !== seriesName) {
             this.currentlyHoveringChartName = seriesName;
         }
@@ -400,7 +400,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
         this.clearHoverValues();
 
-        this.constructorOptions.eventDispatcher[EventName.onChartViewReset]();
+        this.constructorOptions.eventDispatcher.call(EventName.onChartViewReset);
     }
 
     private clearHoverValues(): void {

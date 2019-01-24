@@ -27,7 +27,7 @@
 import { SettingsBase } from "./settingsBase";
 
 import { AxisDescriptor } from "./descriptors/axisDescriptor";
-import { BaseDescriptor } from "./descriptors/BaseDescriptor";
+import { BaseDescriptor } from "./descriptors/baseDescriptor";
 import { ChartDescriptor } from "./descriptors/chartDescriptor";
 import { FormatDescriptor } from "./descriptors/formatDescriptor";
 import { GridDescriptor } from "./descriptors/gridDescriptor";

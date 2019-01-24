@@ -72,7 +72,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
 
     public getViewport(): powerbi.IViewport {
         const height: number = this.element && this.isShown
-            ? $(this.element.node()).height()
+            ? (this.element.node() as HTMLElement).clientHeight
             : 0;
 
         return {

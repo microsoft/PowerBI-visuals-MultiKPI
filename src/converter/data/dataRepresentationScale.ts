@@ -75,7 +75,7 @@ export class DataRepresentationScale {
         }
 
         if (scale) {
-            scale.domain(values);
+            (scale as any).domain(values); // "as any" is some kind of hack for TS to build it well
         }
 
         this.baseScale = scale;
@@ -97,7 +97,7 @@ export class DataRepresentationScale {
             return 0;
         }
 
-        return this.baseScale(value);
+        return (this.baseScale as any)(value); // "as any" is some kind of hack for TS to build it well
     }
 
     public copy(): DataRepresentationScale {

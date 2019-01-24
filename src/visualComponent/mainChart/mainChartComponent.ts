@@ -110,7 +110,7 @@ export class MainChartComponent extends BaseContainerComponent<IVisualComponentC
             event.stopPropagation();
             event.stopImmediatePropagation();
 
-            eventDispatcher[EventName.onMouseMove](d3Mouse(this));
+            eventDispatcher.call(EventName.onMouseMove, undefined, d3Mouse(this));
         }
 
         this.element.on("mousemove", onMouseMove);
@@ -124,9 +124,9 @@ export class MainChartComponent extends BaseContainerComponent<IVisualComponentC
             event.stopPropagation();
             event.stopImmediatePropagation();
 
-            eventDispatcher[EventName.onMouseOut]();
-            eventDispatcher[EventName.onChartChangeStop]();
-            eventDispatcher[EventName.onChartViewReset]();
+            eventDispatcher.call(EventName.onMouseOut);
+            eventDispatcher.call(EventName.onChartChangeStop);
+            eventDispatcher.call(EventName.onChartViewReset);
         }
 
         this.element.on("mouseout", onMouseOut);
@@ -134,7 +134,7 @@ export class MainChartComponent extends BaseContainerComponent<IVisualComponentC
         this.element.on("touchleave", onMouseOut);
 
         this.element.on("mouseenter", () => {
-            this.constructorOptions.eventDispatcher[EventName.onChartChangeStop]();
+            this.constructorOptions.eventDispatcher.call(EventName.onChartChangeStop);
         });
     }
 }

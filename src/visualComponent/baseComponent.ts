@@ -209,23 +209,21 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
             return;
         }
 
-        const styleObject: any = {};
+        const formatedWidth: string = width !== undefined && width !== null
+            ? pixelConverter.toString(width)
+            : null;
 
-        styleObject.width
-            = styleObject["min-width"]
-            = styleObject["max-width"]
-            = width !== undefined && width !== null
-                ? pixelConverter.toString(width)
-                : null;
+        const formatedHeight: string = height !== undefined && height !== null
+            ? pixelConverter.toString(height)
+            : null;
 
-        styleObject.height
-            = styleObject["min-height"]
-            = styleObject["max-height"]
-            = height !== undefined && height !== null
-                ? pixelConverter.toString(height)
-                : null;
-
-        this.element.style(styleObject);
+        this.element
+            .style("min-width", formatedWidth)
+            .style("max-width", formatedWidth)
+            .style("width", formatedWidth)
+            .style("min-height", formatedHeight)
+            .style("max-height", formatedHeight)
+            .style("height", formatedHeight);
     }
 
     protected updateElementOrder(element: Selection<any, any, any, any>, order: number): void {

@@ -41,6 +41,8 @@ export interface IRenderGroup {
 }
 
 export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseComponent<IVisualComponentConstructorOptions, RenderOptions> {
+    protected className: string = "chartLabelBaseComponent";
+
     protected headerSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_header`);
     protected bodySelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_body`);
     protected footerSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_footer`);
@@ -48,7 +50,6 @@ export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseCompone
     protected varianceNotAvailableSelector: CssConstants.ClassAndSelector
         = this.getSelectorWithPrefix(`${this.className}_body_variance_na`);
 
-    private className: string = "chartLabelBaseComponent";
     private itemSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix(`${this.className}_items`);
 
     constructor(options: IVisualComponentConstructorOptions) {
