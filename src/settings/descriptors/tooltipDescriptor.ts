@@ -27,7 +27,7 @@
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class TooltipDescriptor extends BaseDescriptor {
-    public label: string = undefined;
+    public label: string = null;
     public showDateDifference: boolean = true;
     public showVariance: boolean = true;
     public showDate: boolean = true;

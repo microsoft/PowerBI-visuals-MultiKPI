@@ -31,10 +31,10 @@ export class AxisDescriptor extends TextFormattingDescriptor {
     public axisLabelX: number = 3;
     public axisLabelY: number = 6;
 
-    public min: DataRepresentationAxisValueType = undefined;
-    public defaultMin: DataRepresentationAxisValueType = undefined;
-    public max: DataRepresentationAxisValueType = undefined;
-    public defaultMax: DataRepresentationAxisValueType = undefined;
+    public min: DataRepresentationAxisValueType = null;
+    public defaultMin: DataRepresentationAxisValueType = null;
+    public max: DataRepresentationAxisValueType = null;
+    public defaultMax: DataRepresentationAxisValueType = null;
 
     constructor() {
         super();
@@ -46,13 +46,13 @@ export class AxisDescriptor extends TextFormattingDescriptor {
     }
 
     public getMin(): DataRepresentationAxisValueType {
-        return this.min === undefined || this.min === null
+        return this.min == null
             ? this.defaultMin
             : this.min;
     }
 
     public getMax(): DataRepresentationAxisValueType {
-        return this.max === undefined || this.max === null
+        return this.max == null
             ? this.defaultMax
             : this.max;
     }

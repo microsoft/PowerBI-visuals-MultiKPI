@@ -234,6 +234,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             const typeOfValue: string = typeof value;
 
             if (typeOfValue === "undefined"
+                || value === null
                 || typeOfValue === "number"
                 || typeOfValue === "string"
                 || typeOfValue === "boolean"

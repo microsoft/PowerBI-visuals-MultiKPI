@@ -27,9 +27,9 @@
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class FormatDescriptor extends BaseDescriptor {
-    public format: string = undefined;
-    public defaultFormat: string = undefined;
-    public columnFormat: string = undefined;
+    public format: string = null;
+    public defaultFormat: string = null;
+    public columnFormat: string = null;
 
     public getFormat(): string {
         return this.format || this.columnFormat || this.defaultFormat;

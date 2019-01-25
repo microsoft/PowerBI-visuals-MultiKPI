@@ -29,13 +29,13 @@ import { IDescriptor } from "./descriptor";
 export class GridDescriptor implements IDescriptor {
     public static MaxColumns: number = 15;
 
-    public columns: number = undefined;
+    public columns: number = null;
     public toggleSparklineOnHover: boolean = true;
 
     private minColumns: number = 1;
 
     public parse() {
-        this.columns = isNaN(this.columns)
+        this.columns = isNaN(this.columns) || this.columns === null
             ? this.columns
             : Math.max(
                 Math.min(this.columns, GridDescriptor.MaxColumns),

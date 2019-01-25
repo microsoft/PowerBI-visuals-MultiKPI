@@ -32,7 +32,7 @@ export class SparklineDescriptor
     extends BaseDescriptor
     implements IDescriptor {
 
-    public position: number = undefined;
+    public position: number = null;
 
     private minPosition: number = 1;
     private maxPosition: number = GridDescriptor.MaxColumns + 1;
