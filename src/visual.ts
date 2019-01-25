@@ -81,7 +81,6 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
         } = options;
 
         this.dataConverter = new DataConverter({
-            colorPalette: null,
             createSelectionIdBuilder: host.createSelectionIdBuilder.bind(host),
         });
 

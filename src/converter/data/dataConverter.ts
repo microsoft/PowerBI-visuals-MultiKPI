@@ -70,7 +70,6 @@ export interface IColumnGroupByRole {
 }
 
 export interface IDataConverterConstructorOptions {
-    colorPalette: powerbi.extensibility.IColorPalette;
     createSelectionIdBuilder: () => powerbi.visuals.ISelectionIdBuilder;
 }
 
