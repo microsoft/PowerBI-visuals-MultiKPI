@@ -1,3 +1,6 @@
+# Multi KPI
+
+> Shows a KPI metric along with other metrics as sparklines
 
 # Contributing
 
