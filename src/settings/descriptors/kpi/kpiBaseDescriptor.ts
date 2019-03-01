@@ -61,6 +61,7 @@ export class KpiBaseDescriptor extends TextFormattingDescriptor {
             delete this.varianceFontSize;
             delete this.dateFontSize;
             delete this.varianceNotAvailableFontSize;
+            delete this.fontSize;
         } else {
             this.seriesNameFontSize = this.getValidFontSize(this.seriesNameFontSize);
             this.valueFontSize = this.getValidFontSize(this.valueFontSize);
@@ -68,5 +69,13 @@ export class KpiBaseDescriptor extends TextFormattingDescriptor {
             this.dateFontSize = this.getValidFontSize(this.dateFontSize);
             this.varianceNotAvailableFontSize = this.getValidFontSize(this.varianceNotAvailableFontSize);
         }
+    }
+
+    public get fontSizePx(): string {
+        if (!this.fontSize) {
+            return undefined;
+        }
+
+        return this.fontSizePx;
     }
 }

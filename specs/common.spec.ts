@@ -60,8 +60,8 @@ import { VarianceChecker } from "../src/converter/variance/varianceChecker";
 import { DataConverter } from "../src/converter/data/dataConverter";
 import { DataFormatter } from "../src/converter/data/dataFormatter";
 
+import { KpiBaseDescriptor } from "../src/settings/descriptors/kpi/kpiBaseDescriptor";
 import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor";
-import { TextFormattingDescriptor } from "../src/settings/descriptors/textFormattingDescriptor";
 
 import { TestWrapper } from "./testWrapper";
 
@@ -368,11 +368,11 @@ describe("Multi KPI", () => {
         });
     });
 
-    describe("TextFormattingDescriptor", () => {
-        let textFormattingDescriptor: TextFormattingDescriptor;
+    describe("KpiBaseDescriptor", () => {
+        let textFormattingDescriptor: KpiBaseDescriptor;
 
         beforeEach(() => {
-            textFormattingDescriptor = new TextFormattingDescriptor();
+            textFormattingDescriptor = new KpiBaseDescriptor();
         });
 
         describe("auto font size", () => {

@@ -47,12 +47,6 @@ export class TextFormattingDescriptor extends NumericDescriptor {
     public parse(): void {
         super.parse();
 
-        if (this.autoAdjustFontSize) {
-            delete this.fontSize;
-
-            return;
-        }
-
         this.fontSize = this.getValidFontSize(this.fontSize);
 
         this.fontSize = Math.max(
@@ -69,10 +63,6 @@ export class TextFormattingDescriptor extends NumericDescriptor {
     }
 
     public get fontSizePx(): string {
-        if (!this.fontSize) {
-            return undefined;
-        }
-
         return pixelConverter.toString(this.fontSizeInPx);
     }
 
