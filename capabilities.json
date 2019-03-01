@@ -64,6 +64,32 @@
         }
       }
     },
+    "variance": {
+      "displayName": "Variance",
+      "properties": {
+        "format": {
+          "displayName": "Format",
+          "placeHolderText": "Auto",
+          "type": {
+            "text": true
+          }
+        },
+        "displayUnits": {
+          "displayName": "Display Units",
+          "type": {
+            "formatting": {
+              "labelDisplayUnits": true
+            }
+          }
+        },
+        "precision": {
+          "displayName": "Precision",
+          "type": {
+            "numeric": true
+          }
+        }
+      }
+    },
     "yAxis": {
       "displayName": "Y Axis",
       "properties": {

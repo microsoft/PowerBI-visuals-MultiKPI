@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-multikpi",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Shows a KPI metric along with other metrics as sparklines",
   "scripts": {
     "start": "pbiviz start",

@@ -44,6 +44,7 @@ import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 export class Settings extends SettingsBase {
     public date: FormatDescriptor = new FormatDescriptor();
     public values: NumericDescriptor = new NumericDescriptor();
+    public variance: NumericDescriptor = new NumericDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public chart: ChartDescriptor = new ChartDescriptor();
     public tooltip: TooltipDescriptor = new TooltipDescriptor();
@@ -60,6 +61,8 @@ export class Settings extends SettingsBase {
 
     constructor() {
         super();
+
+        this.variance.precision = 2; // It's different because we need to keep the existing behavior
 
         this.subtitle.show = false;
         this.subtitle.fontSize = 8.25;
