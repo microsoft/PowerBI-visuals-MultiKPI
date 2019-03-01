@@ -63,6 +63,7 @@ export class Settings extends SettingsBase {
         super();
 
         this.variance.precision = 2; // It's different because we need to keep the existing behavior
+        this.variance.defaultFormat = "+0.00%;-0.00%;0.00%";
 
         this.subtitle.show = false;
         this.subtitle.fontSize = 8.25;

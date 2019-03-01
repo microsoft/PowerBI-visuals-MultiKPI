@@ -24,9 +24,9 @@
  *  THE SOFTWARE.
  */
 
-import { IDescriptor } from "./descriptor";
+import { BaseDescriptor } from "./baseDescriptor";
 
-export class GridDescriptor implements IDescriptor {
+export class GridDescriptor extends BaseDescriptor {
     public static MaxColumns: number = 15;
 
     public columns: number = null;

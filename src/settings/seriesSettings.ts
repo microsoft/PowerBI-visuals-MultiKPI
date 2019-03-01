@@ -36,6 +36,7 @@ import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 
 export class SeriesSettings extends SettingsBase {
     public values: NumericDescriptor = new NumericDescriptor();
+    public variance: NumericDescriptor = new NumericDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public tooltip: TooltipDescriptor = new TooltipDescriptor();
     public sparkline: SparklineDescriptor = new SparklineDescriptor();

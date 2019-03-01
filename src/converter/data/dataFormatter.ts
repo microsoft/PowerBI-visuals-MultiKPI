@@ -4,18 +4,12 @@ import { NumericDescriptor } from "../../settings/descriptors/numericDescriptor"
 import { VarianceChecker } from "../variance/varianceChecker";
 
 export class DataFormatter {
-    public static getFormattedVariance(variance: number): string {
+    public static getFormattedVariance(variance: number, settings: NumericDescriptor): string {
         if (!VarianceChecker.isVarianceValid(variance)) {
             return "N/A";
         }
 
-        return valueFormatter.valueFormatter
-            .create({
-                format: "+0.00%;-0.00%;0.00%",
-                precision: 2,
-                value: variance,
-            })
-            .format(variance);
+        return this.getFormattedValue(variance, settings);
     }
 
     public static getFormattedDate(date: Date, format: string = valueFormatter.valueFormatter.DefaultDateFormat): string {

@@ -39,9 +39,11 @@ import { IVerticalReferenceLineComponentRenderOptions } from "../verticalReferen
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
 import { KpiOnHoverDescriptor } from "../../settings/descriptors/kpi/kpiOnHoverDescriptor";
+import { NumericDescriptor } from "../../settings/descriptors/numericDescriptor";
 
 export interface IHoverLabelComponentRenderOptions extends IVerticalReferenceLineComponentRenderOptions {
     kpiOnHoverSettings: KpiOnHoverDescriptor;
+    varianceSettings: NumericDescriptor;
 }
 
 export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComponentRenderOptions> {
@@ -60,6 +62,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             dataPoint,
             kpiOnHoverSettings,
             dateSettings,
+            varianceSettings,
         } = options;
 
         this.updateFormatting(this.element, kpiOnHoverSettings);
@@ -113,7 +116,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
                     color: isVarianceValid
                         ? kpiOnHoverSettings.varianceColor
                         : kpiOnHoverSettings.varianceNotAvailableColor,
-                    data: `(${DataFormatter.getFormattedVariance(variance)})`,
+                    data: `(${DataFormatter.getFormattedVariance(variance, varianceSettings)})`,
                     fontSizeInPt: isVarianceValid
                         ? kpiOnHoverSettings.varianceFontSize
                         : kpiOnHoverSettings.varianceNotAvailableFontSize,

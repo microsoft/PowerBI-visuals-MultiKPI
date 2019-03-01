@@ -60,6 +60,7 @@ import { VarianceChecker } from "../src/converter/variance/varianceChecker";
 import { DataConverter } from "../src/converter/data/dataConverter";
 import { DataFormatter } from "../src/converter/data/dataFormatter";
 
+import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor";
 import { TextFormattingDescriptor } from "../src/settings/descriptors/textFormattingDescriptor";
 
 import { TestWrapper } from "./testWrapper";
@@ -278,7 +279,24 @@ describe("Multi KPI", () => {
     describe("DataFormatter", () => {
         describe("getFormattedVariance", () => {
             it("should return N/A if a variance is not valid", () => {
-                expect(DataFormatter.getFormattedVariance(NaN)).toBe("N/A");
+                expect(DataFormatter.getFormattedVariance(NaN, null)).toBe("N/A");
+            });
+
+            it("should return 12.34K if precision is 2 and display units are 1000", () => {
+                const value: number = 12340;
+                const expectedValue: string = "12.34K";
+
+                const numericDescriptor: NumericDescriptor = new NumericDescriptor();
+
+                numericDescriptor.precision = 2;
+                numericDescriptor.displayUnits = 1000;
+
+                const actualValue: string = DataFormatter.getFormattedVariance(
+                    value,
+                    numericDescriptor,
+                );
+
+                expect(actualValue).toBe(expectedValue);
             });
         });
     });

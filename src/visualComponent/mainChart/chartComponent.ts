@@ -284,6 +284,7 @@ export class ChartComponent extends BaseContainerComponent<
             kpiSettings: this.renderOptions.settings.kpi,
             offset: 0,
             series: this.renderOptions.series,
+            varianceSettings: this.renderOptions.series.settings.variance,
             viewport: { width: this.width, height: this.height },
         };
 

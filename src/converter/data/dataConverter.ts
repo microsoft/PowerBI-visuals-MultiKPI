@@ -431,7 +431,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 });
 
             series.formattedDate = DataFormatter.getFormattedDate(startDataPoint.x, settings.date.getFormat());
-            series.formattedVariance = DataFormatter.getFormattedVariance(series.variance);
+            series.formattedVariance = DataFormatter.getFormattedVariance(series.variance, series.settings.variance);
 
             series.dateDifference = this.getDaysBetween(endDataPoint.x, startDataPoint.x);
 

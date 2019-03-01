@@ -25,9 +25,9 @@
  */
 
 import { DataRepresentationPointGradientType } from "../../converter/data/dataRepresentation";
-import { IDescriptor } from "./descriptor";
+import { BaseDescriptor } from "./baseDescriptor";
 
-export class ChartDescriptor implements IDescriptor {
+export class ChartDescriptor extends BaseDescriptor {
     public chartType: DataRepresentationPointGradientType = DataRepresentationPointGradientType.area;
     public color: string = "#c8d9ec";
     public alternativeColor: string = "#f1f5fa";
