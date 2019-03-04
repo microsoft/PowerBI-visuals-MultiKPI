@@ -82,6 +82,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         this.renderIcon(
             `Data is ${dateDifference} days old. ${staleDataSettings.staleDataText}`,
             this.dataAgeSelector,
+            staleDataSettings.color,
         );
     }
 
