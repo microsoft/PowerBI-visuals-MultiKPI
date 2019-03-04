@@ -69,6 +69,16 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
         super.render(options);
 
+        this.renderStaleData(dateDifference, staleDataSettings);
+    }
+
+    private renderStaleData(dateDifference: number, staleDataSettings: StaleDataDescriptor): void {
+        if (!staleDataSettings.shouldBeShown) {
+            this.renderIcon(null, this.dataAgeSelector);
+
+            return;
+        }
+
         this.renderIcon(
             `Data is ${dateDifference} days old. ${staleDataSettings.staleDataText}`,
             this.dataAgeSelector,
@@ -78,6 +88,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
     private renderIcon(
         title: string,
         selector: CssConstants.ClassAndSelector,
+        color: string = null,
     ): void {
         const iconSelection: Selection<any, string, any, any> = this.element
             .selectAll(selector.selectorName)
@@ -92,6 +103,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             .append("div")
             .classed(selector.className, true)
             .merge(iconSelection)
-            .attr("title", (titleData: string) => titleData);
+            .attr("title", (titleData: string) => titleData)
+            .style("color", color);
     }
 }
