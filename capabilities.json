@@ -862,6 +862,7 @@
         },
         "staleDataText": {
           "displayName": "Stale Data Text",
+          "description": "Use ${1} to indicate where to put a date difference to indicate how old data is",
           "type": {
             "text": true
           }

@@ -45,10 +45,11 @@ export interface ISubtitleWarningComponentRenderOptions extends ISubtitleCompone
 }
 
 interface IIcon {
-    backgroundColor: string;
-    color: string;
+    backgroundColor?: string;
+    color?: string;
+    isShown: boolean;
     selector: CssConstants.ClassAndSelector;
-    title: string;
+    title?: string;
 }
 
 export class SubtitleWarningComponent extends SubtitleComponent {
@@ -72,8 +73,9 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         this.renderIcon({
             backgroundColor: null,
             color: null,
+            isShown: !!(warningState > 0 && subtitleSettings.warningText),
             selector: this.warningSelector,
-            title: warningState > 0 ? subtitleSettings.warningText : null,
+            title: subtitleSettings.warningText,
         });
 
         super.render(options);
@@ -82,34 +84,36 @@ export class SubtitleWarningComponent extends SubtitleComponent {
     }
 
     private renderStaleData(dateDifference: number, staleDataSettings: StaleDataDescriptor): void {
-        if (!staleDataSettings.shouldBeShown) {
-            this.renderIcon({
-                backgroundColor: null,
-                color: null,
-                selector: this.dataAgeSelector,
-                title: null,
-            });
+        const {
+            background,
+            color,
+            shouldBeShown,
+            staleDataText,
+        } = staleDataSettings;
 
-            return;
-        }
+        const title: string = staleDataText && staleDataText.replace
+            ? staleDataText.replace("${1}", `${dateDifference}`)
+            : staleDataText;
 
         this.renderIcon({
-            backgroundColor: staleDataSettings.background,
-            color: staleDataSettings.color,
+            backgroundColor: background,
+            color,
+            isShown: shouldBeShown,
             selector: this.dataAgeSelector,
-            title: `Data is ${dateDifference} days old. ${staleDataSettings.staleDataText}`,
+            title,
         });
     }
 
     private renderIcon({
         backgroundColor,
         color,
+        isShown,
         selector,
         title,
     }: IIcon): void {
         const iconSelection: Selection<any, string, any, any> = this.element
             .selectAll(selector.selectorName)
-            .data(title ? [title] : []);
+            .data(isShown ? [title] : []);
 
         iconSelection
             .exit()

@@ -101,7 +101,7 @@ export class Settings extends SettingsBase {
         if (this.subtitle.staleDataText
             && this.staleData.staleDataText === undefined
         ) {
-            this.staleData.staleDataText = this.subtitle.staleDataText;
+            this.staleData.staleDataText = "Data is ${1} days old." + this.subtitle.staleDataText;
         }
 
         if (!this.subtitle.shouldBeShown) {
