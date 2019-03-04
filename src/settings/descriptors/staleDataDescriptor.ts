@@ -24,27 +24,10 @@
  *  THE SOFTWARE.
  */
 
-export class BaseDescriptor {
-    public show: boolean = true;
-    public isShown: boolean = true;
+import { BaseDescriptor } from "./baseDescriptor";
 
-    public get shouldBeShown(): boolean {
-        return this.show && this.isShown;
-    }
-
-    public applyDefault(defaultSettings: BaseDescriptor) {
-        if (!defaultSettings) {
-            return;
-        }
-
-        Object
-            .keys(defaultSettings)
-            .forEach((propertyName: string) => {
-                this[propertyName] = defaultSettings[propertyName];
-            });
-    }
-
-    public getValueByPropertyName(propertyName: string): any {
-        return this[propertyName];
-    }
+export class StaleDataDescriptor extends BaseDescriptor {
+    public staleDataText: string = undefined; // We keep it here just for compatibility with old reports
+    public staleDataCriteria: number = undefined;
+    public color: string = "#3599b8";
 }

@@ -47,14 +47,13 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
             }
         });
 
+        settings.parse();
+
         return settings;
     }
 
-    public parse(dataView: powerbi.DataView): SettingsBase {
-        return this.parseObjects(dataView
-            && dataView.metadata
-            && dataView.metadata.objects,
-        );
+    public parse(): void {
+        // This function is required to update settings once they are parsed from a data view object
     }
 
     public parseObjects(objects: powerbi.DataViewObjects): SettingsBase {
@@ -77,7 +76,9 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
             }
         }
 
-        return this as any;
+        this.parse();
+
+        return this;
     }
 
     public enumerateObjectInstances(options: powerbi.EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumerationObject {

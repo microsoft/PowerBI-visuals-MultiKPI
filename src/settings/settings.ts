@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import powerbi from "powerbi-visuals-api";
+
 import { SettingsBase } from "./settingsBase";
 
 import { AxisDescriptor } from "./descriptors/axisDescriptor";
@@ -37,6 +39,7 @@ import { NumericDescriptor } from "./descriptors/numericDescriptor";
 import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
+import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
 import { SubtitleAlignment, SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { SubtitleWarningDescriptor } from "./descriptors/subtitleWarningDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
@@ -57,6 +60,7 @@ export class Settings extends SettingsBase {
     public sparklineYAxis: SparklineAxisDescriptor = new SparklineAxisDescriptor();
     public sparklineValue: SubtitleDescriptor = new SubtitleDescriptor();
     public subtitle: SubtitleWarningDescriptor = new SubtitleWarningDescriptor();
+    public staleData: StaleDataDescriptor = new StaleDataDescriptor();
     public printMode: BaseDescriptor = new BaseDescriptor();
 
     constructor() {
@@ -91,5 +95,17 @@ export class Settings extends SettingsBase {
         this.sparklineYAxis.isShown = false;
 
         this.printMode.show = false;
+    }
+
+    public parse(): void {
+        if (this.subtitle.staleDataText
+            && this.staleData.staleDataText === undefined
+        ) {
+            this.staleData.staleDataText = this.subtitle.staleDataText;
+        }
+
+        if (!this.subtitle.shouldBeShown) {
+            this.staleData.show = false;
+        }
     }
 }

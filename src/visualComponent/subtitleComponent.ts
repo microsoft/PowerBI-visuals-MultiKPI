@@ -37,7 +37,7 @@ import { BaseComponent } from "./baseComponent";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
 export interface ISubtitleComponentRenderOptions {
-    settings: SubtitleDescriptor;
+    subtitleSettings: SubtitleDescriptor;
 }
 
 export class SubtitleComponent extends BaseComponent<IVisualComponentConstructorOptions, ISubtitleComponentRenderOptions> {
@@ -60,9 +60,9 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     }
 
     public render(options: ISubtitleComponentRenderOptions): void {
-        const { settings } = options;
+        const { subtitleSettings: settings } = options;
 
-        if (settings.shouldBeShown()) {
+        if (settings.shouldBeShown) {
             this.show();
             this.renderComponent(settings);
         } else {
@@ -84,7 +84,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     private renderComponent(settings: SubtitleDescriptor): void {
         const subtitleSelection: Selection<any, any, any, any> = this.element
             .selectAll(this.subtitleSelector.selectorName)
-            .data(settings.shouldBeShown() ? [[]] : []);
+            .data(settings.shouldBeShown ? [[]] : []);
 
         subtitleSelection
             .exit()

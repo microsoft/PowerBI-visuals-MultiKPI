@@ -200,7 +200,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         settings.titleText = name;
         settings.autoFontSizeValue = fontSize;
 
-        this.topLabelComponent.render({ settings });
+        this.topLabelComponent.render({ subtitleSettings: settings });
     }
 
     private renderBottomLabel(
@@ -219,7 +219,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         settings.titleText = formatter.format(value);
         settings.autoFontSizeValue = actualValueKPIFontSize;
 
-        this.bottomLabelComponent.render({ settings });
+        this.bottomLabelComponent.render({ subtitleSettings: settings });
     }
 
     private renderPlot(options: ISparklineComponentRenderOptions): void {

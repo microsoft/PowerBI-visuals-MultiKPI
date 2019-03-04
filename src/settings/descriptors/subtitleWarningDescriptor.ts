@@ -28,5 +28,19 @@ import { SubtitleDescriptor } from "./subtitleDescriptor";
 
 export class SubtitleWarningDescriptor extends SubtitleDescriptor {
     public warningText: string = "Warning Message";
-    public staleDataText: string = "";
+    public staleDataText: string = ""; // We keep it here just for compatibility with old reports
+
+    public parse(): void {
+        super.parse();
+
+        // Hide staleDataText from Format Panel
+        Object.defineProperty(
+            this,
+            "staleDataText",
+            {
+                configurable: true,
+                enumerable: false,
+            },
+        );
+    }
 }

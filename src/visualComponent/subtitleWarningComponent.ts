@@ -28,6 +28,7 @@ import { Selection } from "d3-selection";
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
+import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor";
 import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarningDescriptor";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
@@ -39,7 +40,8 @@ import {
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
     dateDifference: number;
-    settings: SubtitleWarningDescriptor;
+    subtitleSettings: SubtitleWarningDescriptor;
+    staleDataSettings: StaleDataDescriptor;
 }
 
 export class SubtitleWarningComponent extends SubtitleComponent {
@@ -54,20 +56,21 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     public render(options: ISubtitleWarningComponentRenderOptions): void {
         const {
-            settings,
+            staleDataSettings,
+            subtitleSettings,
             warningState,
             dateDifference,
         } = options;
 
         this.renderIcon(
-            warningState > 0 ? settings.warningText : null,
+            warningState > 0 ? subtitleSettings.warningText : null,
             this.warningSelector,
         );
 
         super.render(options);
 
         this.renderIcon(
-            `Data is ${dateDifference} days old. ${settings.staleDataText}`,
+            `Data is ${dateDifference} days old. ${staleDataSettings.staleDataText}`,
             this.dataAgeSelector,
         );
     }

@@ -212,7 +212,8 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
         this.subtitleComponent.render({
             dateDifference: data.dateDifference,
-            settings: settings.subtitle,
+            staleDataSettings: settings.staleData,
+            subtitleSettings: settings.subtitle,
             warningState: data.warningState,
         });
 
