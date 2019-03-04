@@ -44,6 +44,13 @@ export interface ISubtitleWarningComponentRenderOptions extends ISubtitleCompone
     staleDataSettings: StaleDataDescriptor;
 }
 
+interface IIcon {
+    backgroundColor: string;
+    color: string;
+    selector: CssConstants.ClassAndSelector;
+    title: string;
+}
+
 export class SubtitleWarningComponent extends SubtitleComponent {
     private warningSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("warning");
     private dataAgeSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("dataAge");
@@ -62,10 +69,12 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             dateDifference,
         } = options;
 
-        this.renderIcon(
-            warningState > 0 ? subtitleSettings.warningText : null,
-            this.warningSelector,
-        );
+        this.renderIcon({
+            backgroundColor: null,
+            color: null,
+            selector: this.warningSelector,
+            title: warningState > 0 ? subtitleSettings.warningText : null,
+        });
 
         super.render(options);
 
@@ -74,23 +83,30 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     private renderStaleData(dateDifference: number, staleDataSettings: StaleDataDescriptor): void {
         if (!staleDataSettings.shouldBeShown) {
-            this.renderIcon(null, this.dataAgeSelector);
+            this.renderIcon({
+                backgroundColor: null,
+                color: null,
+                selector: this.dataAgeSelector,
+                title: null,
+            });
 
             return;
         }
 
-        this.renderIcon(
-            `Data is ${dateDifference} days old. ${staleDataSettings.staleDataText}`,
-            this.dataAgeSelector,
-            staleDataSettings.color,
-        );
+        this.renderIcon({
+            backgroundColor: staleDataSettings.background,
+            color: staleDataSettings.color,
+            selector: this.dataAgeSelector,
+            title: `Data is ${dateDifference} days old. ${staleDataSettings.staleDataText}`,
+        });
     }
 
-    private renderIcon(
-        title: string,
-        selector: CssConstants.ClassAndSelector,
-        color: string = null,
-    ): void {
+    private renderIcon({
+        backgroundColor,
+        color,
+        selector,
+        title,
+    }: IIcon): void {
         const iconSelection: Selection<any, string, any, any> = this.element
             .selectAll(selector.selectorName)
             .data(title ? [title] : []);
@@ -105,6 +121,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             .classed(selector.className, true)
             .merge(iconSelection)
             .attr("title", (titleData: string) => titleData)
-            .style("color", color);
+            .style("color", color || null)
+            .style("background-color", backgroundColor || null);
     }
 }

@@ -814,6 +814,14 @@
             }
           }
         },
+        "alignment": {
+          "displayName": "Alignment",
+          "type": {
+            "formatting": {
+              "alignment": true
+            }
+          }
+        },
         "fontSize": {
           "displayName": "Text Size",
           "type": {
@@ -870,6 +878,18 @@
             "fill": {
               "solid": {
                 "color": true
+              }
+            }
+          }
+        },
+        "background": {
+          "displayName": "Background Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "nullable": true
+                }
               }
             }
           }

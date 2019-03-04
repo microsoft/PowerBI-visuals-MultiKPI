@@ -27,7 +27,8 @@
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class StaleDataDescriptor extends BaseDescriptor {
-    public staleDataText: string = undefined; // We keep it here just for compatibility with old reports
+    public staleDataText: string = undefined;
     public staleDataCriteria: number = undefined;
     public color: string = "#3599b8";
+    public background: string = "";
 }
