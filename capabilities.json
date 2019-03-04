@@ -861,14 +861,15 @@
           }
         },
         "staleDataText": {
-          "displayName": "Stale Data Text",
+          "displayName": "Title",
           "description": "Use ${1} to indicate where to put a date difference to indicate how old data is",
           "type": {
             "text": true
           }
         },
-        "staleDataCriteria": {
-          "displayName": "Stale Data Criteria",
+        "staleDataThreshold": {
+          "displayName": "Threshold (days)",
+          "description": "Data is stale if data is older than some number of days from now",
           "type": {
             "numeric": true
           }

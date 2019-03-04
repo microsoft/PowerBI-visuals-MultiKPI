@@ -1,6 +1,8 @@
 ## 2.1.0
 * Adds Decimal Places, Precision and Format for variance values
 * Fixes auto font size issue
+* Adds Stale Data options (title pattern, threshold, color, and background)
+* Adds alignment for subtitle
 
 ## 2.0.0
 * API 2.2.0

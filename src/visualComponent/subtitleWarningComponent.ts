@@ -89,19 +89,36 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             color,
             shouldBeShown,
             staleDataText,
+            staleDataThreshold,
         } = staleDataSettings;
 
-        const title: string = staleDataText && staleDataText.replace
-            ? staleDataText.replace("${1}", `${dateDifference}`)
-            : staleDataText;
+        const title: string = this.getTitle(
+            staleDataText,
+            dateDifference,
+        );
+
+        const isDataStale: boolean = this.isDataStale(
+            dateDifference,
+            staleDataThreshold,
+        );
 
         this.renderIcon({
             backgroundColor: background,
             color,
-            isShown: shouldBeShown,
+            isShown: shouldBeShown && isDataStale,
             selector: this.dataAgeSelector,
             title,
         });
+    }
+
+    private isDataStale(dateDifference: number, staleDataThreshold: number): boolean {
+        return dateDifference > staleDataThreshold;
+    }
+
+    private getTitle(stringTemplate: string, dateDifference: number): string {
+        return stringTemplate && stringTemplate.replace
+            ? stringTemplate.replace("${1}", `${dateDifference}`)
+            : stringTemplate;
     }
 
     private renderIcon({
