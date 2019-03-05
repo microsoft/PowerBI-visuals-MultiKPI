@@ -24,8 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
-
 import { SettingsBase } from "./settingsBase";
 
 import { AxisDescriptor } from "./descriptors/axisDescriptor";

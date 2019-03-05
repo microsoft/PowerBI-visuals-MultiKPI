@@ -26,7 +26,7 @@
 
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
-import { ChartLabelBaseComponent } from "./chartLabelBaseComponent";
+import { ChartLabelBaseComponent, IRenderGroup } from "./chartLabelBaseComponent";
 
 import { createVarianceConverter } from "../../converter/variance/varianceConverter";
 
@@ -128,22 +128,28 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             ],
         );
 
+        const dateGroup: IRenderGroup[] = [
+            {
+                color: kpiOnHoverSettings.currentValueColor,
+                data: formatter.format(dataPoint.y),
+                fontSizeInPt: kpiOnHoverSettings.currentValueFontSize,
+                isShown: kpiOnHoverSettings.isCurrentValueShown,
+            },
+            {
+                color: kpiOnHoverSettings.dateColor,
+                data: DataFormatter.getFormattedDate(dataPoint.x, dateSettings.getFormat()),
+                fontSizeInPt: kpiOnHoverSettings.dateFontSize,
+                isShown: kpiOnHoverSettings.isDateShown,
+            },
+        ];
+
+        const dateGroupToRender: IRenderGroup[] = kpiOnHoverSettings.isCurrentValueLeftAligned
+            ? dateGroup
+            : [...dateGroup].reverse(); // Make dateGroupBase array immutable
+
         this.renderGroup(
             this.footerSelector,
-            [
-                {
-                    color: kpiOnHoverSettings.currentValueColor,
-                    data: formatter.format(dataPoint.y),
-                    fontSizeInPt: kpiOnHoverSettings.currentValueFontSize,
-                    isShown: kpiOnHoverSettings.isCurrentValueShown,
-                },
-                {
-                    color: kpiOnHoverSettings.dateColor,
-                    data: DataFormatter.getFormattedDate(dataPoint.x, dateSettings.getFormat()),
-                    fontSizeInPt: kpiOnHoverSettings.dateFontSize,
-                    isShown: kpiOnHoverSettings.isDateShown,
-                },
-            ],
+            dateGroupToRender,
         );
     }
 }

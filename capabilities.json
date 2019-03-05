@@ -492,6 +492,12 @@
             "numeric": true
           }
         },
+        "isCurrentValueLeftAligned": {
+          "displayName": "Current Value Is Left Aligned",
+          "type": {
+            "bool": true
+          }
+        },
         "isCurrentValueShown": {
           "displayName": "Current Value",
           "type": {

@@ -30,6 +30,7 @@ export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
     public isCurrentValueShown: boolean = true;
     public currentValueFontSize: number = 11;
     public currentValueColor: string = "#217CC9";
+    public isCurrentValueLeftAligned: boolean = true;
 
     constructor() {
         super();
