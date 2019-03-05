@@ -33,7 +33,6 @@ import { FormatDescriptor } from "./descriptors/formatDescriptor";
 import { GridDescriptor } from "./descriptors/gridDescriptor";
 import { KpiDescriptor } from "./descriptors/kpi/kpiDescriptor";
 import { KpiOnHoverDescriptor } from "./descriptors/kpi/kpiOnHoverDescriptor";
-import { NumericDescriptor } from "./descriptors/numericDescriptor";
 import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
@@ -41,11 +40,12 @@ import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
 import { SubtitleAlignment, SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { SubtitleWarningDescriptor } from "./descriptors/subtitleWarningDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
+import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
 import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 
 export class Settings extends SettingsBase {
     public date: FormatDescriptor = new FormatDescriptor();
-    public values: NumericDescriptor = new NumericDescriptor();
+    public values: ValuesDescriptor = new ValuesDescriptor();
     public variance: VarianceDescriptor = new VarianceDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public chart: ChartDescriptor = new ChartDescriptor();

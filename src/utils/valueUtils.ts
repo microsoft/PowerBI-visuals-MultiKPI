@@ -24,34 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-
-import { NumericDescriptor } from "../../settings/descriptors/numericDescriptor";
-import { isValueValid } from "../../utils/valueUtils";
-
-export function getFormattedValueWithFallback(variance: number, settings: NumericDescriptor): string {
-    if (!isValueValid(variance)) {
-        return "N/A";
-    }
-
-    return getFormattedValue(variance, settings);
-}
-
-export function getFormattedDate(date: Date, format: string = valueFormatter.valueFormatter.DefaultDateFormat): string {
-    return valueFormatter.valueFormatter
-        .create({ format })
-        .format(date);
-}
-
-export function getFormattedValue(value: number, settings: NumericDescriptor): string {
-    return getValueFormatter(value, settings).format(value);
-}
-
-export function getValueFormatter(value: number, settings: NumericDescriptor): valueFormatter.IValueFormatter {
-    return valueFormatter.valueFormatter.create({
-        displayUnitSystemType: 2,
-        format: settings.getFormat(),
-        precision: settings.precision,
-        value: settings.displayUnits || value,
-    });
+export function isValueValid(value: number): boolean {
+    return isFinite(value) && value != null;
 }

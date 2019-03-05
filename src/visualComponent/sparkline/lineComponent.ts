@@ -34,6 +34,7 @@ import {
 import { Selection } from "d3-selection";
 
 import powerbi from "powerbi-visuals-api";
+
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
@@ -48,6 +49,8 @@ import {
 
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 import { EventName } from "../../event/eventName";
+
+import { isValueValid } from "../../utils/valueUtils";
 
 export interface ILineComponentRenderOptions {
     viewport: powerbi.IViewport;
@@ -203,13 +206,15 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .classed(this.lineSelector.className, true)
             .merge(lineSelection)
             .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
+                const filteredPoints: IDataRepresentationPoint[] = this.filterPoints(lineRenderOptions.points);
+
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(lineRenderOptions.points);
+                        return this.getArea(xScale, yScale, viewport)(filteredPoints);
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
-                        return this.getLine(xScale, yScale)(lineRenderOptions.points);
+                        return this.getLine(xScale, yScale)(filteredPoints);
                     }
                 }
             })
@@ -274,6 +279,12 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .y1((dataPoint: IDataRepresentationPoint) => {
                 return yScale.scale(dataPoint.y);
             });
+    }
+
+    private filterPoints(points: IDataRepresentationPoint[]): IDataRepresentationPoint[] {
+        return points.filter((point: IDataRepresentationPoint) => {
+            return point && isValueValid(point.y);
+        });
     }
 
     private getGradientUrl(): string {

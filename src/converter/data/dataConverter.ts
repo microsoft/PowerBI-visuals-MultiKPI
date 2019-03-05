@@ -57,7 +57,10 @@ import {
 
 import { createVarianceConverterByType } from "../variance";
 
-import { DataFormatter } from "../data/dataFormatter";
+import {
+    getFormattedDate,
+    getFormattedValueWithFallback,
+} from "../data/dataFormatter";
 
 export interface IColumnGroup {
     name: string;
@@ -281,6 +284,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     const series: IDataRepresentationSeries = {
                         current: undefined,
                         dateDifference: undefined,
+                        filteredPoints: [],
                         formattedDate: "",
                         formattedTooltip: undefined,
                         formattedVariance: "",
@@ -320,7 +324,10 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     dataRepresentation.sortedSeries.push(series);
                 }
 
-                const y: number = valueColumnGroup.values[columnIndex] || 0;
+                const y: number = this.parseValue(
+                    valueColumnGroup.values[columnIndex],
+                    dataRepresentation.series[columnIndex].settings.values.treatEmptyValuesAsZero,
+                );
 
                 const dataPoint: IDataRepresentationPoint = {
                     index: dataRepresentation.series[columnIndex].points.length,
@@ -343,25 +350,29 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     x,
                 );
 
-                dataRepresentation.series[columnIndex].y.min = this.getMin(
-                    dataRepresentation.series[columnIndex].y.min,
-                    y,
-                );
+                if (!isNaN(y)) {
+                    dataRepresentation.series[columnIndex].filteredPoints.push(dataPoint);
 
-                dataRepresentation.series[columnIndex].y.max = this.getMax(
-                    dataRepresentation.series[columnIndex].y.max,
-                    y,
-                );
+                    dataRepresentation.series[columnIndex].y.min = this.getMin(
+                        dataRepresentation.series[columnIndex].y.min,
+                        y,
+                    );
 
-                dataRepresentation.series[columnIndex].ySparkline.min = this.getMin(
-                    dataRepresentation.series[columnIndex].ySparkline.min,
-                    y,
-                );
+                    dataRepresentation.series[columnIndex].y.max = this.getMax(
+                        dataRepresentation.series[columnIndex].y.max,
+                        y,
+                    );
 
-                dataRepresentation.series[columnIndex].ySparkline.max = this.getMax(
-                    dataRepresentation.series[columnIndex].ySparkline.max,
-                    y,
-                );
+                    dataRepresentation.series[columnIndex].ySparkline.min = this.getMin(
+                        dataRepresentation.series[columnIndex].ySparkline.min,
+                        y,
+                    );
+
+                    dataRepresentation.series[columnIndex].ySparkline.max = this.getMax(
+                        dataRepresentation.series[columnIndex].ySparkline.max,
+                        y,
+                    );
+                }
 
                 const tooltip: string = tooltipColumnGroup
                     && tooltipColumnGroup.values
@@ -392,7 +403,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
-        dataRepresentation.series.forEach((series: IDataRepresentationSeries, seriesIndex: number) => {
+        dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
             series.x.initialMin = series.x.min;
             series.x.initialMax = series.x.max;
 
@@ -430,8 +441,8 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     secondDataPoint: endDataPoint,
                 });
 
-            series.formattedDate = DataFormatter.getFormattedDate(startDataPoint.x, settings.date.getFormat());
-            series.formattedVariance = DataFormatter.getFormattedVariance(series.variance, series.settings.variance);
+            series.formattedDate = getFormattedDate(startDataPoint.x, settings.date.getFormat());
+            series.formattedVariance = getFormattedValueWithFallback(series.variance, series.settings.variance);
 
             series.dateDifference = this.getDaysBetween(endDataPoint.x, startDataPoint.x);
 
@@ -506,22 +517,52 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     private getMin<Type>(originalValue: Type, value: Type): Type {
-        if (originalValue === undefined || originalValue === null) {
+        const isOriginalValueValid: boolean = this.isValueValid(originalValue);
+        const isValueValid: boolean = this.isValueValid(value);
+
+        if (isOriginalValueValid && isValueValid) {
+            return value < originalValue
+                ? value
+                : originalValue;
+        }
+
+        if (isValueValid) {
             return value;
         }
 
-        return value < originalValue
-            ? value
-            : originalValue;
+        return undefined;
     }
 
     private getMax<Type>(originalValue: Type, value: Type): Type {
-        if (originalValue === undefined || originalValue === null) {
+        const isOriginalValueValid: boolean = this.isValueValid(originalValue);
+        const isValueValid: boolean = this.isValueValid(value);
+
+        if (isOriginalValueValid && isValueValid) {
+            return value > originalValue
+                ? value
+                : originalValue;
+        }
+
+        if (isValueValid) {
             return value;
         }
 
-        return value > originalValue
-            ? value
-            : originalValue;
+        return undefined;
+    }
+
+    private isValueValid<Type>(value: Type): boolean {
+        return value != null;
+    }
+
+    private parseValue(value: number, treatEmptyValuesAsZero: boolean): number {
+        if (isFinite(value) && value != null) {
+            return value;
+        }
+
+        if (treatEmptyValuesAsZero) {
+            return 0;
+        }
+
+        return NaN;
     }
 }

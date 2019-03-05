@@ -24,10 +24,8 @@
  *  THE SOFTWARE.
  */
 
-export class VarianceChecker {
-    public static isVarianceValid(variance: number): boolean {
-        return isFinite(variance)
-            && variance !== undefined
-            && variance !== null;
-    }
+import { NumericDescriptor } from "./numericDescriptor";
+
+export class ValuesDescriptor extends NumericDescriptor {
+    public treatEmptyValuesAsZero: boolean = true;
 }

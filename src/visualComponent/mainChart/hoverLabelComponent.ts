@@ -30,10 +30,14 @@ import { ChartLabelBaseComponent, IRenderGroup } from "./chartLabelBaseComponent
 
 import { createVarianceConverterByType } from "../../converter/variance";
 
-import { DataFormatter } from "../../converter/data/dataFormatter";
 import { IDataRepresentationPoint } from "../../converter/data/dataRepresentation";
 
-import { VarianceChecker } from "../../converter/variance/varianceChecker";
+import {
+    getFormattedDate,
+    getFormattedValueWithFallback,
+} from "../../converter/data/dataFormatter";
+
+import { isValueValid } from "../../utils/valueUtils";
 
 import { IVerticalReferenceLineComponentRenderOptions } from "../verticalReferenceLineComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
@@ -83,11 +87,6 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
                 secondDataPoint: latestDataPoint,
             });
 
-        const formatter: valueFormatter.IValueFormatter = DataFormatter.getValueFormatter(
-            latestDataPoint.y,
-            series.settings.values,
-        );
-
         this.renderGroup(
             this.headerSelector,
             [
@@ -101,14 +100,14 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
 
         );
 
-        const isVarianceValid: boolean = VarianceChecker.isVarianceValid(variance);
+        const isVarianceValid: boolean = isValueValid(variance);
 
         this.renderGroup(
             this.bodySelector,
             [
                 {
                     color: kpiOnHoverSettings.valueColor,
-                    data: formatter.format(latestDataPoint.y),
+                    data: getFormattedValueWithFallback(latestDataPoint.y, series.settings.values),
                     fontSizeInPt: kpiOnHoverSettings.valueFontSize,
                     isShown: kpiOnHoverSettings.isValueShown,
                 },
@@ -116,7 +115,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
                     color: isVarianceValid
                         ? kpiOnHoverSettings.varianceColor
                         : kpiOnHoverSettings.varianceNotAvailableColor,
-                    data: `(${DataFormatter.getFormattedVariance(variance, varianceSettings)})`,
+                    data: `(${getFormattedValueWithFallback(variance, varianceSettings)})`,
                     fontSizeInPt: isVarianceValid
                         ? kpiOnHoverSettings.varianceFontSize
                         : kpiOnHoverSettings.varianceNotAvailableFontSize,
@@ -131,13 +130,13 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
         const dateGroup: IRenderGroup[] = [
             {
                 color: kpiOnHoverSettings.currentValueColor,
-                data: formatter.format(dataPoint.y),
+                data: getFormattedValueWithFallback(dataPoint.y, series.settings.values),
                 fontSizeInPt: kpiOnHoverSettings.currentValueFontSize,
                 isShown: kpiOnHoverSettings.isCurrentValueShown,
             },
             {
                 color: kpiOnHoverSettings.dateColor,
-                data: DataFormatter.getFormattedDate(dataPoint.x, dateSettings.getFormat()),
+                data: getFormattedDate(dataPoint.x, dateSettings.getFormat()),
                 fontSizeInPt: kpiOnHoverSettings.dateFontSize,
                 isShown: kpiOnHoverSettings.isDateShown,
             },

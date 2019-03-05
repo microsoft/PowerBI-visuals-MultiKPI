@@ -35,9 +35,9 @@ import { IVisualComponentConstructorOptions } from "../visualComponentConstructo
 
 import { ChartLabelBaseComponent } from "./chartLabelBaseComponent";
 
-import { DataFormatter } from "../../converter/data/dataFormatter";
-import { VarianceChecker } from "../../converter/variance/varianceChecker";
+import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
 import { EventName } from "../../event/eventName";
+import { isValueValid } from "../../utils/valueUtils";
 
 export interface IChartLabelComponentRenderOptions {
     dateSettings: FormatDescriptor;
@@ -98,14 +98,14 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComp
             ],
         );
 
-        const isVarianceValid: boolean = VarianceChecker.isVarianceValid(series.variance);
+        const isVarianceValid: boolean = isValueValid(series.variance);
 
         this.renderGroup(
             this.bodySelector,
             [
                 {
                     color: kpiSettings.valueColor,
-                    data: DataFormatter.getFormattedValue(value, series.settings.values),
+                    data: getFormattedValueWithFallback(value, series.settings.values),
                     fontSizeInPt: kpiSettings.valueFontSize,
                     isShown: kpiSettings.isValueShown,
                 },

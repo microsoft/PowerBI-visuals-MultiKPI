@@ -61,6 +61,12 @@
           "type": {
             "numeric": true
           }
+        },
+        "treatEmptyValuesAsZero": {
+          "displayName": "Treat Empty Values As Zero",
+          "type": {
+            "bool": true
+          }
         }
       }
     },
