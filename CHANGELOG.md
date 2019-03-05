@@ -3,6 +3,8 @@
 * Fixes auto font size issue
 * Adds Stale Data options (title pattern, threshold, color, and background)
 * Adds alignment for subtitle
+* Adds "On Hover Current Value" alignment
+* Allows calculating a difference instead of growth for percentage metrics
 
 ## 2.0.0
 * API 2.2.0

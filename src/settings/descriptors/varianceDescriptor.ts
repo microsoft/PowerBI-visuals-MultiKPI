@@ -24,43 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import { IConverter } from "../converter";
-import { IDataRepresentationPoint } from "../data/dataRepresentation";
+import { NumericDescriptor } from "./numericDescriptor";
 
-export interface IVarianceConverterOptions {
-    firstDataPoint: IDataRepresentationPoint;
-    secondDataPoint: IDataRepresentationPoint;
-}
-
-export class VarianceConverter implements IConverter<IVarianceConverterOptions, number> {
-    public convert(options: IVarianceConverterOptions): number {
-        const { secondDataPoint, firstDataPoint } = options;
-
-        return this.getPercentChange(firstDataPoint.y, secondDataPoint.y);
-    }
-
-    private getPercentChange(startValue: number, endValue: number): number {
-        if (startValue === 0) {
-            return NaN;
-        }
-
-        const diff: number = endValue - startValue;
-        let percentChange: number = Math.abs(diff / startValue);
-
-        if (endValue < startValue) {
-            percentChange = percentChange * -1;
-        }
-
-        return percentChange;
-    }
-}
-
-let converter: IConverter<IVarianceConverterOptions, number>;
-
-export function create(): IConverter<IVarianceConverterOptions, number> {
-    if (!converter) {
-        converter = new VarianceConverter();
-    }
-
-    return converter;
+export class VarianceDescriptor extends NumericDescriptor {
+    public shouldCalculateDifference: boolean = false;
 }

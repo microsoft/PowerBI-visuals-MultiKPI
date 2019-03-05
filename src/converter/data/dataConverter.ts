@@ -55,7 +55,7 @@ import {
     DataRepresentationTypeEnum,
 } from "../data/dataRepresentationScale";
 
-import { createVarianceConverter } from "../variance/varianceConverter";
+import { createVarianceConverterByType } from "../variance";
 
 import { DataFormatter } from "../data/dataFormatter";
 
@@ -424,7 +424,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
 
             const endDataPoint: IDataRepresentationPoint = series.points[series.points.length - 1];
 
-            series.variance = createVarianceConverter()
+            series.variance = createVarianceConverterByType(series.settings.variance.shouldCalculateDifference)
                 .convert({
                     firstDataPoint: startDataPoint,
                     secondDataPoint: endDataPoint,

@@ -41,11 +41,12 @@ import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
 import { SubtitleAlignment, SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { SubtitleWarningDescriptor } from "./descriptors/subtitleWarningDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
+import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 
 export class Settings extends SettingsBase {
     public date: FormatDescriptor = new FormatDescriptor();
     public values: NumericDescriptor = new NumericDescriptor();
-    public variance: NumericDescriptor = new NumericDescriptor();
+    public variance: VarianceDescriptor = new VarianceDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public chart: ChartDescriptor = new ChartDescriptor();
     public tooltip: TooltipDescriptor = new TooltipDescriptor();

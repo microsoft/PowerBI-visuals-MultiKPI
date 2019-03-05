@@ -25,42 +25,22 @@
  */
 
 import { IConverter } from "../converter";
-import { IDataRepresentationPoint } from "../data/dataRepresentation";
+import { IVarianceConverterOptions } from "./varianceConverter";
 
-export interface IVarianceConverterOptions {
-    firstDataPoint: IDataRepresentationPoint;
-    secondDataPoint: IDataRepresentationPoint;
-}
-
-export class VarianceConverter implements IConverter<IVarianceConverterOptions, number> {
+export class VarianceBasedOnDifferenceConverter implements IConverter<IVarianceConverterOptions, number> {
     public convert(options: IVarianceConverterOptions): number {
         const { secondDataPoint, firstDataPoint } = options;
 
-        return this.getPercentChange(firstDataPoint.y, secondDataPoint.y);
-    }
-
-    private getPercentChange(startValue: number, endValue: number): number {
-        if (startValue === 0) {
-            return NaN;
-        }
-
-        const diff: number = endValue - startValue;
-        let percentChange: number = Math.abs(diff / startValue);
-
-        if (endValue < startValue) {
-            percentChange = percentChange * -1;
-        }
-
-        return percentChange;
+        return secondDataPoint.y - firstDataPoint.y;
     }
 }
 
-let converter: IConverter<IVarianceConverterOptions, number>;
+let convert: IConverter<IVarianceConverterOptions, number>;
 
 export function create(): IConverter<IVarianceConverterOptions, number> {
-    if (!converter) {
-        converter = new VarianceConverter();
+    if (!convert) {
+        convert = new VarianceBasedOnDifferenceConverter();
     }
 
-    return converter;
+    return convert;
 }

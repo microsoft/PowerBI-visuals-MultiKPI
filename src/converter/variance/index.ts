@@ -24,43 +24,11 @@
  *  THE SOFTWARE.
  */
 
-import { IConverter } from "../converter";
-import { IDataRepresentationPoint } from "../data/dataRepresentation";
+import { create as createDifferenceConverter } from "./differenceConverter";
+import { create as createVarianceConverter } from "./varianceConverter";
 
-export interface IVarianceConverterOptions {
-    firstDataPoint: IDataRepresentationPoint;
-    secondDataPoint: IDataRepresentationPoint;
-}
-
-export class VarianceConverter implements IConverter<IVarianceConverterOptions, number> {
-    public convert(options: IVarianceConverterOptions): number {
-        const { secondDataPoint, firstDataPoint } = options;
-
-        return this.getPercentChange(firstDataPoint.y, secondDataPoint.y);
-    }
-
-    private getPercentChange(startValue: number, endValue: number): number {
-        if (startValue === 0) {
-            return NaN;
-        }
-
-        const diff: number = endValue - startValue;
-        let percentChange: number = Math.abs(diff / startValue);
-
-        if (endValue < startValue) {
-            percentChange = percentChange * -1;
-        }
-
-        return percentChange;
-    }
-}
-
-let converter: IConverter<IVarianceConverterOptions, number>;
-
-export function create(): IConverter<IVarianceConverterOptions, number> {
-    if (!converter) {
-        converter = new VarianceConverter();
-    }
-
-    return converter;
+export function createVarianceConverterByType(isDataInPercentageFormat: boolean) {
+    return isDataInPercentageFormat
+        ? createDifferenceConverter()
+        : createVarianceConverter();
 }

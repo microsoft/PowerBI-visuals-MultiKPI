@@ -87,6 +87,13 @@
           "type": {
             "numeric": true
           }
+        },
+        "shouldCalculateDifference": {
+          "displayName": "Calculate Difference",
+          "description": "Calculates a difference instead of growth",
+          "type": {
+            "bool": true
+          }
         }
       }
     },

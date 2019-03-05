@@ -28,7 +28,7 @@ import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
 import { ChartLabelBaseComponent, IRenderGroup } from "./chartLabelBaseComponent";
 
-import { createVarianceConverter } from "../../converter/variance/varianceConverter";
+import { createVarianceConverterByType } from "../../converter/variance";
 
 import { DataFormatter } from "../../converter/data/dataFormatter";
 import { IDataRepresentationPoint } from "../../converter/data/dataRepresentation";
@@ -39,11 +39,11 @@ import { IVerticalReferenceLineComponentRenderOptions } from "../verticalReferen
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
 import { KpiOnHoverDescriptor } from "../../settings/descriptors/kpi/kpiOnHoverDescriptor";
-import { NumericDescriptor } from "../../settings/descriptors/numericDescriptor";
+import { VarianceDescriptor } from "../../settings/descriptors/varianceDescriptor";
 
 export interface IHoverLabelComponentRenderOptions extends IVerticalReferenceLineComponentRenderOptions {
     kpiOnHoverSettings: KpiOnHoverDescriptor;
-    varianceSettings: NumericDescriptor;
+    varianceSettings: VarianceDescriptor;
 }
 
 export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComponentRenderOptions> {
@@ -77,7 +77,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
 
         const latestDataPoint: IDataRepresentationPoint = series.points[series.points.length - 1];
 
-        const variance: number = createVarianceConverter()
+        const variance: number = createVarianceConverterByType(varianceSettings.shouldCalculateDifference)
             .convert({
                 firstDataPoint: dataPoint,
                 secondDataPoint: latestDataPoint,
@@ -145,7 +145,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
 
         const dateGroupToRender: IRenderGroup[] = kpiOnHoverSettings.isCurrentValueLeftAligned
             ? dateGroup
-            : [...dateGroup].reverse(); // Make dateGroupBase array immutable
+            : [...dateGroup].reverse(); // Makes dateGroupBase array immutable
 
         this.renderGroup(
             this.footerSelector,

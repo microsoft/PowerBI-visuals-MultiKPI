@@ -33,10 +33,11 @@ import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChart
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
 import { SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
+import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 
 export class SeriesSettings extends SettingsBase {
     public values: NumericDescriptor = new NumericDescriptor();
-    public variance: NumericDescriptor = new NumericDescriptor();
+    public variance: VarianceDescriptor = new VarianceDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public tooltip: TooltipDescriptor = new TooltipDescriptor();
     public sparkline: SparklineDescriptor = new SparklineDescriptor();
