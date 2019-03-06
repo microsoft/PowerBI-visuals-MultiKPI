@@ -55,10 +55,10 @@ import {
     IDataRepresentationPoint,
 } from "../src/converter/data/dataRepresentation";
 
-import { VarianceChecker } from "../src/converter/variance/varianceChecker";
+import { isValueValid } from "../src/utils/valueUtils";
 
 import { DataConverter } from "../src/converter/data/dataConverter";
-import { DataFormatter } from "../src/converter/data/dataFormatter";
+import { getFormattedValueWithFallback } from "../src/converter/data/dataFormatter";
 
 import { KpiBaseDescriptor } from "../src/settings/descriptors/kpi/kpiBaseDescriptor";
 import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor";
@@ -248,30 +248,30 @@ describe("Multi KPI", () => {
         });
     });
 
-    describe("VarianceChecker", () => {
-        describe("isVarianceValid", () => {
+    describe("Value Utils", () => {
+        describe("isValueValid", () => {
             it("should return true if a variance is valid", () => {
-                expect(VarianceChecker.isVarianceValid(99)).toBeTruthy();
+                expect(isValueValid(99)).toBeTruthy();
             });
 
             it("should return false if a variance is not valid (NaN)", () => {
-                expect(VarianceChecker.isVarianceValid(NaN)).toBeFalsy();
+                expect(isValueValid(NaN)).toBeFalsy();
             });
 
             it("should return false if a variance is not valid (undefined)", () => {
-                expect(VarianceChecker.isVarianceValid(undefined)).toBeFalsy();
+                expect(isValueValid(undefined)).toBeFalsy();
             });
 
             it("should return false if a variance is not valid (null)", () => {
-                expect(VarianceChecker.isVarianceValid(null)).toBeFalsy();
+                expect(isValueValid(null)).toBeFalsy();
             });
 
             it("should return false if a variance is not valid (Infinity)", () => {
-                expect(VarianceChecker.isVarianceValid(Infinity)).toBeFalsy();
+                expect(isValueValid(Infinity)).toBeFalsy();
             });
 
             it("should return false if a variance is not valid (-Infinity)", () => {
-                expect(VarianceChecker.isVarianceValid(-Infinity)).toBeFalsy();
+                expect(isValueValid(-Infinity)).toBeFalsy();
             });
         });
     });
@@ -279,7 +279,7 @@ describe("Multi KPI", () => {
     describe("DataFormatter", () => {
         describe("getFormattedVariance", () => {
             it("should return N/A if a variance is not valid", () => {
-                expect(DataFormatter.getFormattedVariance(NaN, null)).toBe("N/A");
+                expect(getFormattedValueWithFallback(NaN, null)).toBe("N/A");
             });
 
             it("should return 12.34K if precision is 2 and display units are 1000", () => {
@@ -291,7 +291,7 @@ describe("Multi KPI", () => {
                 numericDescriptor.precision = 2;
                 numericDescriptor.displayUnits = 1000;
 
-                const actualValue: string = DataFormatter.getFormattedVariance(
+                const actualValue: string = getFormattedValueWithFallback(
                     value,
                     numericDescriptor,
                 );

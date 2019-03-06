@@ -54,7 +54,6 @@ export interface IDataRepresentationSeries {
     name: string;
     index: number;
     points: IDataRepresentationPoint[]; // All data points as is
-    filteredPoints: IDataRepresentationPoint[]; // We add only a valid data point
     smoothedPoints: IDataRepresentationPoint[]; // Interpolated data points
     current: IDataRepresentationPoint;
     x: IDataRepresentationAxis;

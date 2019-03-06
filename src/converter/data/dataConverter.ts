@@ -284,7 +284,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     const series: IDataRepresentationSeries = {
                         current: undefined,
                         dateDifference: undefined,
-                        filteredPoints: [],
                         formattedDate: "",
                         formattedTooltip: undefined,
                         formattedVariance: "",
@@ -351,8 +350,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 );
 
                 if (!isNaN(y)) {
-                    dataRepresentation.series[columnIndex].filteredPoints.push(dataPoint);
-
                     dataRepresentation.series[columnIndex].y.min = this.getMin(
                         dataRepresentation.series[columnIndex].y.min,
                         y,

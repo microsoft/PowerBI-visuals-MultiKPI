@@ -55,7 +55,6 @@ import { isValueValid } from "../../utils/valueUtils";
 export interface ILineComponentRenderOptions {
     alternativeColor: string;
     color: string;
-    filteredPoints: IDataRepresentationPoint[];
     points: IDataRepresentationPoint[];
     thickness: number;
     type: DataRepresentationPointGradientType;
@@ -64,12 +63,18 @@ export interface ILineComponentRenderOptions {
     y: IDataRepresentationAxis;
 }
 
+interface IAdvancedLineComponentRenderOptions extends ILineComponentRenderOptions {
+    validPoints: IDataRepresentationPoint[];
+}
+
 export interface ILineComponentGradient {
     color: string;
     offset: string;
 }
 
 export class LineComponent extends BaseComponent<IVisualComponentConstructorOptions, ILineComponentRenderOptions> {
+    protected renderOptions: IAdvancedLineComponentRenderOptions;
+
     private className: string = "lineComponent";
     private lineSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("line");
 
@@ -107,7 +112,14 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     }
 
     public render(options: ILineComponentRenderOptions): void {
-        this.renderOptions = options;
+        const { points } = options;
+
+        const validPoints: IDataRepresentationPoint[] = this.getValidPoints(points);
+
+        this.renderOptions = {
+            ...options,
+            validPoints,
+        };
 
         this.renderComponent(this.renderOptions);
     }
@@ -133,13 +145,12 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         const {
             alternativeColor,
             color,
-            filteredPoints,
+            validPoints,
             viewport,
         } = this.renderOptions;
 
         // Last valid point is required here to line width to generate a correct gradient
-        const lastValidPoint: IDataRepresentationPoint = filteredPoints
-            && filteredPoints[filteredPoints.length - 1];
+        const lastValidPoint: IDataRepresentationPoint = validPoints && validPoints[validPoints.length - 1];
 
         if (!lastValidPoint) {
             return;
@@ -223,13 +234,15 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .classed(this.lineSelector.className, true)
             .merge(lineSelection)
             .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
+                const points: IDataRepresentationPoint[] = this.getValidPoints(lineRenderOptions.points);
+
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(lineRenderOptions.filteredPoints);
+                        return this.getArea(xScale, yScale, viewport)(points);
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
-                        return this.getLine(xScale, yScale)(lineRenderOptions.filteredPoints);
+                        return this.getLine(xScale, yScale)(points);
                     }
                 }
             })
@@ -344,5 +357,15 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         // tslint:enable:prefer-for-of
 
         return concatenatedGeneratedId;
+    }
+
+    private getValidPoints(points: IDataRepresentationPoint[]): IDataRepresentationPoint[] {
+        return points.filter((point: IDataRepresentationPoint) => {
+            return this.isPointValid(point);
+        });
+    }
+
+    private isPointValid(point: IDataRepresentationPoint): boolean {
+        return point && isValueValid(point.y);
     }
 }
