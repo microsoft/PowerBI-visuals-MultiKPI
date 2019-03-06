@@ -223,15 +223,13 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .classed(this.lineSelector.className, true)
             .merge(lineSelection)
             .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
-                const filteredPoints: IDataRepresentationPoint[] = this.filterPoints(lineRenderOptions.points);
-
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(filteredPoints);
+                        return this.getArea(xScale, yScale, viewport)(lineRenderOptions.filteredPoints);
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
-                        return this.getLine(xScale, yScale)(filteredPoints);
+                        return this.getLine(xScale, yScale)(lineRenderOptions.filteredPoints);
                     }
                 }
             })
@@ -296,12 +294,6 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .y1((dataPoint: IDataRepresentationPoint) => {
                 return yScale.scale(dataPoint.y);
             });
-    }
-
-    private filterPoints(points: IDataRepresentationPoint[]): IDataRepresentationPoint[] {
-        return points.filter((point: IDataRepresentationPoint) => {
-            return point && isValueValid(point.y);
-        });
     }
 
     private getGradientUrl(): string {
