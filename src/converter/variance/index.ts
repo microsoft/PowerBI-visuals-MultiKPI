@@ -27,8 +27,8 @@
 import { create as createDifferenceConverter } from "./differenceConverter";
 import { create as createVarianceConverter } from "./varianceConverter";
 
-export function createVarianceConverterByType(isDataInPercentageFormat: boolean) {
-    return isDataInPercentageFormat
+export function createVarianceConverterByType(shouldUseDifferenceConverter: boolean) {
+    return shouldUseDifferenceConverter
         ? createDifferenceConverter()
         : createVarianceConverter();
 }

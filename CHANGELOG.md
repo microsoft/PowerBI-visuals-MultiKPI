@@ -5,6 +5,7 @@
 * Adds alignment for subtitle
 * Adds "On Hover Current Value" alignment
 * Allows calculating a difference instead of growth for percentage metrics
+* Allows to treat empty values as zero
 
 ## 2.0.0
 * API 2.2.0
