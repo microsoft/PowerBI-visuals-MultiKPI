@@ -202,6 +202,7 @@ export class ChartComponent extends BaseContainerComponent<
         this.lineComponent.render({
             alternativeColor: settings.chart.alternativeColor,
             color: settings.chart.color,
+            filteredPoints: series.filteredPoints,
             points: series.points,
             thickness: settings.chart.thickness,
             type: settings.chart.chartType,

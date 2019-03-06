@@ -53,14 +53,15 @@ import { EventName } from "../../event/eventName";
 import { isValueValid } from "../../utils/valueUtils";
 
 export interface ILineComponentRenderOptions {
+    alternativeColor: string;
+    color: string;
+    filteredPoints: IDataRepresentationPoint[];
+    points: IDataRepresentationPoint[];
+    thickness: number;
+    type: DataRepresentationPointGradientType;
     viewport: powerbi.IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
-    color: string;
-    thickness: number;
-    alternativeColor: string;
-    points: IDataRepresentationPoint[];
-    type: DataRepresentationPointGradientType;
 }
 
 export interface ILineComponentGradient {
@@ -130,17 +131,33 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         }
 
         const {
-            color,
-            viewport,
             alternativeColor,
+            color,
+            filteredPoints,
+            viewport,
         } = this.renderOptions;
 
-        const xPosition: number = this.renderOptions.x.scale
-            .copy()
-            .range([0, viewport.width])
-            .scale(point.x);
+        // Last valid point is required here to line width to generate a correct gradient
+        const lastValidPoint: IDataRepresentationPoint = filteredPoints
+            && filteredPoints[filteredPoints.length - 1];
 
-        const offset: number = xPosition / viewport.width * 100;
+        if (!lastValidPoint) {
+            return;
+        }
+
+        const xScale: DataRepresentationScale = this.renderOptions.x.scale
+            .copy()
+            .range([0, viewport.width]);
+
+        const xPosition: number = xScale.scale(point.x);
+
+        const lineWidth: number = xScale.scale(lastValidPoint.x);
+
+        const width: number = lineWidth > viewport.width
+            ? viewport.width
+            : lineWidth;
+
+        const offset: number = xPosition / width * 100;
         const offsetInPercent: string = `${offset}%`;
 
         const gradients: ILineComponentGradient[] = offset === 100
