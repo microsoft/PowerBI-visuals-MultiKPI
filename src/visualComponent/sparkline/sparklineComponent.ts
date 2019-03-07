@@ -39,7 +39,7 @@ import {
     ViewportSize,
 } from "../../converter/data/dataRepresentation";
 
-import { DataFormatter } from "../../converter/data/dataFormatter";
+import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
 
 import { EventName } from "../../event/eventName";
 
@@ -200,7 +200,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         settings.titleText = name;
         settings.autoFontSizeValue = fontSize;
 
-        this.topLabelComponent.render({ settings });
+        this.topLabelComponent.render({ subtitleSettings: settings });
     }
 
     private renderBottomLabel(
@@ -211,15 +211,10 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         const fontSize: number = this.getFontSizeByViewportSize(viewportSize);
         const actualValueKPIFontSize: number = fontSize * this.getActualValueKPIFactorByViewportSize(viewportSize);
 
-        const formatter: valueFormatter.IValueFormatter = DataFormatter.getValueFormatter(
-            value,
-            settings,
-        );
-
-        settings.titleText = formatter.format(value);
+        settings.titleText = getFormattedValueWithFallback(value, settings);
         settings.autoFontSizeValue = actualValueKPIFontSize;
 
-        this.bottomLabelComponent.render({ settings });
+        this.bottomLabelComponent.render({ subtitleSettings: settings });
     }
 
     private renderPlot(options: ISparklineComponentRenderOptions): void {

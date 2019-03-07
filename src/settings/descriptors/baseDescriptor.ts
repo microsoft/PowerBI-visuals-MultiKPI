@@ -28,7 +28,7 @@ export class BaseDescriptor {
     public show: boolean = true;
     public isShown: boolean = true;
 
-    public shouldBeShown(): boolean {
+    public get shouldBeShown(): boolean {
         return this.show && this.isShown;
     }
 

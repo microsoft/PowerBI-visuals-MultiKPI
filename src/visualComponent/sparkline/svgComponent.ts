@@ -51,6 +51,8 @@ import {
 import { EventName } from "../../event/eventName";
 import { MultiLineComponent } from "./multiLineComponent";
 
+import { isValueValid } from "../../utils/valueUtils";
+
 export class SvgComponent extends BaseContainerComponent<
     IVisualComponentConstructorOptions,
     ISparklineComponentRenderOptions,
@@ -170,11 +172,13 @@ export class SvgComponent extends BaseContainerComponent<
             const points: IDataRepresentationPoint[] = [];
 
             this.renderOptions.series.forEach((series: IDataRepresentationSeries) => {
-                if (series
-                    && series.smoothedPoints
-                    && series.smoothedPoints[index]
-                ) {
-                    points.push(series.smoothedPoints[index]);
+                const point: IDataRepresentationPoint = this.getClosestValidPoint(
+                    series.smoothedPoints,
+                    index,
+                );
+
+                if (point) {
+                    points.push(point);
                 }
             });
 
@@ -191,5 +195,25 @@ export class SvgComponent extends BaseContainerComponent<
                 },
             );
         }
+    }
+
+    private getClosestValidPoint(
+        points: IDataRepresentationPoint[],
+        pointIndex: number,
+    ): IDataRepresentationPoint {
+        if (points
+            && points.length
+            && pointIndex < points.length
+        ) {
+            for (let index = pointIndex; index >= 0; index--) {
+                const point: IDataRepresentationPoint = points[index];
+
+                if (point && isValueValid(point.y)) {
+                    return point;
+                }
+            }
+        }
+
+        return null;
     }
 }

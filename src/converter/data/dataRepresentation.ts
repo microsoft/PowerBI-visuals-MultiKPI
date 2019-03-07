@@ -53,8 +53,8 @@ export interface IDataRepresentationAxis {
 export interface IDataRepresentationSeries {
     name: string;
     index: number;
-    points: IDataRepresentationPoint[];
-    smoothedPoints: IDataRepresentationPoint[];
+    points: IDataRepresentationPoint[]; // All data points as is
+    smoothedPoints: IDataRepresentationPoint[]; // Interpolated data points
     current: IDataRepresentationPoint;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;

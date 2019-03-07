@@ -24,30 +24,11 @@
  *  THE SOFTWARE.
  */
 
-import { KpiBaseDescriptor } from "./kpiBaseDescriptor";
+import { BaseDescriptor } from "./baseDescriptor";
 
-export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
-    public isCurrentValueShown: boolean = true;
-    public currentValueFontSize: number = 11;
-    public currentValueColor: string = "#217CC9";
-    public isCurrentValueLeftAligned: boolean = true;
-
-    constructor() {
-        super();
-
-        const color: string = "#4F4F4F";
-
-        this.seriesNameColor = color;
-        this.valueColor = color;
-    }
-
-    public parse() {
-        super.parse();
-
-        if (this.autoAdjustFontSize) {
-            delete this.currentValueFontSize;
-        } else {
-            this.currentValueFontSize = this.getValidFontSize(this.currentValueFontSize);
-        }
-    }
+export class StaleDataDescriptor extends BaseDescriptor {
+    public staleDataText: string = undefined;
+    public staleDataThreshold: number = 0;
+    public color: string = "#3599b8";
+    public background: string = "";
 }

@@ -41,6 +41,8 @@ import { IVisualComponentConstructorOptions } from "../visualComponentConstructo
 
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 
+import { isValueValid } from "../../utils/valueUtils";
+
 export interface IDotsComponentRenderOptions {
     viewport: powerbi.IViewport;
     x: IDataRepresentationAxis;
@@ -81,7 +83,9 @@ export class DotsComponent extends BaseComponent<IVisualComponentConstructorOpti
 
         const dotSelection: Selection<any, IDataRepresentationPoint, any, any> = this.element
             .selectAll(this.dotSelector.selectorName)
-            .data(points);
+            .data(points.filter((point: IDataRepresentationPoint) => {
+                return point && isValueValid(point.y);
+            }));
 
         dotSelection
             .exit()

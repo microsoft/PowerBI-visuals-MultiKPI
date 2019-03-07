@@ -61,6 +61,45 @@
           "type": {
             "numeric": true
           }
+        },
+        "treatEmptyValuesAsZero": {
+          "displayName": "Treat Empty Values As Zero",
+          "type": {
+            "bool": true
+          }
+        }
+      }
+    },
+    "variance": {
+      "displayName": "Variance",
+      "properties": {
+        "format": {
+          "displayName": "Format",
+          "placeHolderText": "Auto",
+          "type": {
+            "text": true
+          }
+        },
+        "displayUnits": {
+          "displayName": "Display Units",
+          "type": {
+            "formatting": {
+              "labelDisplayUnits": true
+            }
+          }
+        },
+        "precision": {
+          "displayName": "Precision",
+          "type": {
+            "numeric": true
+          }
+        },
+        "shouldCalculateDifference": {
+          "displayName": "Calculate Difference",
+          "description": "Calculates a difference instead of growth",
+          "type": {
+            "bool": true
+          }
         }
       }
     },
@@ -466,6 +505,12 @@
             "numeric": true
           }
         },
+        "isCurrentValueLeftAligned": {
+          "displayName": "Current Value Is Left Aligned",
+          "type": {
+            "bool": true
+          }
+        },
         "isCurrentValueShown": {
           "displayName": "Current Value",
           "type": {
@@ -788,6 +833,14 @@
             }
           }
         },
+        "alignment": {
+          "displayName": "Alignment",
+          "type": {
+            "formatting": {
+              "alignment": true
+            }
+          }
+        },
         "fontSize": {
           "displayName": "Text Size",
           "type": {
@@ -812,6 +865,54 @@
           "displayName": "Stale Data Text",
           "type": {
             "text": true
+          }
+        }
+      }
+    },
+    "staleData": {
+      "displayName": "Stale Data",
+      "description": "To turn on Stale Data make sure to turn on Subtitle first",
+      "properties": {
+        "show": {
+          "displayName": "Show",
+          "type": {
+            "bool": true
+          }
+        },
+        "staleDataText": {
+          "displayName": "Title",
+          "description": "Use ${1} to indicate where to put a date difference to indicate how old data is",
+          "type": {
+            "text": true
+          }
+        },
+        "staleDataThreshold": {
+          "displayName": "Threshold (days)",
+          "description": "Data is stale if data is older than some number of days from now",
+          "type": {
+            "numeric": true
+          }
+        },
+        "color": {
+          "displayName": "Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "background": {
+          "displayName": "Background Color",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "nullable": true
+                }
+              }
+            }
           }
         }
       }

@@ -33,17 +33,20 @@ import { FormatDescriptor } from "./descriptors/formatDescriptor";
 import { GridDescriptor } from "./descriptors/gridDescriptor";
 import { KpiDescriptor } from "./descriptors/kpi/kpiDescriptor";
 import { KpiOnHoverDescriptor } from "./descriptors/kpi/kpiOnHoverDescriptor";
-import { NumericDescriptor } from "./descriptors/numericDescriptor";
 import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
+import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
 import { SubtitleAlignment, SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { SubtitleWarningDescriptor } from "./descriptors/subtitleWarningDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
+import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
+import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 
 export class Settings extends SettingsBase {
     public date: FormatDescriptor = new FormatDescriptor();
-    public values: NumericDescriptor = new NumericDescriptor();
+    public values: ValuesDescriptor = new ValuesDescriptor();
+    public variance: VarianceDescriptor = new VarianceDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public chart: ChartDescriptor = new ChartDescriptor();
     public tooltip: TooltipDescriptor = new TooltipDescriptor();
@@ -56,10 +59,14 @@ export class Settings extends SettingsBase {
     public sparklineYAxis: SparklineAxisDescriptor = new SparklineAxisDescriptor();
     public sparklineValue: SubtitleDescriptor = new SubtitleDescriptor();
     public subtitle: SubtitleWarningDescriptor = new SubtitleWarningDescriptor();
+    public staleData: StaleDataDescriptor = new StaleDataDescriptor();
     public printMode: BaseDescriptor = new BaseDescriptor();
 
     constructor() {
         super();
+
+        this.variance.precision = 2; // It's different because we need to keep the existing behavior
+        this.variance.defaultFormat = "+0.00%;-0.00%;0.00%";
 
         this.subtitle.show = false;
         this.subtitle.fontSize = 8.25;
@@ -87,5 +94,15 @@ export class Settings extends SettingsBase {
         this.sparklineYAxis.isShown = false;
 
         this.printMode.show = false;
+    }
+
+    public parse(): void {
+        if (this.staleData.staleDataText === undefined) {
+            this.staleData.staleDataText = "Data is ${1} days old." + (this.subtitle.staleDataText || "");
+        }
+
+        if (!this.subtitle.shouldBeShown) {
+            this.staleData.show = false;
+        }
     }
 }

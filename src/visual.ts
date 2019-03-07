@@ -30,8 +30,6 @@ import "../styles/styles.less";
 
 import powerbi from "powerbi-visuals-api";
 
-import { ColorHelper } from "powerbi-visuals-utils-colorutils";
-
 import { dispatch, Dispatch } from "d3-dispatch";
 import { select as d3Select } from "d3-selection";
 
@@ -42,15 +40,10 @@ import { EventName } from "./event/eventName";
 import { SeriesSettings } from "./settings/seriesSettings";
 import { Settings } from "./settings/settings";
 
-import { BaseDescriptor } from "./settings/descriptors/baseDescriptor";
-
 import { DataOrderConverter } from "./converter/data/dataOrderConverter";
 import { DataOrderConverterWithDuplicates } from "./converter/data/dataOrderConverterWithDuplicates";
 
-import {
-    IDataRepresentation,
-    IDataRepresentationSeries,
-} from "./converter/data/dataRepresentation";
+import { IDataRepresentation } from "./converter/data/dataRepresentation";
 
 import { RootComponent } from "./visualComponent/rootComponent";
 import { IVisualComponent } from "./visualComponent/visualComponent";
@@ -96,7 +89,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
 
         this.eventDispatcher.on(
             EventName.onChartViewReset,
-            this.render.bind(this),
+            () => this.render(this.dataRepresentation, this.settings, this.viewport),
         );
 
         this.rootComponent = new RootComponent({
@@ -126,40 +119,56 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             viewport: this.viewport,
         });
 
-        this.render();
+        this.render(
+            this.dataRepresentation,
+            this.settings,
+            this.viewport,
+        );
     }
 
     public enumerateObjectInstances(options: powerbi.EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
+        if (!this.settings) {
+            return [];
+        }
+
         const { objectName } = options;
 
         const shouldUseContainers: boolean = Object.keys(new SeriesSettings()).indexOf(objectName) !== -1;
 
         if (!shouldUseContainers) {
-            return Settings.enumerateObjectInstances(
-                this.settings || Settings.getDefault(),
-                options,
-            );
+            return this.settings.enumerateObjectInstances(options);
         }
 
-        const enumerationObject: powerbi.VisualObjectInstanceEnumerationObject = {
-            containers: [],
-            instances: [],
-        };
+        const enumerationObject: powerbi.VisualObjectInstanceEnumerationObject
+            = this.settings.enumerateObjectInstancesWithSelectionId(
+                options,
+                "[All]",
+                null,
+            );
 
-        this.enumerateSettings(
-            enumerationObject,
-            options.objectName,
-            this.getSettings.bind(this),
-        );
+        for (const series of this.dataRepresentation.sortedSeries) {
+            if (series && series.settings) {
+                series.settings.enumerateObjectInstancesWithSelectionId(
+                    options,
+                    series.name,
+                    series.selectionId,
+                    enumerationObject,
+                );
+            }
+        }
 
         return enumerationObject;
     }
 
-    private render(): void {
+    private render(
+        data: IDataRepresentation,
+        settings: Settings,
+        viewport: powerbi.IViewport,
+    ): void {
         this.rootComponent.render({
-            data: this.dataRepresentation,
-            settings: this.settings,
-            viewport: this.viewport,
+            data,
+            settings,
+            viewport,
         });
     }
 
@@ -182,11 +191,11 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             firstSeriesName: name,
         });
 
-        this.rootComponent.render({
-            data: this.dataRepresentation,
-            settings: this.settings,
-            viewport: this.viewport,
-        });
+        this.render(
+            this.dataRepresentation,
+            this.settings,
+            this.viewport,
+        );
     }
 
     private onChartViewChange(name: string): void {
@@ -197,88 +206,10 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             firstSeriesName: name,
         });
 
-        this.rootComponent.render({
-            data: dataRepresentation,
-            settings: this.settings,
-            viewport: this.viewport,
-        });
-    }
-
-    private enumerateSettings(
-        enumerationObject: powerbi.VisualObjectInstanceEnumerationObject,
-        objectName: string,
-        getSettings: (settings: BaseDescriptor) => { [propertyName: string]: powerbi.DataViewPropertyValue },
-    ): void {
-        this.applySettings(
-            objectName,
-            "[All]",
-            null,
-            enumerationObject,
-            getSettings(this.settings[objectName]));
-
-        this.enumerateSettingsDeep(
-            this.dataRepresentation.sortedSeries,
-            objectName,
-            enumerationObject,
-            getSettings,
+        this.render(
+            dataRepresentation,
+            this.settings,
+            this.viewport,
         );
-    }
-
-    private getSettings(settings: BaseDescriptor): { [propertyName: string]: powerbi.DataViewPropertyValue } {
-        const properties: { [propertyName: string]: powerbi.DataViewPropertyValue; } = {};
-
-        for (const descriptor in settings) {
-            const value: any = settings.getValueByPropertyName(descriptor);
-
-            const typeOfValue: string = typeof value;
-
-            if (typeOfValue === "undefined"
-                || value === null
-                || typeOfValue === "number"
-                || typeOfValue === "string"
-                || typeOfValue === "boolean"
-            ) {
-                properties[descriptor] = value;
-            }
-        }
-
-        return properties;
-    }
-
-    private applySettings(
-        objectName: string,
-        displayName: string,
-        selector: powerbi.data.Selector,
-        enumerationObject: powerbi.VisualObjectInstanceEnumerationObject,
-        properties: { [propertyName: string]: powerbi.DataViewPropertyValue },
-    ): void {
-        const containerIdx: number = enumerationObject.containers.push({ displayName }) - 1;
-
-        enumerationObject.instances.push({
-            containerIdx,
-            objectName,
-            properties,
-            selector,
-        });
-    }
-
-    private enumerateSettingsDeep(
-        seriesArray: IDataRepresentationSeries[],
-        objectName: string,
-        enumerationObject: powerbi.VisualObjectInstanceEnumerationObject,
-        getSettings: (settings: BaseDescriptor) => { [propertyName: string]: powerbi.DataViewPropertyValue },
-    ): void {
-        for (const series of seriesArray) {
-            const selector: powerbi.data.Selector = series.selectionId
-                && (series.selectionId as powerbi.visuals.ISelectionId).getSelector();
-
-            this.applySettings(
-                objectName,
-                series.name,
-                ColorHelper.normalizeSelector(selector),
-                enumerationObject,
-                getSettings(series.settings[objectName]),
-            );
-        }
     }
 }

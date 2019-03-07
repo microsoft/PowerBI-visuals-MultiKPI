@@ -55,12 +55,12 @@ export class VarianceConverter implements IConverter<IVarianceConverterOptions, 
     }
 }
 
-let varianceConverter: IConverter<IVarianceConverterOptions, number>;
+let converter: IConverter<IVarianceConverterOptions, number>;
 
-export function createVarianceConverter(): IConverter<IVarianceConverterOptions, number> {
-    if (!varianceConverter) {
-        varianceConverter = new VarianceConverter();
+export function create(): IConverter<IVarianceConverterOptions, number> {
+    if (!converter) {
+        converter = new VarianceConverter();
     }
 
-    return varianceConverter;
+    return converter;
 }

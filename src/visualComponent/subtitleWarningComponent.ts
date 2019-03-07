@@ -28,6 +28,7 @@ import { Selection } from "d3-selection";
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
+import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor";
 import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarningDescriptor";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
@@ -39,7 +40,16 @@ import {
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
     dateDifference: number;
-    settings: SubtitleWarningDescriptor;
+    subtitleSettings: SubtitleWarningDescriptor;
+    staleDataSettings: StaleDataDescriptor;
+}
+
+interface IIcon {
+    backgroundColor?: string;
+    color?: string;
+    isShown: boolean;
+    selector: CssConstants.ClassAndSelector;
+    title?: string;
 }
 
 export class SubtitleWarningComponent extends SubtitleComponent {
@@ -54,31 +64,73 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     public render(options: ISubtitleWarningComponentRenderOptions): void {
         const {
-            settings,
+            staleDataSettings,
+            subtitleSettings,
             warningState,
             dateDifference,
         } = options;
 
-        this.renderIcon(
-            warningState > 0 ? settings.warningText : null,
-            this.warningSelector,
-        );
+        this.renderIcon({
+            backgroundColor: null,
+            color: null,
+            isShown: !!(warningState > 0 && subtitleSettings.warningText),
+            selector: this.warningSelector,
+            title: subtitleSettings.warningText,
+        });
 
         super.render(options);
 
-        this.renderIcon(
-            `Data is ${dateDifference} days old. ${settings.staleDataText}`,
-            this.dataAgeSelector,
-        );
+        this.renderStaleData(dateDifference, staleDataSettings);
     }
 
-    private renderIcon(
-        title: string,
-        selector: CssConstants.ClassAndSelector,
-    ): void {
+    private renderStaleData(dateDifference: number, staleDataSettings: StaleDataDescriptor): void {
+        const {
+            background,
+            color,
+            shouldBeShown,
+            staleDataText,
+            staleDataThreshold,
+        } = staleDataSettings;
+
+        const title: string = this.getTitle(
+            staleDataText,
+            dateDifference,
+        );
+
+        const isDataStale: boolean = this.isDataStale(
+            dateDifference,
+            staleDataThreshold,
+        );
+
+        this.renderIcon({
+            backgroundColor: background,
+            color,
+            isShown: shouldBeShown && isDataStale,
+            selector: this.dataAgeSelector,
+            title,
+        });
+    }
+
+    private isDataStale(dateDifference: number, staleDataThreshold: number): boolean {
+        return dateDifference > staleDataThreshold;
+    }
+
+    private getTitle(stringTemplate: string, dateDifference: number): string {
+        return stringTemplate && stringTemplate.replace
+            ? stringTemplate.replace("${1}", `${dateDifference}`)
+            : stringTemplate;
+    }
+
+    private renderIcon({
+        backgroundColor,
+        color,
+        isShown,
+        selector,
+        title,
+    }: IIcon): void {
         const iconSelection: Selection<any, string, any, any> = this.element
             .selectAll(selector.selectorName)
-            .data(title ? [title] : []);
+            .data(isShown ? [title] : []);
 
         iconSelection
             .exit()
@@ -89,6 +141,8 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             .append("div")
             .classed(selector.className, true)
             .merge(iconSelection)
-            .attr("title", (titleData: string) => titleData);
+            .attr("title", (titleData: string) => titleData)
+            .style("color", color || null)
+            .style("background-color", backgroundColor || null);
     }
 }

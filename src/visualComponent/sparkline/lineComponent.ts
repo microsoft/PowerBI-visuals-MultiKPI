@@ -34,6 +34,7 @@ import {
 import { Selection } from "d3-selection";
 
 import powerbi from "powerbi-visuals-api";
+
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
@@ -49,15 +50,21 @@ import {
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 import { EventName } from "../../event/eventName";
 
+import { isValueValid } from "../../utils/valueUtils";
+
 export interface ILineComponentRenderOptions {
+    alternativeColor: string;
+    color: string;
+    points: IDataRepresentationPoint[];
+    thickness: number;
+    type: DataRepresentationPointGradientType;
     viewport: powerbi.IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
-    color: string;
-    thickness: number;
-    alternativeColor: string;
-    points: IDataRepresentationPoint[];
-    type: DataRepresentationPointGradientType;
+}
+
+interface IAdvancedLineComponentRenderOptions extends ILineComponentRenderOptions {
+    validPoints: IDataRepresentationPoint[];
 }
 
 export interface ILineComponentGradient {
@@ -66,6 +73,8 @@ export interface ILineComponentGradient {
 }
 
 export class LineComponent extends BaseComponent<IVisualComponentConstructorOptions, ILineComponentRenderOptions> {
+    protected renderOptions: IAdvancedLineComponentRenderOptions;
+
     private className: string = "lineComponent";
     private lineSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("line");
 
@@ -103,7 +112,14 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     }
 
     public render(options: ILineComponentRenderOptions): void {
-        this.renderOptions = options;
+        const { points } = options;
+
+        const validPoints: IDataRepresentationPoint[] = this.getValidPoints(points);
+
+        this.renderOptions = {
+            ...options,
+            validPoints,
+        };
 
         this.renderComponent(this.renderOptions);
     }
@@ -127,17 +143,32 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         }
 
         const {
-            color,
-            viewport,
             alternativeColor,
+            color,
+            validPoints,
+            viewport,
         } = this.renderOptions;
 
-        const xPosition: number = this.renderOptions.x.scale
-            .copy()
-            .range([0, viewport.width])
-            .scale(point.x);
+        // Last valid point is required here to line width to generate a correct gradient
+        const lastValidPoint: IDataRepresentationPoint = validPoints && validPoints[validPoints.length - 1];
 
-        const offset: number = xPosition / viewport.width * 100;
+        if (!lastValidPoint) {
+            return;
+        }
+
+        const xScale: DataRepresentationScale = this.renderOptions.x.scale
+            .copy()
+            .range([0, viewport.width]);
+
+        const xPosition: number = xScale.scale(point.x);
+
+        const lineWidth: number = xScale.scale(lastValidPoint.x);
+
+        const width: number = lineWidth > viewport.width
+            ? viewport.width
+            : lineWidth;
+
+        const offset: number = xPosition / width * 100;
         const offsetInPercent: string = `${offset}%`;
 
         const gradients: ILineComponentGradient[] = offset === 100
@@ -203,13 +234,15 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .classed(this.lineSelector.className, true)
             .merge(lineSelection)
             .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
+                const points: IDataRepresentationPoint[] = this.getValidPoints(lineRenderOptions.points);
+
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(lineRenderOptions.points);
+                        return this.getArea(xScale, yScale, viewport)(points);
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
-                        return this.getLine(xScale, yScale)(lineRenderOptions.points);
+                        return this.getLine(xScale, yScale)(points);
                     }
                 }
             })
@@ -324,5 +357,15 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         // tslint:enable:prefer-for-of
 
         return concatenatedGeneratedId;
+    }
+
+    private getValidPoints(points: IDataRepresentationPoint[]): IDataRepresentationPoint[] {
+        return points.filter((point: IDataRepresentationPoint) => {
+            return this.isPointValid(point);
+        });
+    }
+
+    private isPointValid(point: IDataRepresentationPoint): boolean {
+        return point && isValueValid(point.y);
     }
 }

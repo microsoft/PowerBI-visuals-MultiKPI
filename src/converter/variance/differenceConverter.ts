@@ -24,30 +24,23 @@
  *  THE SOFTWARE.
  */
 
-import { KpiBaseDescriptor } from "./kpiBaseDescriptor";
+import { IConverter } from "../converter";
+import { IVarianceConverterOptions } from "./varianceConverter";
 
-export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
-    public isCurrentValueShown: boolean = true;
-    public currentValueFontSize: number = 11;
-    public currentValueColor: string = "#217CC9";
-    public isCurrentValueLeftAligned: boolean = true;
+export class VarianceBasedOnDifferenceConverter implements IConverter<IVarianceConverterOptions, number> {
+    public convert(options: IVarianceConverterOptions): number {
+        const { secondDataPoint, firstDataPoint } = options;
 
-    constructor() {
-        super();
+        return secondDataPoint.y - firstDataPoint.y;
+    }
+}
 
-        const color: string = "#4F4F4F";
+let convert: IConverter<IVarianceConverterOptions, number>;
 
-        this.seriesNameColor = color;
-        this.valueColor = color;
+export function create(): IConverter<IVarianceConverterOptions, number> {
+    if (!convert) {
+        convert = new VarianceBasedOnDifferenceConverter();
     }
 
-    public parse() {
-        super.parse();
-
-        if (this.autoAdjustFontSize) {
-            delete this.currentValueFontSize;
-        } else {
-            this.currentValueFontSize = this.getValidFontSize(this.currentValueFontSize);
-        }
-    }
+    return convert;
 }

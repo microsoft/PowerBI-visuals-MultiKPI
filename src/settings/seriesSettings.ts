@@ -27,15 +27,17 @@
 import { SettingsBase } from "./settingsBase";
 
 import { AxisDescriptor } from "./descriptors/axisDescriptor";
-import { NumericDescriptor } from "./descriptors/numericDescriptor";
 import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
 import { SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
+import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
+import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 
 export class SeriesSettings extends SettingsBase {
-    public values: NumericDescriptor = new NumericDescriptor();
+    public values: ValuesDescriptor = new ValuesDescriptor();
+    public variance: VarianceDescriptor = new VarianceDescriptor();
     public yAxis: AxisDescriptor = new AxisDescriptor();
     public tooltip: TooltipDescriptor = new TooltipDescriptor();
     public sparkline: SparklineDescriptor = new SparklineDescriptor();
