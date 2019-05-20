@@ -1,17 +1,22 @@
 # Multi KPI
+[![Build Status](https://dev.azure.com/customvisuals/public/_apis/build/status/Microsoft.powerbi-visuals-multikpi)](https://dev.azure.com/customvisuals/public/_build/latest?definitionId=10)
+[![Coverage Status](https://coveralls.io/repos/github/Microsoft/powerbi-visuals-multikpi/badge.svg?branch=master)](https://coveralls.io/github/Microsoft/powerbi-visuals-multikpi?branch=master)
+> A powerful Multi KPI visualization, of a key KPI along with multiple sparklines of supporting data
 
-> Shows a KPI metric along with other metrics as sparklines
+![stacked area chart screenshot](./assets/screenshot.png)
+# Overview
 
-# Contributing
+The Multi KPI custom visual is for presenting a key performance indicator (KPI) along with a variety of supporting information, including:
+- Title, Subtitle
+- Sparklines
+- Current date and KPI status (value, date, variance)
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+Some of the key features include:
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+- KPI trend over time: hover-over the main chart to see a KPI for each date.
+- Rich Formatting Options: set alternate titles, and tooltips, font sizes, colors, background colors.
+- Numerous Chart Features: multi KPI support number types, precision, Y-axis tick marks, and hover-over tooltips.
+Sparkline Interpolation: Interpolate sparkline values to get rid of noisy points.
+- Auto-Scaling: design a larger tile in your report with rich details. After pinning it to a Power BI Dashboard, you may resize it to smaller versions of the tile without losing essential details.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+See also [Pulse Chart at Microsoft AppSource](https://appsource.microsoft.com/en-us/product/power-bi-visuals/WA104381763)
