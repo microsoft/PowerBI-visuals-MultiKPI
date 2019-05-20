@@ -19,4 +19,4 @@ Some of the key features include:
 Sparkline Interpolation: Interpolate sparkline values to get rid of noisy points.
 - Auto-Scaling: design a larger tile in your report with rich details. After pinning it to a Power BI Dashboard, you may resize it to smaller versions of the tile without losing essential details.
 
-See also [Pulse Chart at Microsoft AppSource](https://appsource.microsoft.com/en-us/product/power-bi-visuals/WA104381763)
+See also [MultiKPI at Microsoft AppSource](https://appsource.microsoft.com/en-us/product/power-bi-visuals/WA104381763)
