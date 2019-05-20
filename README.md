@@ -1,6 +1,6 @@
 # Multi KPI
 [![Build Status](https://dev.azure.com/customvisuals/public/_apis/build/status/Microsoft.powerbi-visuals-multikpi)](https://dev.azure.com/customvisuals/public/_build/latest?definitionId=10)
-[![Coverage Status](https://coveralls.io/repos/github/Microsoft/powerbi-visuals-multikpi/badge.svg?branch=master)](https://coveralls.io/github/Microsoft/powerbi-visuals-multikpi?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/microsoft/PowerBI-visuals-MultiKPI/badge.svg?branch=master)](https://coveralls.io/github/microsoft/PowerBI-visuals-MultiKPI?branch=master)
 > A powerful Multi KPI visualization, of a key KPI along with multiple sparklines of supporting data
 
 ![stacked area chart screenshot](./assets/screenshot.png)
