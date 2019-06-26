@@ -92,7 +92,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
 
         const domain: number[] = yScale.getDomain() as number[];
 
-        const axisValueFormatter: valueFormatter.IValueFormatter = valueFormatter.create({
+        const axisValueFormatter: valueFormatter.IValueFormatter = valueFormatter.valueFormatter.create({
             displayUnitSystemType: 2,
             format: settings.getFormat(),
             precision: settings.precision,
