@@ -24,8 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import "@babel/polyfill";
-
 import "../styles/styles.less";
 
 import powerbi from "powerbi-visuals-api";
@@ -68,6 +66,10 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
     private eventDispatcher: Dispatch<any> = dispatch(...Object.keys(EventName));
 
     constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
+        if (window.location !== window.parent.location) {
+            require("core-js/stable");
+        }
+
         const {
             element,
             host,
