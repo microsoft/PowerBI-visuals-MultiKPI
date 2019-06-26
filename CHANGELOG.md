@@ -1,3 +1,8 @@
+## 2.1.1
+* API 2.5.0
+* Conditional loading of `core-js/stable` only for sandbox mode
+* `@babel/polyfill` replacement by `core-js/stable`
+
 ## 2.1.0
 * Adds Decimal Places, Precision and Format for variance values
 * Fixes auto font size issue
