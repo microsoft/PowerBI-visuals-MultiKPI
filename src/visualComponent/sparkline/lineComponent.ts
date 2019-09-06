@@ -24,34 +24,22 @@
  *  THE SOFTWARE.
  */
 
-import {
-    area,
-    Area,
-    line,
-    Line,
-} from "d3-shape";
-
 import { Selection } from "d3-selection";
-
+import { area, Area, line, Line } from "d3-shape";
 import powerbi from "powerbi-visuals-api";
-
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
-
-import { BaseComponent } from "../baseComponent";
-import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
-
 import {
+    DataRepresentationAxisValueType,
     DataRepresentationPointGradientType,
     IDataRepresentationAxis,
     IDataRepresentationPoint,
-    DataRepresentationAxisValueType,
 } from "../../converter/data/dataRepresentation";
-
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 import { EventName } from "../../event/eventName";
-
 import { isValueValid } from "../../utils/valueUtils";
+import { BaseComponent } from "../baseComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
 export interface ILineComponentRenderOptions {
     alternativeColor: string;
@@ -169,7 +157,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             ? viewport.width
             : lineWidth;
 
-        const firstValue: IDataRepresentationPoint = this.renderOptions.points.find(x => x.y || x.y === 0);
+        const firstValue: IDataRepresentationPoint = this.renderOptions.points.find((x) => x.y || x.y === 0);
         const trueXPosition: number = xScale.scale(firstValue.x);
 
         const offset: number = xPosition >= trueXPosition ? ((xPosition - trueXPosition) / (width - trueXPosition) * 100) : 0;
@@ -312,7 +300,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
                 if (yMin.valueOf() < 0) {
                     return yScale.scale(0);
                 }
-                
+
                 return viewport.height;
             })
             .y1((dataPoint: IDataRepresentationPoint) => {

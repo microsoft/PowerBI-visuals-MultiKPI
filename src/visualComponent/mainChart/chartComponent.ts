@@ -201,13 +201,13 @@ export class ChartComponent extends BaseContainerComponent<
         this.lineComponent.render({
             alternativeColor: settings.chart.alternativeColor,
             color: settings.chart.color,
+            current: series.current,
             points: series.points,
             thickness: settings.chart.thickness,
             type: settings.chart.chartType,
             viewport,
             x: series.x,
             y: series.y,
-            current: series.current,
         });
 
         const margin: IMargin = this.getMarginByThickness(settings.chart.thickness);

@@ -23,23 +23,16 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import powerbi from "powerbi-visuals-api";
-
 import { Selection } from "d3-selection";
-
+import powerbi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
-
+import { IDataRepresentationSeries } from "../converter/data/dataRepresentation";
 import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor";
 import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarningDescriptor";
+import { ISubtitleComponentRenderOptions, SubtitleComponent } from "./subtitleComponent";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
 import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
-
-import {
-    ISubtitleComponentRenderOptions,
-    SubtitleComponent,
-} from "./subtitleComponent";
-import { IDataRepresentationSeries } from "../converter/data/dataRepresentation";
 
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
@@ -90,8 +83,8 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             tooltipItems: [
                 {
                     displayName: undefined,
-                    value: warningText
-                }
+                    value: warningText,
+                },
             ],
         });
     }
@@ -113,7 +106,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             staleDataThreshold,
         );
 
-        const tooltipItems: VisualTooltipDataItem[] = series.filter(x => x.staleDateDifference).map((s) => {
+        const tooltipItems: VisualTooltipDataItem[] = series.filter((x) => x.staleDateDifference).map((s) => {
             const title: string = this.getTitle(
                 staleDataText,
                 s.staleDateDifference,

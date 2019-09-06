@@ -82,9 +82,9 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
 
         this.tooltipServiceWrapper = new TooltipServiceWrapper(
             {
-                tooltipService: host.tooltipService,
+                handleTouchDelay: 0,
                 rootElement: options.element,
-                handleTouchDelay: 0
+                tooltipService: host.tooltipService,
             });
 
         this.dataConverter = new DataConverter({

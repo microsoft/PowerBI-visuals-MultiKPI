@@ -211,10 +211,10 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
         } = options;
         this.subtitleComponent.render({
             dateDifference: data.dateDifference,
+            series: data.series,
             staleDataSettings: settings.staleData,
             subtitleSettings: settings.subtitle,
             warningState: data.warningState,
-            series: data.series,
         });
 
         const subtitleComponentHeight: number = this.subtitleComponent.getViewport().height;

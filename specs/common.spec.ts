@@ -109,6 +109,7 @@ describe("Multi KPI", () => {
                 const lineRenderOptions: ILineComponentRenderOptions = {
                     alternativeColor: "blue",
                     color: "green",
+                    current: undefined,
                     points: [
                         {
                             index: 0,
