@@ -37,8 +37,8 @@ export function getFormattedValueWithFallback(variance: number, settings: Numeri
     return getFormattedValue(variance, settings);
 }
 
-export function getFormattedDate(date: Date, format: string = valueFormatter.valueFormatter.DefaultDateFormat): string {
-    return valueFormatter.valueFormatter
+export function getFormattedDate(date: Date, format: string = valueFormatter.DefaultDateFormat): string {
+    return valueFormatter
         .create({ format })
         .format(date);
 }
@@ -48,7 +48,7 @@ export function getFormattedValue(value: number, settings: NumericDescriptor): s
 }
 
 export function getValueFormatter(value: number, settings: NumericDescriptor): valueFormatter.IValueFormatter {
-    return valueFormatter.valueFormatter.create({
+    return valueFormatter.create({
         displayUnitSystemType: 2,
         format: settings.getFormat(),
         precision: settings.precision,

@@ -23,6 +23,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import powerbi from "powerbi-visuals-api";
 
 import { Selection } from "d3-selection";
 
@@ -32,16 +33,20 @@ import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor
 import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarningDescriptor";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
+import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+
 import {
     ISubtitleComponentRenderOptions,
     SubtitleComponent,
 } from "./subtitleComponent";
+import { IDataRepresentationSeries } from "../converter/data/dataRepresentation";
 
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
     dateDifference: number;
     subtitleSettings: SubtitleWarningDescriptor;
     staleDataSettings: StaleDataDescriptor;
+    series: IDataRepresentationSeries[];
 }
 
 interface IIcon {
@@ -49,7 +54,7 @@ interface IIcon {
     color?: string;
     isShown: boolean;
     selector: CssConstants.ClassAndSelector;
-    title?: string;
+    tooltipItems?: VisualTooltipDataItem[];
 }
 
 export class SubtitleWarningComponent extends SubtitleComponent {
@@ -68,22 +73,33 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             subtitleSettings,
             warningState,
             dateDifference,
+            series,
         } = options;
 
+        this.renderWarningMessage(warningState, subtitleSettings.warningText);
+        super.render(options);
+        this.renderStaleData(dateDifference, staleDataSettings, series);
+    }
+
+    private renderWarningMessage(warningState: number, warningText: string): void {
         this.renderIcon({
             backgroundColor: null,
             color: null,
-            isShown: !!(warningState > 0 && subtitleSettings.warningText),
+            isShown: !!(warningState > 0 && warningText),
             selector: this.warningSelector,
-            title: subtitleSettings.warningText,
+            tooltipItems: [
+                {
+                    displayName: undefined,
+                    value: warningText
+                }
+            ],
         });
-
-        super.render(options);
-
-        this.renderStaleData(dateDifference, staleDataSettings);
     }
 
-    private renderStaleData(dateDifference: number, staleDataSettings: StaleDataDescriptor): void {
+    private renderStaleData(
+        dateDifference: number,
+        staleDataSettings: StaleDataDescriptor,
+        series: IDataRepresentationSeries[]): void {
         const {
             background,
             color,
@@ -92,22 +108,31 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             staleDataThreshold,
         } = staleDataSettings;
 
-        const title: string = this.getTitle(
-            staleDataText,
-            dateDifference,
-        );
-
         const isDataStale: boolean = this.isDataStale(
             dateDifference,
             staleDataThreshold,
         );
+
+        const tooltipItems: VisualTooltipDataItem[] = series.filter(x => x.staleDateDifference).map((s) => {
+            const title: string = this.getTitle(
+                staleDataText,
+                s.staleDateDifference,
+            );
+
+            const tolltipItem: VisualTooltipDataItem = {
+                displayName: s.name,
+                value: title,
+            };
+
+            return tolltipItem;
+        });
 
         this.renderIcon({
             backgroundColor: background,
             color,
             isShown: shouldBeShown && isDataStale,
             selector: this.dataAgeSelector,
-            title,
+            tooltipItems,
         });
     }
 
@@ -126,11 +151,11 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         color,
         isShown,
         selector,
-        title,
+        tooltipItems,
     }: IIcon): void {
-        const iconSelection: Selection<any, string, any, any> = this.element
+        const iconSelection: Selection<any, any, any, any> = this.element
             .selectAll(selector.selectorName)
-            .data(isShown ? [title] : []);
+            .data(isShown ? [1] : []);
 
         iconSelection
             .exit()
@@ -141,8 +166,15 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             .append("div")
             .classed(selector.className, true)
             .merge(iconSelection)
-            .attr("title", (titleData: string) => titleData)
             .style("color", color || null)
             .style("background-color", backgroundColor || null);
+
+        this.constructorOptions.tooltipServiceWrapper.addTooltip(
+            iconSelection,
+            () => {
+                if (tooltipItems && tooltipItems.length > 0) {
+                    return tooltipItems;
+                }
+            });
     }
 }

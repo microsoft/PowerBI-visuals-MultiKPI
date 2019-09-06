@@ -87,6 +87,7 @@ export class MultiLineComponent
                     viewport,
                     x: currentSeries.x,
                     y: currentSeries.ySparkline,
+                    current: currentSeries.current,
                 });
             },
         );

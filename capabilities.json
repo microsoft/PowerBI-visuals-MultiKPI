@@ -879,6 +879,12 @@
             "bool": true
           }
         },
+        "showLatterAvailableVaue": {
+          "displayName": "Show Latter Available Value",
+          "type": {
+            "bool": true
+          }
+        },
         "staleDataText": {
           "displayName": "Title",
           "description": "Use ${1} to indicate where to put a date difference to indicate how old data is",

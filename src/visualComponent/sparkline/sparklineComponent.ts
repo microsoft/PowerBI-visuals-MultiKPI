@@ -24,8 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-
 import powerbi from "powerbi-visuals-api";
 
 import { BaseContainerComponent } from "../baseContainerComponent";
@@ -129,17 +127,25 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
 
         this.updateElementOrder(this.element, position);
 
-        this.element.attr(
-            "title",
-            current && current.formattedTooltip || null,
-        );
-
         if (current && series) {
             if (!this.components.length) {
                 this.initialize();
             }
-
             this.renderComponent(this.renderOptions);
+
+            const tooltipText: string = current && current.formattedTooltip || null;
+
+            this.constructorOptions.tooltipServiceWrapper.addTooltip(
+                this.element,
+                () => {
+                    if (tooltipText) {
+                        return [{
+                            displayName: null,
+                            value: tooltipText,
+                        }];
+                    }
+                });
+
         } else {
             this.destroyComponents();
         }
@@ -156,7 +162,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         this.renderOptions = options;
 
         this.renderTopLabel(current.name, viewportSize, current.settings.sparklineLabel);
-        this.renderBottomLabel(current.current.y, viewportSize, current.settings.sparklineValue);
+        this.renderBottomLabel(current.current ? current.current.y : NaN, viewportSize, current.settings.sparklineValue);
         this.renderPlot(options);
     }
 

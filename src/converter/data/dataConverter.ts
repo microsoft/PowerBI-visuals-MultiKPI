@@ -337,7 +337,14 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 dataRepresentation.latestDate = x;
 
                 dataRepresentation.series[columnIndex].points.push(dataPoint);
-                dataRepresentation.series[columnIndex].current = dataPoint;
+
+                if (settings.staleData.show && settings.staleData.showLatterAvailableVaue) {
+                    if (!isNaN(dataPoint.y)) {
+                        dataRepresentation.series[columnIndex].current = dataPoint;
+                    }
+                } else {
+                    dataRepresentation.series[columnIndex].current = dataPoint;
+                }
 
                 dataRepresentation.series[columnIndex].x.min = this.getMin(
                     dataRepresentation.series[columnIndex].x.min,
@@ -401,6 +408,10 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
 
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
+            if (series.current && series.current.x) {
+                series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
+            }
+
             series.x.initialMin = series.x.min;
             series.x.initialMax = series.x.max;
 

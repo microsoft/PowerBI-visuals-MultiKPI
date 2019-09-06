@@ -151,8 +151,7 @@ export class ChartComponent extends BaseContainerComponent<
             () => {
                 const latestDataPoint: IDataRepresentationPoint = this.renderOptions
                     && this.renderOptions.series
-                    && this.renderOptions.series.points
-                    && this.renderOptions.series.points[this.renderOptions.series.points.length - 1];
+                    && this.renderOptions.series.current;
 
                 this.constructorOptions.eventDispatcher.call(
                     EventName.onCurrentDataPointIndexReset,
@@ -208,6 +207,7 @@ export class ChartComponent extends BaseContainerComponent<
             viewport,
             x: series.x,
             y: series.y,
+            current: series.current,
         });
 
         const margin: IMargin = this.getMarginByThickness(settings.chart.thickness);

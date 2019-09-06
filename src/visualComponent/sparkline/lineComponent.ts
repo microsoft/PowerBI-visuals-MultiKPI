@@ -45,6 +45,7 @@ import {
     DataRepresentationPointGradientType,
     IDataRepresentationAxis,
     IDataRepresentationPoint,
+    DataRepresentationAxisValueType,
 } from "../../converter/data/dataRepresentation";
 
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
@@ -61,6 +62,7 @@ export interface ILineComponentRenderOptions {
     viewport: powerbi.IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
+    current: IDataRepresentationPoint;
 }
 
 interface IAdvancedLineComponentRenderOptions extends ILineComponentRenderOptions {
@@ -94,7 +96,6 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .append("defs")
             .append("linearGradient")
             .attr("id", this.gradientId);
-
         this.constructorOptions = {
             ...options,
             element: this.element,
@@ -145,12 +146,12 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         const {
             alternativeColor,
             color,
-            validPoints,
             viewport,
+            current,
         } = this.renderOptions;
 
         // Last valid point is required here to line width to generate a correct gradient
-        const lastValidPoint: IDataRepresentationPoint = validPoints && validPoints[validPoints.length - 1];
+        const lastValidPoint: IDataRepresentationPoint = current;
 
         if (!lastValidPoint) {
             return;
@@ -168,7 +169,10 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             ? viewport.width
             : lineWidth;
 
-        const offset: number = xPosition / width * 100;
+        const firstValue: IDataRepresentationPoint = this.renderOptions.points.find(x => x.y || x.y === 0);
+        const trueXPosition: number = xScale.scale(firstValue.x);
+
+        const offset: number = xPosition >= trueXPosition ? ((xPosition - trueXPosition) / (width - trueXPosition) * 100) : 0;
         const offsetInPercent: string = `${offset}%`;
 
         const gradients: ILineComponentGradient[] = offset === 100
@@ -238,7 +242,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
 
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(points);
+                        return this.getArea(xScale, yScale, viewport, y.min)(points);
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
@@ -298,12 +302,19 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         xScale: DataRepresentationScale,
         yScale: DataRepresentationScale,
         viewport: powerbi.IViewport,
+        yMin: DataRepresentationAxisValueType,
     ): Area<IDataRepresentationPoint> {
         return area<IDataRepresentationPoint>()
             .x((dataPoint: IDataRepresentationPoint) => {
                 return xScale.scale(dataPoint.x);
             })
-            .y0(viewport.height)
+            .y0((dataPoint: IDataRepresentationPoint) => {
+                if (yMin.valueOf() < 0) {
+                    return yScale.scale(0);
+                }
+                
+                return viewport.height;
+            })
             .y1((dataPoint: IDataRepresentationPoint) => {
                 return yScale.scale(dataPoint.y);
             });

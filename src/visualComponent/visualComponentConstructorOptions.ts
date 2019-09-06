@@ -30,6 +30,7 @@ import powerbi from "powerbi-visuals-api";
 import { ScaleService } from "../services/scaleService";
 import { Settings } from "../settings/settings";
 import { IVisualComponentBaseConstructorOptions } from "./visualComponentBaseConstructorOptions";
+import { ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 
 export interface IVisualComponentConstructorOptions extends IVisualComponentBaseConstructorOptions {
     eventDispatcher?: Dispatch<any>; // TODO
@@ -37,4 +38,5 @@ export interface IVisualComponentConstructorOptions extends IVisualComponentBase
     scaleService?: ScaleService;
     style?: powerbi.extensibility.IColorPalette; // TODO: must be renamed
     getSettings?: () => Settings;
+    tooltipServiceWrapper?: ITooltipServiceWrapper;
 }

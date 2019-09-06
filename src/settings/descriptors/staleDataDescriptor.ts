@@ -27,6 +27,7 @@
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class StaleDataDescriptor extends BaseDescriptor {
+    public showLatterAvailableVaue: boolean = false;
     public staleDataText: string = undefined;
     public staleDataThreshold: number = 0;
     public color: string = "#3599b8";

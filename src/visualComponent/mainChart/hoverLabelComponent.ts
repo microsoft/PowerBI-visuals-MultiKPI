@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
+import powerbi from "powerbi-visuals-api";
 
 import { ChartLabelBaseComponent, IRenderGroup } from "./chartLabelBaseComponent";
 
@@ -44,6 +44,8 @@ import { IVisualComponentConstructorOptions } from "../visualComponentConstructo
 
 import { KpiOnHoverDescriptor } from "../../settings/descriptors/kpi/kpiOnHoverDescriptor";
 import { VarianceDescriptor } from "../../settings/descriptors/varianceDescriptor";
+
+import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 
 export interface IHoverLabelComponentRenderOptions extends IVerticalReferenceLineComponentRenderOptions {
     kpiOnHoverSettings: KpiOnHoverDescriptor;
@@ -79,7 +81,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             this.show();
         }
 
-        const latestDataPoint: IDataRepresentationPoint = series.points[series.points.length - 1];
+        const latestDataPoint: IDataRepresentationPoint = series.current;
 
         const variance: number = createVarianceConverterByType(varianceSettings.shouldCalculateDifference)
             .convert({
@@ -102,14 +104,25 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
 
         const isVarianceValid: boolean = isValueValid(variance);
 
+        const tooltipText: string = series && series.formattedTooltip || null;
+        let tooltipDataItems: VisualTooltipDataItem[];
+
+        if (tooltipText) {
+            tooltipDataItems = [{
+                displayName: null,
+                value: tooltipText,
+            }];
+        }
+
         this.renderGroup(
             this.bodySelector,
             [
                 {
                     color: kpiOnHoverSettings.valueColor,
-                    data: getFormattedValueWithFallback(latestDataPoint.y, series.settings.values),
+                    data: getFormattedValueWithFallback((latestDataPoint ? latestDataPoint.y : NaN), series.settings.values),
                     fontSizeInPt: kpiOnHoverSettings.valueFontSize,
                     isShown: kpiOnHoverSettings.isValueShown,
+                    tooltipDataItems,
                 },
                 {
                     color: isVarianceValid
@@ -123,6 +136,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
                     selector: isVarianceValid || !kpiOnHoverSettings.autoAdjustFontSize
                         ? undefined
                         : this.varianceNotAvailableSelector,
+                    tooltipDataItems,
                 },
             ],
         );
