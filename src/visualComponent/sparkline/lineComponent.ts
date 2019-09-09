@@ -135,11 +135,11 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             alternativeColor,
             color,
             viewport,
-            current,
+            validPoints,
         } = this.renderOptions;
 
         // Last valid point is required here to line width to generate a correct gradient
-        const lastValidPoint: IDataRepresentationPoint = current;
+        const lastValidPoint: IDataRepresentationPoint = validPoints && validPoints[validPoints.length - 1];
 
         if (!lastValidPoint) {
             return;
@@ -158,7 +158,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             : lineWidth;
 
         const firstValue: IDataRepresentationPoint = this.renderOptions.points.find((x) => x.y || x.y === 0);
-        const trueXPosition: number = xScale.scale(firstValue.x);
+        const trueXPosition: number = firstValue ? xScale.scale(firstValue.x) : undefined;
 
         const offset: number = xPosition >= trueXPosition ? ((xPosition - trueXPosition) / (width - trueXPosition) * 100) : 0;
         const offsetInPercent: string = `${offset}%`;
