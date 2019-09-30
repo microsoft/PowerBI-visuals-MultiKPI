@@ -338,7 +338,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
 
                 dataRepresentation.series[columnIndex].points.push(dataPoint);
 
-                if (settings.staleData.show && settings.staleData.showLatterAvailableVaue) {
+                if (settings.staleData.show && settings.staleData.showLatterAvailableValue) {
                     if (!isNaN(dataPoint.y)) {
                         dataRepresentation.series[columnIndex].current = dataPoint;
                     }
@@ -409,7 +409,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
             if (series.current && series.current.x) {
-                series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
+                series.staleDateDifference = this.getDaysBetween(series.current.x, new Date(), settings.staleData.staleDataThreshold);
             }
 
             series.x.initialMin = series.x.min;
@@ -461,7 +461,14 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 : series.points;
         });
 
-        dataRepresentation.dateDifference = this.getDaysBetween(dataRepresentation.latestDate, new Date());
+        let maxDays = 0;
+        dataRepresentation.series.forEach((item) => {
+            if (item.staleDateDifference && item.staleDateDifference > maxDays) {
+                maxDays = item.staleDateDifference;
+            }
+        });
+
+        dataRepresentation.dateDifference = maxDays + settings.staleData.staleDataThreshold;
     }
 
     private getFormattedTooltip(series: IDataRepresentationSeries): string {
@@ -518,10 +525,10 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         );
     }
 
-    private getDaysBetween(startDate: Date, endDate: Date): number {
+    private getDaysBetween(startDate: Date, endDate: Date, daysToDeduct: number = 0): number {
         const oneDayInMs: number = 24 * 60 * 60 * 1000;
 
-        return Math.round(Math.abs(startDate.getTime() - endDate.getTime()) / oneDayInMs);
+        return Math.round(Math.abs(startDate.getTime() - endDate.getTime()) / oneDayInMs) - daysToDeduct;
     }
 
     private getMin<Type>(originalValue: Type, value: Type): Type {

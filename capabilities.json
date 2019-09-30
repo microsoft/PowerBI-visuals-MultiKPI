@@ -879,8 +879,8 @@
             "bool": true
           }
         },
-        "showLatterAvailableVaue": {
-          "displayName": "Show Latter Available Value",
+        "showLatterAvailableValue": {
+          "displayName": "Show Latest Available As Current Value",
           "type": {
             "bool": true
           }

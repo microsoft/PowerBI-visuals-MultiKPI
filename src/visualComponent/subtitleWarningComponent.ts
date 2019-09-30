@@ -106,7 +106,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             staleDataThreshold,
         );
 
-        const tooltipItems: VisualTooltipDataItem[] = series.filter((x) => x.staleDateDifference).map((s) => {
+        const tooltipItems: VisualTooltipDataItem[] = series.filter((x) => x.staleDateDifference && x.staleDateDifference > 0).map((s) => {
             const title: string = this.getTitle(
                 staleDataText,
                 s.staleDateDifference,
