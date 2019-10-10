@@ -899,6 +899,12 @@
             "numeric": true
           }
         },
+        "deductThresholdDays": {
+          "displayName": "Deduct Threshold Days",
+          "type": {
+            "bool": true
+          }
+        },
         "color": {
           "displayName": "Color",
           "type": {

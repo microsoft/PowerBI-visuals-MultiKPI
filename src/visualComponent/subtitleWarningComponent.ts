@@ -37,6 +37,7 @@ import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
     dateDifference: number;
+    staleDataDifference: number;
     subtitleSettings: SubtitleWarningDescriptor;
     staleDataSettings: StaleDataDescriptor;
     series: IDataRepresentationSeries[];
@@ -65,13 +66,13 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             staleDataSettings,
             subtitleSettings,
             warningState,
-            dateDifference,
             series,
+            staleDataDifference,
         } = options;
 
         this.renderWarningMessage(warningState, subtitleSettings.warningText);
         super.render(options);
-        this.renderStaleData(dateDifference, staleDataSettings, series);
+        this.renderStaleData(staleDataSettings, series, staleDataDifference);
     }
 
     private renderWarningMessage(warningState: number, warningText: string): void {
@@ -90,9 +91,9 @@ export class SubtitleWarningComponent extends SubtitleComponent {
     }
 
     private renderStaleData(
-        dateDifference: number,
         staleDataSettings: StaleDataDescriptor,
-        series: IDataRepresentationSeries[]): void {
+        series: IDataRepresentationSeries[],
+        staleDataDifference: number): void {
         const {
             background,
             color,
@@ -102,23 +103,49 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         } = staleDataSettings;
 
         const isDataStale: boolean = this.isDataStale(
-            dateDifference,
+            staleDataDifference,
             staleDataThreshold,
         );
 
-        const tooltipItems: VisualTooltipDataItem[] = series.filter((x) => x.staleDateDifference && x.staleDateDifference > 0).map((s) => {
-            const title: string = this.getTitle(
-                staleDataText,
-                s.staleDateDifference,
-            );
+        let tooltipItems: VisualTooltipDataItem[] = [];
 
-            const tolltipItem: VisualTooltipDataItem = {
-                displayName: s.name,
-                value: title,
-            };
+        const filterItemsFunc = (x: IDataRepresentationSeries) => {
+            if (x.staleDateDifference) {
+                if (staleDataSettings.deductThresholdDays) {
+                    return (x.staleDateDifference - staleDataThreshold > 0);
+                }
+                return (x.staleDateDifference > 0);
+            }
+            return false;
+        };
 
-            return tolltipItem;
-        });
+        if (staleDataSettings.showLatterAvailableValue) {
+            tooltipItems = series.filter(filterItemsFunc).map((s) => {
+                const title: string = this.getTitle(
+                    staleDataText,
+                    s.staleDateDifference,
+                    staleDataSettings.deductThresholdDays ? staleDataThreshold : 0,
+                );
+
+                const tolltipItem: VisualTooltipDataItem = {
+                    displayName: s.name,
+                    value: title,
+                };
+
+                return tolltipItem;
+            });
+        } else {
+            tooltipItems = [
+                {
+                    displayName: null,
+                    value: this.getTitle(
+                        staleDataText,
+                        staleDataDifference,
+                        staleDataSettings.deductThresholdDays ? staleDataThreshold : 0,
+                    ),
+                },
+            ];
+        }
 
         this.renderIcon({
             backgroundColor: background,
@@ -133,9 +160,10 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         return dateDifference > staleDataThreshold;
     }
 
-    private getTitle(stringTemplate: string, dateDifference: number): string {
+    private getTitle(stringTemplate: string, dateDifference: number, staleDataThreshold: number): string {
+        const days: number = dateDifference - staleDataThreshold;
         return stringTemplate && stringTemplate.replace
-            ? stringTemplate.replace("${1}", `${dateDifference}`)
+            ? stringTemplate.replace("${1}", `${days}`)
             : stringTemplate;
     }
 

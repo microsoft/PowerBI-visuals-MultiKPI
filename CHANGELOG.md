@@ -5,8 +5,9 @@
 * Principal tooltip was moved from the whole chart area into value and variant labels
 * Model of area filling was changed for values that are under zero
 * Was fixed a bag when cursor was shifted, if data of a chart started not from the beginning of a period
-* Was added a new option into "Stale Data" option group to show a latter available value for each chart
-* A tooltip regarding stale data now shows info for each chart
+* Was added a new option "Show Latest Available As Current Value" into "Stale Data" option group to show a latter available value for each chart
+* A tooltip regarding stale data now shows info for each chart (if option "Show Latest Available As Current Value" is anbled)
+* Was added a new option "Deduct Threshold Days" into "Stale Data" option group to deduct threshold days from days that is showed in tooltips
 
 ## 2.1.1
 * API 2.5.0

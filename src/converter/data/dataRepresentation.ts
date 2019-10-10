@@ -87,6 +87,7 @@ export interface IDataRepresentation {
     warningState: number;
     latestDate: Date;
     dateDifference: number;
+    staleDateDifference?: number;
     percentCalcDate: Date;
 
     viewport: powerbi.IViewport;

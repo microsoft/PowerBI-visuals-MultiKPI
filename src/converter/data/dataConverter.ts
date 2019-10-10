@@ -409,7 +409,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
             if (series.current && series.current.x) {
-                series.staleDateDifference = this.getDaysBetween(series.current.x, new Date(), settings.staleData.staleDataThreshold);
+                series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
             }
 
             series.x.initialMin = series.x.min;
@@ -465,10 +465,15 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         dataRepresentation.series.forEach((item) => {
             if (item.staleDateDifference && item.staleDateDifference > maxDays) {
                 maxDays = item.staleDateDifference;
+                dataRepresentation.staleDateDifference = maxDays;
             }
         });
 
-        dataRepresentation.dateDifference = maxDays + settings.staleData.staleDataThreshold;
+        dataRepresentation.dateDifference = this.getDaysBetween(dataRepresentation.latestDate, new Date());
+
+        if (settings.staleData.showLatterAvailableValue) {
+            dataRepresentation.dateDifference = maxDays + settings.staleData.staleDataThreshold;
+        }
     }
 
     private getFormattedTooltip(series: IDataRepresentationSeries): string {
@@ -525,10 +530,10 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         );
     }
 
-    private getDaysBetween(startDate: Date, endDate: Date, daysToDeduct: number = 0): number {
+    private getDaysBetween(startDate: Date, endDate: Date): number {
         const oneDayInMs: number = 24 * 60 * 60 * 1000;
 
-        return Math.round(Math.abs(startDate.getTime() - endDate.getTime()) / oneDayInMs) - daysToDeduct;
+        return Math.round(Math.abs(startDate.getTime() - endDate.getTime()) / oneDayInMs);
     }
 
     private getMin<Type>(originalValue: Type, value: Type): Type {
