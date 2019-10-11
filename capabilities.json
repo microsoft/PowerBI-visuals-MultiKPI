@@ -67,6 +67,13 @@
           "type": {
             "bool": true
           }
+        },
+        "noValueLabel": {
+          "displayName": "No Value Label",
+          "placeHolderText": "N/A",
+          "type": {
+            "text": true
+          }
         }
       }
     },
@@ -99,6 +106,13 @@
           "description": "Calculates a difference instead of growth",
           "type": {
             "bool": true
+          }
+        },
+        "noValueLabel": {
+          "displayName": "No Value Label",
+          "placeHolderText": "N/A",
+          "type": {
+            "text": true
           }
         }
       }

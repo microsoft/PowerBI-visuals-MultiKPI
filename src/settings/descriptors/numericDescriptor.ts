@@ -31,6 +31,7 @@ export class NumericDescriptor
     extends FormatDescriptor
     implements IDescriptor {
 
+    public noValueLabel: string = "N/A";
     public displayUnits: number = 0;
     public precision: number = 0;
 

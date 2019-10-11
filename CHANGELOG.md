@@ -8,6 +8,7 @@
 * Was added a new option "Show Latest Available As Current Value" into "Stale Data" option group to show a latter available value for each chart
 * A tooltip regarding stale data now shows info for each chart (if option "Show Latest Available As Current Value" is anbled)
 * Was added a new option "Deduct Threshold Days" into "Stale Data" option group to deduct threshold days from days that is showed in tooltips
+* "No Value Label" property inside "Values" and "Variance" option groups to set custom text for measures if value or variance doesn't exist
 
 ## 2.1.1
 * API 2.5.0

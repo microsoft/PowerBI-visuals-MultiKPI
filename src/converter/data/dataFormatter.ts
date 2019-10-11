@@ -31,6 +31,9 @@ import { isValueValid } from "../../utils/valueUtils";
 
 export function getFormattedValueWithFallback(variance: number, settings: NumericDescriptor): string {
     if (!isValueValid(variance)) {
+        if (settings && settings.noValueLabel) {
+            return settings.noValueLabel;
+        }
         return "N/A";
     }
 
