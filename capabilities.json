@@ -69,7 +69,7 @@
           }
         },
         "noValueLabel": {
-          "displayName": "No Value Label",
+          "displayName": "Missing Value Label",
           "placeHolderText": "N/A",
           "type": {
             "text": true
@@ -109,7 +109,7 @@
           }
         },
         "noValueLabel": {
-          "displayName": "No Value Label",
+          "displayName": "Missing Variance Label",
           "placeHolderText": "N/A",
           "type": {
             "text": true
@@ -347,7 +347,7 @@
           }
         },
         "varianceNotAvailableColor": {
-          "displayName": "Variance N/A Color",
+          "displayName": "Missing Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -363,7 +363,7 @@
           }
         },
         "varianceNotAvailableFontSize": {
-          "displayName": "Variance N/A Font Size",
+          "displayName": "Missing Variance Font Size",
           "type": {
             "numeric": true
           }
@@ -476,7 +476,7 @@
           }
         },
         "varianceNotAvailableColor": {
-          "displayName": "Variance N/A Color",
+          "displayName": "Missing Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -492,7 +492,7 @@
           }
         },
         "varianceNotAvailableFontSize": {
-          "displayName": "Variance N/A Font Size",
+          "displayName": "Missing Variance Font Size",
           "type": {
             "numeric": true
           }
