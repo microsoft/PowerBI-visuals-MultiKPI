@@ -36,7 +36,6 @@ import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
-    dateDifference: number;
     staleDataDifference: number;
     subtitleSettings: SubtitleWarningDescriptor;
     staleDataSettings: StaleDataDescriptor;
@@ -119,7 +118,18 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             return false;
         };
 
-        if (staleDataSettings.showLatterAvailableValue) {
+        let isTheSameStaledays: boolean = true;
+        let currentStaleDays: number | undefined;
+
+        for (const sr of series) {
+            if (currentStaleDays && sr.staleDateDifference && currentStaleDays !== sr.staleDateDifference) {
+                isTheSameStaledays = false;
+            } else {
+                currentStaleDays = sr.staleDateDifference;
+            }
+        }
+
+        if (!isTheSameStaledays) {
             tooltipItems = series.filter(filterItemsFunc).map((s) => {
                 const title: string = this.getTitle(
                     staleDataText,

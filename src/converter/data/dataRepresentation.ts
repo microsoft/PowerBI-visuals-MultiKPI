@@ -83,10 +83,8 @@ export enum ViewportSize {
 export interface IDataRepresentation {
     series: IDataRepresentationSeries[];
     sortedSeries: IDataRepresentationSeries[];
-
     warningState: number;
     latestDate: Date;
-    dateDifference: number;
     staleDateDifference?: number;
     percentCalcDate: Date;
 

@@ -215,7 +215,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
 
     private getDefaultData(defaultPercentCalcDate?: Date): IDataRepresentation {
         return {
-            dateDifference: 0,
             latestDate: new Date(),
             percentCalcDate: defaultPercentCalcDate,
             series: [],
@@ -338,7 +337,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
 
                 dataRepresentation.series[columnIndex].points.push(dataPoint);
 
-                if (settings.staleData.show && settings.staleData.showLatterAvailableValue) {
+                if (dataRepresentation.series[columnIndex].settings.values.showLatterAvailableValue) {
                     if (!isNaN(dataPoint.y)) {
                         dataRepresentation.series[columnIndex].current = dataPoint;
                     }
@@ -407,9 +406,14 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
+        dataRepresentation.staleDateDifference = 0;
+
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
             if (series.current && series.current.x) {
                 series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
+                if (series.staleDateDifference > dataRepresentation.staleDateDifference) {
+                    dataRepresentation.staleDateDifference = series.staleDateDifference;
+                }
             }
 
             series.x.initialMin = series.x.min;
@@ -460,20 +464,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 ? this.smoothConverter.convert(series.points)
                 : series.points;
         });
-
-        let maxDays = 0;
-        dataRepresentation.series.forEach((item) => {
-            if (item.staleDateDifference && item.staleDateDifference > maxDays) {
-                maxDays = item.staleDateDifference;
-                dataRepresentation.staleDateDifference = maxDays;
-            }
-        });
-
-        dataRepresentation.dateDifference = this.getDaysBetween(dataRepresentation.latestDate, new Date());
-
-        if (settings.staleData.showLatterAvailableValue) {
-            dataRepresentation.dateDifference = maxDays + settings.staleData.staleDataThreshold;
-        }
     }
 
     private getFormattedTooltip(series: IDataRepresentationSeries): string {

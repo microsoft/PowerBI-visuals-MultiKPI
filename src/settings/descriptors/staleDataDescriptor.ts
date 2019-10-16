@@ -27,7 +27,6 @@
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class StaleDataDescriptor extends BaseDescriptor {
-    public showLatterAvailableValue: boolean = false;
     public staleDataText: string = undefined;
     public staleDataThreshold: number = 0;
     public deductThresholdDays: boolean = false;

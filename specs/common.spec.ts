@@ -66,6 +66,20 @@ import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor
 import { TestWrapper } from "./testWrapper";
 
 describe("Multi KPI", () => {
+    describe("Format Pane Options", () => {
+        it("Missing Value Label is set up for all series", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                // expect(testWrapper.visualBuilder.$root).toBeInDOM();
+
+                done();
+            });
+        });
+    });
+
     describe("DOM", () => {
         it("root element should be defined in DOM", (done) => {
             const testWrapper: TestWrapper = TestWrapper.create();
@@ -401,4 +415,12 @@ function createElement(viewport: powerbi.IViewport = { height: 600, width: 800 }
         viewport.height.toString(),
         viewport.width.toString(),
     ).get(0));
+}
+
+function castZeroToNullOrReturnBack(dataView: powerbi.DataView): void {
+    dataView.categorical.values.forEach((x) => x.values.forEach((value, index, theArray) => {
+        if (value === 0) {
+            theArray[index] = null;
+        }
+    }));
 }

@@ -42,21 +42,44 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     public dates: Date[] = [];
     public seriesValues: number[][] = [];
 
-    constructor() {
+    constructor(withMisisngValues?: boolean) {
         super();
 
         this.dates = getDateRange(
             new Date(2016, 0, 1),
-            new Date(2016, 0, 10),
+            new Date(2016, 0, 12),
             1000 * 24 * 3600,
         );
 
-        for (let i: number = 0; i < this.amountOfSeries; i++) {
-            this.seriesValues.push(getRandomNumbers(
-                this.dates.length,
-                -Number.MAX_VALUE,
-                Number.MAX_VALUE,
-            ));
+        if (withMisisngValues) {
+            for (let i: number = 0; i < this.amountOfSeries; i++) {
+                if (i === 4) {
+                    const noDataArray: number[] = [];
+                    this.dates.forEach((d) => {
+                        noDataArray.push(undefined);
+                    });
+                    this.seriesValues.push(noDataArray);
+                } else if (i === 2) {
+                    const valArr: number[] = getRandomNumbers(this.dates.length - 3, -Number.MAX_VALUE, Number.MAX_VALUE);
+                    valArr.push(undefined);
+                    valArr.push(undefined);
+                    this.seriesValues.push(valArr);
+                } else {
+                    this.seriesValues.push(getRandomNumbers(
+                        this.dates.length,
+                        -Number.MAX_VALUE,
+                        Number.MAX_VALUE,
+                    ));
+                }
+            }
+        } else {
+            for (let i: number = 0; i < this.amountOfSeries; i++) {
+                this.seriesValues.push(getRandomNumbers(
+                    this.dates.length,
+                    -Number.MAX_VALUE,
+                    Number.MAX_VALUE,
+                ));
+            }
         }
     }
 

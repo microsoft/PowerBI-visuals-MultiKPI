@@ -63,7 +63,13 @@
           }
         },
         "treatEmptyValuesAsZero": {
-          "displayName": "Treat Empty Values As Zero",
+          "displayName": "Treat Empty/Missing Values As Zero",
+          "type": {
+            "bool": true
+          }
+        },
+        "showLatterAvailableValue": {
+          "displayName": "Show Latest Available As Current Value",
           "type": {
             "bool": true
           }
@@ -889,12 +895,6 @@
       "properties": {
         "show": {
           "displayName": "Show",
-          "type": {
-            "bool": true
-          }
-        },
-        "showLatterAvailableValue": {
-          "displayName": "Show Latest Available As Current Value",
           "type": {
             "bool": true
           }
