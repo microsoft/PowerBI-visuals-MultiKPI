@@ -42,12 +42,15 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     public dates: Date[] = [];
     public seriesValues: number[][] = [];
 
-    constructor(withMisisngValues?: boolean) {
+    constructor(withMisisngValues?: boolean, brokenMetricIndex: number = 0, howOlderDatesAreInDays: number = 0) {
         super();
 
+        let today = new Date();
+        today = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (2 - howOlderDatesAreInDays));
+        const weekBefore = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 12);
         this.dates = getDateRange(
-            new Date(2016, 0, 1),
-            new Date(2016, 0, 12),
+            weekBefore,
+            today,
             1000 * 24 * 3600,
         );
 
@@ -59,16 +62,17 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
                         noDataArray.push(undefined);
                     });
                     this.seriesValues.push(noDataArray);
-                } else if (i === 2) {
-                    const valArr: number[] = getRandomNumbers(this.dates.length - 3, -Number.MAX_VALUE, Number.MAX_VALUE);
+                } else if (i === brokenMetricIndex) {
+                    const valArr: number[] = getRandomNumbers(this.dates.length - 4, -150, 150);
+                    valArr.push(25);
                     valArr.push(undefined);
                     valArr.push(undefined);
                     this.seriesValues.push(valArr);
                 } else {
                     this.seriesValues.push(getRandomNumbers(
                         this.dates.length,
-                        -Number.MAX_VALUE,
-                        Number.MAX_VALUE,
+                        -150,
+                        150,
                     ));
                 }
             }
@@ -76,8 +80,8 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
             for (let i: number = 0; i < this.amountOfSeries; i++) {
                 this.seriesValues.push(getRandomNumbers(
                     this.dates.length,
-                    -Number.MAX_VALUE,
-                    Number.MAX_VALUE,
+                    -150,
+                    150,
                 ));
             }
         }
@@ -88,7 +92,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
             source: {
                 displayName: dateColumn.name,
                 format: "%M/%d/yyyy",
-                roles: { Axis: true },
+                roles: { dateColumn: true },
                 type: valueType.ValueType.fromDescriptor({ dateTime: true }),
             },
             values: this.dates,
@@ -99,7 +103,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
                 return {
                     source: {
                         displayName: valueColumn.name,
-                        roles: { Values: true },
+                        roles: { valueColumn: true },
                         type: valueType.ValueType.fromDescriptor({ integer: true }),
                     },
                     values,

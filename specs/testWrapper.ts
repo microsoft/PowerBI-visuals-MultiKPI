@@ -30,17 +30,26 @@ import { MultiKpiData } from "./dataBuilder";
 import { MultiKpiBuilder } from "./visualBuilder";
 
 export class TestWrapper {
-    public static create(withMisisngValues?: boolean): TestWrapper {
-        return new TestWrapper(withMisisngValues);
+    public static create(
+        withMisisngValues: boolean = false,
+        brokenMetricIndex: number = 0,
+        howOlderDatesAreInDays: number = 0): TestWrapper {
+        return new TestWrapper(withMisisngValues, brokenMetricIndex, howOlderDatesAreInDays);
     }
 
     public dataView: powerbi.DataView;
     public dataViewBuilder: MultiKpiData;
     public visualBuilder: MultiKpiBuilder;
 
-    constructor(withMisisngValues?: boolean, width: number = 1024, height: number = 768) {
+    constructor(
+        withMisisngValues: boolean = false,
+        brokenMetricIndex: number = 0,
+        howOlderDatesAreInDays: number = 0,
+        width: number = 1024,
+        height: number = 768) {
+
         this.visualBuilder = new MultiKpiBuilder(width, height);
-        this.dataViewBuilder = new MultiKpiData(withMisisngValues);
+        this.dataViewBuilder = new MultiKpiData(withMisisngValues, brokenMetricIndex, howOlderDatesAreInDays);
 
         this.dataView = this.dataViewBuilder.getDataView();
     }

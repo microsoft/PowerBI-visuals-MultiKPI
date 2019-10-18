@@ -60,7 +60,15 @@ export class MultiKpiBuilder extends VisualBuilderBase<MultiKpi> {
         return this.$root.find(".multiKpi_mainChartComponent");
     }
 
+    public get $mainChartNAVarance(): JQuery {
+        return this.$root.find(".multiKpi_mainChartComponent .multiKpi_chartLabelBaseComponent_body_variance_na");
+    }
+
     public get $subtitle(): JQuery {
         return this.$root.find(".multiKpi_subtitleWarningComponent");
+    }
+
+    public get $staleIcon(): JQuery {
+        return this.$root.find(".multiKpi_subtitleWarningComponent .multiKpi_dataAge");
     }
 }
