@@ -252,22 +252,13 @@ describe("Multi KPI", () => {
                 subtitle: {
                     show: true,
                 },
+                values: {
+                    showLatterAvailableValue: false,
+                    treatEmptyValuesAsZero: true,
+                },
             };
 
             testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                let today = new Date();
-                today = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (2));
-                expect(today).toBe(new Date());
-                const weekBefore = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 12);
-                expect(weekBefore).toBe(new Date());
-                this.dates = getDateRange(
-                    weekBefore,
-                    today,
-                    1000 * 24 * 3600,
-                );
-                expect(this.dates[0]).toBe(new Date());
-                expect(this.dates[this.dates.lenth - 1]).toBe(new Date());
-
                 const sdIcon = testWrapper.visualBuilder.$staleIcon;
                 expect(sdIcon.length).toBe(0);
                 done();
