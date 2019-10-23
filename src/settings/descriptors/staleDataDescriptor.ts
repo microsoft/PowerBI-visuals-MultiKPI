@@ -29,6 +29,7 @@ import { BaseDescriptor } from "./baseDescriptor";
 export class StaleDataDescriptor extends BaseDescriptor {
     public staleDataText: string = undefined;
     public staleDataThreshold: number = 0;
+    public deductThresholdDays: boolean = false;
     public color: string = "#3599b8";
     public background: string = "";
 }

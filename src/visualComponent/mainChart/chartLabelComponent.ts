@@ -84,7 +84,7 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComp
             this.show();
         }
 
-        const value: number = series.points[series.points.length - 1].y;
+        const value: number = series.current ? series.current.y : NaN;
 
         this.renderGroup(
             this.headerSelector,

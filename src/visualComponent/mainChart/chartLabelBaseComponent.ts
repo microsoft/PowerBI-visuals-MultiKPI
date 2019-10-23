@@ -24,6 +24,8 @@
  *  THE SOFTWARE.
  */
 
+import powerbi from "powerbi-visuals-api";
+
 import { Selection } from "d3-selection";
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
@@ -32,12 +34,15 @@ import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 import { BaseComponent } from "../baseComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
+import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+
 export interface IRenderGroup {
     data: string;
     isShown: boolean;
     color?: string;
     selector?: CssConstants.ClassAndSelector;
     fontSizeInPt?: number;
+    tooltipDataItems?: VisualTooltipDataItem[];
 }
 
 export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseComponent<IVisualComponentConstructorOptions, RenderOptions> {
@@ -68,11 +73,11 @@ export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseCompone
 
     protected renderGroup(
         selector: CssConstants.ClassAndSelector,
-        renderGroupDate: IRenderGroup[],
+        renderGroupData: IRenderGroup[],
     ): void {
         const selection: Selection<any, IRenderGroup[], any, any> = this.element
             .selectAll(selector.selectorName)
-            .data([renderGroupDate]);
+            .data([renderGroupData]);
 
         selection
             .exit()
@@ -117,6 +122,14 @@ export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseCompone
                 const fontSizeInPx: number = pixelConverter.fromPointToPixel(data.fontSizeInPt);
 
                 return pixelConverter.toString(fontSizeInPx);
+            });
+
+        this.constructorOptions.tooltipServiceWrapper.addTooltip<IRenderGroup>(
+            itemSelection,
+            (args) => {
+                if (args.data.tooltipDataItems) {
+                    return args.data.tooltipDataItems;
+                }
             });
     }
 }

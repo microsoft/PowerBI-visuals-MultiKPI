@@ -215,7 +215,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
 
     private getDefaultData(defaultPercentCalcDate?: Date): IDataRepresentation {
         return {
-            dateDifference: 0,
             latestDate: new Date(),
             percentCalcDate: defaultPercentCalcDate,
             series: [],
@@ -337,7 +336,14 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 dataRepresentation.latestDate = x;
 
                 dataRepresentation.series[columnIndex].points.push(dataPoint);
-                dataRepresentation.series[columnIndex].current = dataPoint;
+
+                if (dataRepresentation.series[columnIndex].settings.values.showLatterAvailableValue) {
+                    if (!isNaN(dataPoint.y)) {
+                        dataRepresentation.series[columnIndex].current = dataPoint;
+                    }
+                } else {
+                    dataRepresentation.series[columnIndex].current = dataPoint;
+                }
 
                 dataRepresentation.series[columnIndex].x.min = this.getMin(
                     dataRepresentation.series[columnIndex].x.min,
@@ -400,7 +406,16 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
+        dataRepresentation.staleDateDifference = 0;
+
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
+            if (series.current && series.current.x) {
+                series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
+                if (series.staleDateDifference > dataRepresentation.staleDateDifference) {
+                    dataRepresentation.staleDateDifference = series.staleDateDifference;
+                }
+            }
+
             series.x.initialMin = series.x.min;
             series.x.initialMax = series.x.max;
 
@@ -449,8 +464,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 ? this.smoothConverter.convert(series.points)
                 : series.points;
         });
-
-        dataRepresentation.dateDifference = this.getDaysBetween(dataRepresentation.latestDate, new Date());
     }
 
     private getFormattedTooltip(series: IDataRepresentationSeries): string {

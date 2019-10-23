@@ -81,6 +81,7 @@ export class MultiLineComponent
                 component.render({
                     alternativeColor: currentSeries.settings.sparklineChart.alternativeColor,
                     color: currentSeries.settings.sparklineChart.color,
+                    current: currentSeries.current,
                     points: currentSeries.smoothedPoints,
                     thickness: currentSeries.settings.sparklineChart.thickness,
                     type: DataRepresentationPointGradientType.line,

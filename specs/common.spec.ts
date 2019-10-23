@@ -66,6 +66,306 @@ import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor
 import { TestWrapper } from "./testWrapper";
 
 describe("Multi KPI", () => {
+    describe("Version 2.2.0 Changes", () => {
+        it("Treat Empty/Missing Values As Zero is enabled", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 2);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    treatEmptyValuesAsZero: true,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const secondSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[3].innerText;
+                expect(secondSparklineValue).toEqual("0");
+                done();
+            });
+        });
+
+        it("Treat Empty/Missing Values As Zero is disabled", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 2);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    treatEmptyValuesAsZero: false,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const secondSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[3].innerText;
+                expect(secondSparklineValue).toEqual("N/A");
+                done();
+            });
+        });
+
+        it("Treat Empty/Missing Values As Zero is disabled but Show Latest Available As Current Value is enabled", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 2);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: false,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const secondSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[3].innerText;
+                expect(secondSparklineValue).toEqual("25");
+                done();
+            });
+        });
+
+        it("Treat Empty/Missing Values As Zero is enabled and Show Latest Available As Current Value is enabled", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 2);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: true,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const secondSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[3].innerText;
+                expect(secondSparklineValue).toEqual("0");
+                done();
+            });
+        });
+
+        it("Missing Value label is customized", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 2);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    noValueLabel: "no data",
+                    treatEmptyValuesAsZero: false,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const secondSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[3].innerText;
+                const fourthSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[7].innerText;
+                expect(secondSparklineValue).toEqual("no data");
+                expect(fourthSparklineValue).toEqual("no data");
+                done();
+            });
+        });
+
+        it("Missing Value label is customized generally and for certain series", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 2);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    noValueLabel: "no data",
+                    treatEmptyValuesAsZero: false,
+                },
+            };
+
+            testWrapper.dataView.metadata.columns[3].objects = {
+                values: {
+                    noValueLabel: "[-]",
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const secondSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[3].innerText;
+                const fourthSparklineValue = testWrapper.visualBuilder.$sparklineSubtitle.find("div")[7].innerText;
+                expect(secondSparklineValue).toEqual("[-]");
+                expect(fourthSparklineValue).toEqual("no data");
+                done();
+            });
+        });
+
+        it("Missing Variance label is customized", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    treatEmptyValuesAsZero: false,
+                },
+                variance: {
+                    noValueLabel: "no data",
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const naVariance = testWrapper.visualBuilder.$mainChartNAVarance.text();
+                expect(naVariance).toEqual("(no data)");
+                done();
+            });
+        });
+
+        it("Missing Variance label is customized generally and for certain series", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                values: {
+                    treatEmptyValuesAsZero: false,
+                },
+                variance: {
+                    noValueLabel: "no data",
+                },
+            };
+
+            testWrapper.dataView.metadata.columns[1].objects = {
+                variance: {
+                    noValueLabel: "-",
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const naVariance = testWrapper.visualBuilder.$mainChartNAVarance.text();
+                expect(naVariance).toEqual("(-)");
+                done();
+            });
+        });
+
+        it("Stale Data is enabled but Dates are actual", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataText: "label {$1}",
+                },
+                subtitle: {
+                    show: true,
+                },
+                values: {
+                    showLatterAvailableValue: false,
+                    treatEmptyValuesAsZero: true,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const sdIcon = testWrapper.visualBuilder.$staleIcon;
+                expect(sdIcon.length).toBe(0);
+                done();
+            });
+        });
+
+        it("Stale Data is enabled and be shown", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0, 1);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataText: "label {$1}",
+                },
+                subtitle: {
+                    show: true,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const sdIcon = testWrapper.visualBuilder.$staleIcon;
+                expect(sdIcon).toBeInDOM();
+                expect(sdIcon.length).toBe(1);
+                done();
+            });
+        });
+
+        it("Stale Data is enabled but Threshold Days are actual", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0, 1);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataText: "label {$1}",
+                    staleDataThreshold: 1,
+                },
+                subtitle: {
+                    show: true,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const sdIcon = testWrapper.visualBuilder.$staleIcon;
+                expect(sdIcon.length).toBe(0);
+                done();
+            });
+        });
+
+        it("Stale Data is enabled but One of the metrics have more obsolete data than others", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0, 1);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataText: "label {$1}",
+                    staleDataThreshold: 1,
+                },
+                subtitle: {
+                    show: true,
+                },
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: false,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const sdIcon = testWrapper.visualBuilder.$staleIcon;
+                expect(sdIcon).toBeInDOM();
+                expect(sdIcon.length).toBe(1);
+                done();
+            });
+        });
+
+        it("Stale Data is enabled and has sufficient threshold days to handle any metrics, even if one of them more obsolete", (done) => {
+            const testWrapper: TestWrapper = TestWrapper.create(true, 0, 1);
+
+            castZeroToNullOrReturnBack(testWrapper.dataView);
+
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataText: "label {$1}",
+                    staleDataThreshold: 4,
+                },
+                subtitle: {
+                    show: true,
+                },
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: false,
+                },
+            };
+
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                const sdIcon = testWrapper.visualBuilder.$staleIcon;
+                expect(sdIcon.length).toBe(0);
+                done();
+            });
+        });
+
+    });
+
     describe("DOM", () => {
         it("root element should be defined in DOM", (done) => {
             const testWrapper: TestWrapper = TestWrapper.create();
@@ -109,6 +409,7 @@ describe("Multi KPI", () => {
                 const lineRenderOptions: ILineComponentRenderOptions = {
                     alternativeColor: "blue",
                     color: "green",
+                    current: undefined,
                     points: [
                         {
                             index: 0,
@@ -400,4 +701,12 @@ function createElement(viewport: powerbi.IViewport = { height: 600, width: 800 }
         viewport.height.toString(),
         viewport.width.toString(),
     ).get(0));
+}
+
+function castZeroToNullOrReturnBack(dataView: powerbi.DataView): void {
+    dataView.categorical.values.forEach((x) => x.values.forEach((value, index, theArray) => {
+        if (value === 0) {
+            theArray[index] = null;
+        }
+    }));
 }

@@ -151,8 +151,7 @@ export class ChartComponent extends BaseContainerComponent<
             () => {
                 const latestDataPoint: IDataRepresentationPoint = this.renderOptions
                     && this.renderOptions.series
-                    && this.renderOptions.series.points
-                    && this.renderOptions.series.points[this.renderOptions.series.points.length - 1];
+                    && this.renderOptions.series.current;
 
                 this.constructorOptions.eventDispatcher.call(
                     EventName.onCurrentDataPointIndexReset,
@@ -202,6 +201,7 @@ export class ChartComponent extends BaseContainerComponent<
         this.lineComponent.render({
             alternativeColor: settings.chart.alternativeColor,
             color: settings.chart.color,
+            current: series.current,
             points: series.points,
             thickness: settings.chart.thickness,
             type: settings.chart.chartType,

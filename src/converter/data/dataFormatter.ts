@@ -24,21 +24,25 @@
  *  THE SOFTWARE.
  */
 
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-
+import { displayUnitSystemType, valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { NumericDescriptor } from "../../settings/descriptors/numericDescriptor";
 import { isValueValid } from "../../utils/valueUtils";
 
+const wholeUnits: displayUnitSystemType.DisplayUnitSystemType = displayUnitSystemType.DisplayUnitSystemType.WholeUnits;
+
 export function getFormattedValueWithFallback(variance: number, settings: NumericDescriptor): string {
     if (!isValueValid(variance)) {
+        if (settings && settings.noValueLabel) {
+            return settings.noValueLabel;
+        }
         return "N/A";
     }
 
     return getFormattedValue(variance, settings);
 }
 
-export function getFormattedDate(date: Date, format: string = valueFormatter.valueFormatter.DefaultDateFormat): string {
-    return valueFormatter.valueFormatter
+export function getFormattedDate(date: Date, format: string = valueFormatter.DefaultDateFormat): string {
+    return valueFormatter
         .create({ format })
         .format(date);
 }
@@ -48,8 +52,8 @@ export function getFormattedValue(value: number, settings: NumericDescriptor): s
 }
 
 export function getValueFormatter(value: number, settings: NumericDescriptor): valueFormatter.IValueFormatter {
-    return valueFormatter.valueFormatter.create({
-        displayUnitSystemType: 2,
+    return valueFormatter.create({
+        displayUnitSystemType: wholeUnits,
         format: settings.getFormat(),
         precision: settings.precision,
         value: settings.displayUnits || value,

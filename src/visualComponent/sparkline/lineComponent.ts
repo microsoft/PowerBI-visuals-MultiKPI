@@ -24,33 +24,22 @@
  *  THE SOFTWARE.
  */
 
-import {
-    area,
-    Area,
-    line,
-    Line,
-} from "d3-shape";
-
 import { Selection } from "d3-selection";
-
+import { area, Area, line, Line } from "d3-shape";
 import powerbi from "powerbi-visuals-api";
-
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
-
-import { BaseComponent } from "../baseComponent";
-import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
-
 import {
+    DataRepresentationAxisValueType,
     DataRepresentationPointGradientType,
     IDataRepresentationAxis,
     IDataRepresentationPoint,
 } from "../../converter/data/dataRepresentation";
-
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 import { EventName } from "../../event/eventName";
-
 import { isValueValid } from "../../utils/valueUtils";
+import { BaseComponent } from "../baseComponent";
+import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
 export interface ILineComponentRenderOptions {
     alternativeColor: string;
@@ -61,6 +50,7 @@ export interface ILineComponentRenderOptions {
     viewport: powerbi.IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
+    current: IDataRepresentationPoint;
 }
 
 interface IAdvancedLineComponentRenderOptions extends ILineComponentRenderOptions {
@@ -94,7 +84,6 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .append("defs")
             .append("linearGradient")
             .attr("id", this.gradientId);
-
         this.constructorOptions = {
             ...options,
             element: this.element,
@@ -145,8 +134,8 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         const {
             alternativeColor,
             color,
-            validPoints,
             viewport,
+            validPoints,
         } = this.renderOptions;
 
         // Last valid point is required here to line width to generate a correct gradient
@@ -168,7 +157,10 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             ? viewport.width
             : lineWidth;
 
-        const offset: number = xPosition / width * 100;
+        const firstValue: IDataRepresentationPoint = this.renderOptions.points.find((x) => x.y || x.y === 0);
+        const trueXPosition: number = firstValue ? xScale.scale(firstValue.x) : undefined;
+
+        const offset: number = xPosition >= trueXPosition ? ((xPosition - trueXPosition) / (width - trueXPosition) * 100) : 0;
         const offsetInPercent: string = `${offset}%`;
 
         const gradients: ILineComponentGradient[] = offset === 100
@@ -238,7 +230,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
 
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
-                        return this.getArea(xScale, yScale, viewport)(points);
+                        return this.getArea(xScale, yScale, viewport, y.min)(points);
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
@@ -298,12 +290,19 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
         xScale: DataRepresentationScale,
         yScale: DataRepresentationScale,
         viewport: powerbi.IViewport,
+        yMin: DataRepresentationAxisValueType,
     ): Area<IDataRepresentationPoint> {
         return area<IDataRepresentationPoint>()
             .x((dataPoint: IDataRepresentationPoint) => {
                 return xScale.scale(dataPoint.x);
             })
-            .y0(viewport.height)
+            .y0((dataPoint: IDataRepresentationPoint) => {
+                if (yMin.valueOf() < 0) {
+                    return yScale.scale(0);
+                }
+
+                return viewport.height;
+            })
             .y1((dataPoint: IDataRepresentationPoint) => {
                 return yScale.scale(dataPoint.y);
             });

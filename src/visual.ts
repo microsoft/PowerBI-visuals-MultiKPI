@@ -49,6 +49,9 @@ import { IVisualComponentRenderOptions } from "./visualComponent/visualComponent
 
 import { ScaleService } from "./services/scaleService";
 
+// powerbi.extensibility.utils.tooltip
+import { ITooltipServiceWrapper, TooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
+
 export class MultiKpi implements powerbi.extensibility.visual.IVisual {
     private dataConverter: DataConverter;
 
@@ -65,6 +68,8 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
 
     private eventDispatcher: Dispatch<any> = dispatch(...Object.keys(EventName));
 
+    private tooltipServiceWrapper: ITooltipServiceWrapper;
+
     constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
         if (window.location !== window.parent.location) {
             require("core-js/stable");
@@ -74,6 +79,13 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             element,
             host,
         } = options;
+
+        this.tooltipServiceWrapper = new TooltipServiceWrapper(
+            {
+                handleTouchDelay: 0,
+                rootElement: options.element,
+                tooltipService: host.tooltipService,
+            });
 
         this.dataConverter = new DataConverter({
             createSelectionIdBuilder: host.createSelectionIdBuilder.bind(host),
@@ -99,6 +111,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             eventDispatcher: this.eventDispatcher,
             scaleService: new ScaleService(element),
             style: host.colorPalette,
+            tooltipServiceWrapper: this.tooltipServiceWrapper,
         });
     }
 

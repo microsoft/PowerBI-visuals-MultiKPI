@@ -87,11 +87,6 @@ export class MainChartComponent extends BaseContainerComponent<IVisualComponentC
 
         this.chart.render(data);
 
-        this.element.attr(
-            "title",
-            data.series && data.series.formattedTooltip || null,
-        );
-
         this.chartLabel.render({
             dateSettings: options.settings.date,
             kpiSettings: options.settings.kpi,

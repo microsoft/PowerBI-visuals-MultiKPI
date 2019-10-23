@@ -28,4 +28,5 @@ import { NumericDescriptor } from "./numericDescriptor";
 
 export class ValuesDescriptor extends NumericDescriptor {
     public treatEmptyValuesAsZero: boolean = true;
+    public showLatterAvailableValue: boolean = false;
 }

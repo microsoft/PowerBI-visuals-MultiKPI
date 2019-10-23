@@ -31,7 +31,11 @@ export class VarianceBasedOnDifferenceConverter implements IConverter<IVarianceC
     public convert(options: IVarianceConverterOptions): number {
         const { secondDataPoint, firstDataPoint } = options;
 
-        return secondDataPoint.y - firstDataPoint.y;
+        if (firstDataPoint && secondDataPoint) {
+            return secondDataPoint.y - firstDataPoint.y;
+        }
+
+        return NaN;
     }
 }
 

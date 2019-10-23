@@ -24,30 +24,16 @@
  *  THE SOFTWARE.
  */
 
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-
 import powerbi from "powerbi-visuals-api";
-
+import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
+import { IDataRepresentation, IDataRepresentationPoint, IDataRepresentationSeries, ViewportSize } from "../../converter/data/dataRepresentation";
+import { EventName } from "../../event/eventName";
+import { SubtitleDescriptor } from "../../settings/descriptors/subtitleDescriptor";
+import { ValuesDescriptor } from "../../settings/descriptors/valuesDescriptor";
 import { BaseContainerComponent } from "../baseContainerComponent";
+import { ISubtitleComponentRenderOptions, SubtitleComponent } from "../subtitleComponent";
 import { IVisualComponent } from "../visualComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
-
-import {
-    IDataRepresentation,
-    IDataRepresentationPoint,
-    IDataRepresentationSeries,
-    ViewportSize,
-} from "../../converter/data/dataRepresentation";
-
-import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
-
-import { EventName } from "../../event/eventName";
-
-import { ISubtitleComponentRenderOptions } from "../subtitleComponent";
-
-import { SubtitleDescriptor } from "../../settings/descriptors/subtitleDescriptor";
-
-import { SubtitleComponent } from "../subtitleComponent";
 import { PlotComponent } from "./plotComponent";
 
 export interface ISparklineComponentRenderOptions {
@@ -129,17 +115,25 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
 
         this.updateElementOrder(this.element, position);
 
-        this.element.attr(
-            "title",
-            current && current.formattedTooltip || null,
-        );
-
         if (current && series) {
             if (!this.components.length) {
                 this.initialize();
             }
-
             this.renderComponent(this.renderOptions);
+
+            const tooltipText: string = current && current.formattedTooltip || null;
+
+            this.constructorOptions.tooltipServiceWrapper.addTooltip(
+                this.element,
+                () => {
+                    if (tooltipText) {
+                        return [{
+                            displayName: null,
+                            value: tooltipText,
+                        }];
+                    }
+                });
+
         } else {
             this.destroyComponents();
         }
@@ -156,7 +150,11 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         this.renderOptions = options;
 
         this.renderTopLabel(current.name, viewportSize, current.settings.sparklineLabel);
-        this.renderBottomLabel(current.current.y, viewportSize, current.settings.sparklineValue);
+        this.renderBottomLabel(
+            current.current ? current.current.y : NaN,
+            viewportSize,
+            current.settings.sparklineValue,
+            current.settings.values);
         this.renderPlot(options);
     }
 
@@ -185,8 +183,13 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             && this.renderOptions.dataRepresentation
             && this.renderOptions.dataRepresentation.viewportSize;
 
+        const valuesSettings: ValuesDescriptor = this.renderOptions
+            && this.renderOptions.current
+            && this.renderOptions.current.settings
+            && this.renderOptions.current.settings.values;
+
         if (current && sparklineValue) {
-            setTimeout(this.renderBottomLabel.bind(this, current.y, viewportSize, sparklineValue));
+            setTimeout(this.renderBottomLabel.bind(this, current.y, viewportSize, sparklineValue, valuesSettings));
         }
     }
 
@@ -206,15 +209,16 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
     private renderBottomLabel(
         value: number,
         viewportSize: ViewportSize,
-        settings: SubtitleDescriptor,
+        subtitleSettings: SubtitleDescriptor,
+        valueSettings: ValuesDescriptor,
     ): void {
         const fontSize: number = this.getFontSizeByViewportSize(viewportSize);
         const actualValueKPIFontSize: number = fontSize * this.getActualValueKPIFactorByViewportSize(viewportSize);
 
-        settings.titleText = getFormattedValueWithFallback(value, settings);
-        settings.autoFontSizeValue = actualValueKPIFontSize;
+        subtitleSettings.titleText = getFormattedValueWithFallback(value, valueSettings);
+        subtitleSettings.autoFontSizeValue = actualValueKPIFontSize;
 
-        this.bottomLabelComponent.render({ subtitleSettings: settings });
+        this.bottomLabelComponent.render({ subtitleSettings });
     }
 
     private renderPlot(options: ISparklineComponentRenderOptions): void {

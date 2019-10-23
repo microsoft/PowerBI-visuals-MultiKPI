@@ -63,6 +63,7 @@ export interface IDataRepresentationSeries {
     formattedVariance: string;
     formattedDate: string;
     dateDifference: number;
+    staleDateDifference?: number;
     tooltip: string;
     formattedTooltip: string;
     selectionId: powerbi.visuals.ISelectionId;
@@ -82,10 +83,9 @@ export enum ViewportSize {
 export interface IDataRepresentation {
     series: IDataRepresentationSeries[];
     sortedSeries: IDataRepresentationSeries[];
-
     warningState: number;
     latestDate: Date;
-    dateDifference: number;
+    staleDateDifference?: number;
     percentCalcDate: Date;
 
     viewport: powerbi.IViewport;

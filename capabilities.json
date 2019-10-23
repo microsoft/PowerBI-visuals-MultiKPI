@@ -63,9 +63,22 @@
           }
         },
         "treatEmptyValuesAsZero": {
-          "displayName": "Treat Empty Values As Zero",
+          "displayName": "Treat Empty/Missing Values As Zero",
           "type": {
             "bool": true
+          }
+        },
+        "showLatterAvailableValue": {
+          "displayName": "Show Latest Available As Current Value",
+          "type": {
+            "bool": true
+          }
+        },
+        "noValueLabel": {
+          "displayName": "Missing Value Label",
+          "placeHolderText": "N/A",
+          "type": {
+            "text": true
           }
         }
       }
@@ -99,6 +112,13 @@
           "description": "Calculates a difference instead of growth",
           "type": {
             "bool": true
+          }
+        },
+        "noValueLabel": {
+          "displayName": "Missing Variance Label",
+          "placeHolderText": "N/A",
+          "type": {
+            "text": true
           }
         }
       }
@@ -333,7 +353,7 @@
           }
         },
         "varianceNotAvailableColor": {
-          "displayName": "Variance N/A Color",
+          "displayName": "Missing Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -349,7 +369,7 @@
           }
         },
         "varianceNotAvailableFontSize": {
-          "displayName": "Variance N/A Font Size",
+          "displayName": "Missing Variance Font Size",
           "type": {
             "numeric": true
           }
@@ -462,7 +482,7 @@
           }
         },
         "varianceNotAvailableColor": {
-          "displayName": "Variance N/A Color",
+          "displayName": "Missing Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -478,7 +498,7 @@
           }
         },
         "varianceNotAvailableFontSize": {
-          "displayName": "Variance N/A Font Size",
+          "displayName": "Missing Variance Font Size",
           "type": {
             "numeric": true
           }
@@ -891,6 +911,12 @@
           "description": "Data is stale if data is older than some number of days from now",
           "type": {
             "numeric": true
+          }
+        },
+        "deductThresholdDays": {
+          "displayName": "Deduct Threshold Days",
+          "type": {
+            "bool": true
           }
         },
         "color": {
