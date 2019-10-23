@@ -65,8 +65,6 @@ import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor
 
 import { TestWrapper } from "./testWrapper";
 
-import { getDateRange } from "./helpers";
-
 describe("Multi KPI", () => {
     describe("Version 2.2.0 Changes", () => {
         it("Treat Empty/Missing Values As Zero is enabled", (done) => {

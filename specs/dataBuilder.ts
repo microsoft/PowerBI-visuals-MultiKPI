@@ -34,8 +34,6 @@ import {
     valueColumn,
 } from "../src/columns/columns";
 
-import { getDateRange } from "./helpers";
-
 export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     public amountOfSeries: number = 5;
 
@@ -45,14 +43,14 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     constructor(withMisisngValues?: boolean, brokenMetricIndex: number = 0, howOlderDatesAreInDays: number = 0) {
         super();
 
-        let today = new Date();
-        today = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (2 - howOlderDatesAreInDays));
-        const weekBefore = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 12);
-        this.dates = getDateRange(
-            weekBefore,
-            today,
-            1000 * 24 * 3600,
-        );
+        const today = new Date();
+        const tommorowOrShifted = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (1 - howOlderDatesAreInDays));
+        const twoWeeksBefore = new Date(tommorowOrShifted.getFullYear(), tommorowOrShifted.getMonth(), tommorowOrShifted.getDate() - 13);
+
+        // Fill two weeks
+        for (let i = 0; i < 14; i++) {
+            this.dates.push(new Date(twoWeeksBefore.getFullYear(), twoWeeksBefore.getMonth(), twoWeeksBefore.getDate() + i));
+        }
 
         if (withMisisngValues) {
             for (let i: number = 0; i < this.amountOfSeries; i++) {
@@ -65,6 +63,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
                 } else if (i === brokenMetricIndex) {
                     const valArr: number[] = getRandomNumbers(this.dates.length - 4, -150, 150);
                     valArr.push(25);
+                    valArr.push(undefined);
                     valArr.push(undefined);
                     valArr.push(undefined);
                     this.seriesValues.push(valArr);
