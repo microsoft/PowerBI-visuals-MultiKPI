@@ -44,8 +44,18 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
         super();
 
         const today = new Date();
-        const tommorowOrShifted = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (1 - howOlderDatesAreInDays));
-        const twoWeeksBefore = new Date(tommorowOrShifted.getFullYear(), tommorowOrShifted.getMonth(), tommorowOrShifted.getDate() - 13);
+        const hours: number = today.getHours();
+        const tomorrowShifter: number = hours > 11 ? 1 : 0;
+        const tommorowOrShifted = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() + (tomorrowShifter - howOlderDatesAreInDays),
+        );
+        const twoWeeksBefore = new Date(
+            tommorowOrShifted.getFullYear(),
+            tommorowOrShifted.getMonth(),
+            tommorowOrShifted.getDate() - 13,
+        );
 
         // Fill two weeks
         for (let i = 0; i < 14; i++) {
