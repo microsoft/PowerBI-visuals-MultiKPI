@@ -38,7 +38,7 @@ For instance, look at the following table:
 
 You can see that one of the metric doesn't contain value for the latest date (08/05/2019).
 
-If tihs option is disabled the value of Metric 4 will be 0, because another option "Treat Empty/Missing Values As Zero" is enabled by default.
+If this option is disabled the value of Metric 4 will be 0, because another option "Treat Empty/Missing Values As Zero" is enabled by default.
 
 ![treat empty values as zero is enabled](./assets/TreatEmptyEnabled.PNG)
 
