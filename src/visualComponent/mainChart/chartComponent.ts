@@ -183,6 +183,8 @@ export class ChartComponent extends BaseContainerComponent<
             viewport,
         } = options;
 
+        viewport.width -= 10;
+
         this.hideComponents();
         this.updateSize(viewport.width, viewport.height);
 
