@@ -277,7 +277,11 @@ export class ChartComponent extends BaseContainerComponent<
             return;
         }
 
-        const dataPoint: IDataRepresentationPoint = this.renderOptions.series.points[index];
+        let dataPoint: IDataRepresentationPoint = this.renderOptions.series.points[index];
+
+        if (!dataPoint) {
+            dataPoint = this.renderOptions.series.points[this.renderOptions.series.points.length - 1];
+        }
 
         const data: IHoverLabelComponentRenderOptions = {
             dataPoint,

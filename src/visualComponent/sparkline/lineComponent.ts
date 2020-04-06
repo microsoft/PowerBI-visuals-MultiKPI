@@ -125,10 +125,10 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             return;
         }
 
-        const point: IDataRepresentationPoint = this.renderOptions.points[index];
+        let point: IDataRepresentationPoint = this.renderOptions.points[index];
 
         if (!point) {
-            return;
+            point = this.renderOptions.points[this.renderOptions.points.length - 1];
         }
 
         const {
@@ -159,18 +159,9 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
 
         const firstValue: IDataRepresentationPoint = this.renderOptions.points.find((x) => x.y || x.y === 0);
         const trueXPosition: number = firstValue ? xScale.scale(firstValue.x) : undefined;
-
         const offset: number = xPosition >= trueXPosition ? ((xPosition - trueXPosition) / (width - trueXPosition) * 100) : 0;
         const offsetInPercent: string = `${offset}%`;
-
-        const gradients: ILineComponentGradient[] = offset === 100
-            ? [
-                {
-                    color,
-                    offset: "100%",
-                },
-            ]
-            : [
+        const gradients: ILineComponentGradient[] = [
                 {
                     color: alternativeColor,
                     offset: "0%",
