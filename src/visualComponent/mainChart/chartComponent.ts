@@ -183,6 +183,8 @@ export class ChartComponent extends BaseContainerComponent<
             viewport,
         } = options;
 
+        viewport.width -= 10;
+
         this.hideComponents();
         this.updateSize(viewport.width, viewport.height);
 
@@ -275,7 +277,11 @@ export class ChartComponent extends BaseContainerComponent<
             return;
         }
 
-        const dataPoint: IDataRepresentationPoint = this.renderOptions.series.points[index];
+        let dataPoint: IDataRepresentationPoint = this.renderOptions.series.points[index];
+
+        if (!dataPoint) {
+            dataPoint = this.renderOptions.series.points[this.renderOptions.series.points.length - 1];
+        }
 
         const data: IHoverLabelComponentRenderOptions = {
             dataPoint,

@@ -1,3 +1,6 @@
+## 2.2.1
+* Fix for last date visual issue
+
 ## 2.2.0
 * API 2.6.1
 * Packages update
