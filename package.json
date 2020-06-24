@@ -6,7 +6,8 @@
     "start": "pbiviz start",
     "package": "pbiviz package",
     "test": "karma start",
-    "watch": "karma start --single-run=false"
+    "watch": "karma start --single-run=false",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
   },
   "repository": {
     "type": "git",
