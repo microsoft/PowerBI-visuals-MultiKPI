@@ -1,5 +1,14 @@
+## 2.3.0
+* API 2.6.1
+* Packages update
+* Subtitle can be loaded form data also (will be merged with subtitle from options)
+* Some of options from Stale Data option group can be set up for a metric
+* New option "Auto Precision" that build values showing minimum 3 digits as 3.56 or 25.7 or 754 or 2345
+* FIXED: it is expected to see the line when values are the same but it will be shown a dot in sparklines and nothing in the main chart
+
 ## 2.2.1
 * Fix for last date visual issue
+
 
 ## 2.2.0
 * API 2.6.1

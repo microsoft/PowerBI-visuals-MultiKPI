@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { Selection } from "d3-selection";
 
@@ -34,7 +34,7 @@ import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 import { BaseComponent } from "../baseComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
-import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
 
 export interface IRenderGroup {
     data: string;

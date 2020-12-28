@@ -139,9 +139,9 @@ export class SparklineGroupComponent
             clearTimeout(this.renderingTimers[index]);
         }
 
-        this.renderingTimers[index] = setTimeout(
+        this.renderingTimers[index] = <number>(<unknown>setTimeout(
             component.render.bind(component, options),
             this.renderingDelay,
-        ) as unknown as number;
+        ));
     }
 }

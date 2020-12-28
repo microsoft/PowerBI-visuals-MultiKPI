@@ -28,7 +28,7 @@ import { bisector } from "d3-array";
 import { Selection } from "d3-selection";
 import { line } from "d3-shape";
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { IMargin } from "powerbi-visuals-utils-svgutils";
 
@@ -36,6 +36,7 @@ import {
     IDataRepresentationPoint,
     IDataRepresentationSeries,
     ViewportSize,
+    DataRepresentationPointGradientType,
 } from "../../converter/data/dataRepresentation";
 
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
@@ -71,12 +72,12 @@ import { HoverLabelComponent } from "./hoverLabelComponent";
 export interface IZeroLineRenderOptions {
     series: IDataRepresentationSeries;
     chart: ChartDescriptor;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
 }
 
 export interface IChartComponentRenderOptions {
     series: IDataRepresentationSeries;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     settings: Settings;
     viewportSize: ViewportSize;
 }
@@ -99,7 +100,7 @@ export class ChartComponent extends BaseContainerComponent<
     private axisComponent: IVisualComponent<IAxisComponentRenderOptions>;
     private lineComponent: IVisualComponent<ILineComponentRenderOptions>;
 
-    private dynamicComponents: Array<IVisualComponent<IHoverLabelComponentRenderOptions>> = [];
+    private dynamicComponents: IVisualComponent<IHoverLabelComponentRenderOptions>[] = [];
 
     constructor(options: IVisualComponentConstructorOptions) {
         super();
@@ -204,9 +205,10 @@ export class ChartComponent extends BaseContainerComponent<
             alternativeColor: settings.chart.alternativeColor,
             color: settings.chart.color,
             current: series.current,
+            isLine: series.isLine,
             points: series.points,
             thickness: settings.chart.thickness,
-            type: settings.chart.chartType,
+            type: series.isLine ? DataRepresentationPointGradientType.line : settings.chart.chartType,
             viewport,
             x: series.x,
             y: series.y,
@@ -251,7 +253,7 @@ export class ChartComponent extends BaseContainerComponent<
             return NaN;
         }
 
-        const areaScale: powerbi.IViewport = this.constructorOptions.scaleService.getScale();
+        const areaScale: powerbiVisualsApi.IViewport = this.constructorOptions.scaleService.getScale();
 
         const width: number = this.width;
 
@@ -263,7 +265,7 @@ export class ChartComponent extends BaseContainerComponent<
 
         const leftPosition: number = (position - thickness) / areaScale.width;
 
-        const x: Date = scale.invert(leftPosition) as Date;
+        const x: Date = <Date>(scale.invert(leftPosition));
 
         return this.dataBisector(this.renderOptions.series.points, x, 1);
     }

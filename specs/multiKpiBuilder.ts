@@ -26,7 +26,7 @@
 
 import { VisualBuilderBase } from "powerbi-visuals-utils-testutils";
 
-import { MultiKpi } from "../src/visual";
+import { MultiKpi } from "../src/multiKpi";
 
 export class MultiKpiBuilder extends VisualBuilderBase<MultiKpi> {
     protected build(): MultiKpi {

@@ -34,6 +34,7 @@ import { SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
 import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
+import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
 
 export class SeriesSettings extends SettingsBase {
     public values: ValuesDescriptor = new ValuesDescriptor();
@@ -45,4 +46,5 @@ export class SeriesSettings extends SettingsBase {
     public sparklineChart: SparklineChartDescriptor = new SparklineChartDescriptor();
     public sparklineYAxis: SparklineAxisDescriptor = new SparklineAxisDescriptor();
     public sparklineValue: SubtitleDescriptor = new SubtitleDescriptor();
+    public staleData: StaleDataDescriptor = new StaleDataDescriptor();
 }

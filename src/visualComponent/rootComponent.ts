@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { mouse as d3Mouse } from "d3-selection";
 
@@ -55,12 +55,12 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
     private isPrintModeActivated: boolean = false;
 
-    private mainChartComponentViewport: powerbi.IViewport;
+    private mainChartComponentViewport: powerbiVisualsApi.IViewport;
 
     private onChartChangeDelay: number = 300;
     private onChartChangeTimer: number = null;
-    private currentChartName: string = undefined;
-    private currentlyHoveringChartName: string = undefined;
+    private currentChartName: string;
+    private currentlyHoveringChartName: string;
     private startCoordinates: [number, number];
 
     constructor(options: IVisualComponentConstructorOptions) {
@@ -164,20 +164,20 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             return;
         }
 
-        const coordinates: [number, number] = d3Mouse(this.element.node()) as [number, number];
+        const coordinates: [number, number] = <[number, number]>d3Mouse(this.element.node());
         const delay: number = this.getOnChartChangeDelay(coordinates);
 
         if (delay) {
             this.clearOnChartChangeTimer();
 
-            this.onChartChangeTimer = setTimeout(
+            this.onChartChangeTimer = <number>(<unknown>setTimeout(
                 this.applyCurrentlyHoveringChartName.bind(
                     this,
                     this.currentlyHoveringChartName,
                     coordinates,
                 ),
                 delay,
-            ) as unknown as number;
+            ));
         } else {
             this.applyCurrentlyHoveringChartName(
                 this.currentlyHoveringChartName,
@@ -187,7 +187,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
     }
 
     private getOnChartChangeDelay([x, y]): number {
-        const scale: powerbi.IViewport = this.constructorOptions.scaleService.getScale();
+        const scale: powerbiVisualsApi.IViewport = this.constructorOptions.scaleService.getScale();
 
         const scaledX: number = x / scale.width;
         const scaledY: number = y / scale.height;
@@ -215,13 +215,14 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             staleDataSettings: settings.staleData,
             subtitleSettings: settings.subtitle,
             warningState: data.warningState,
+            subtitle: data.subtitle,
         });
 
         const subtitleComponentHeight: number = this.subtitleComponent.getViewport().height;
 
         const viewportFactor: number = this.getViewportFactorByViewportSize(data.viewportSize);
 
-        const viewport: powerbi.IViewport = {
+        const viewport: powerbiVisualsApi.IViewport = {
             height: options.viewport.height / viewportFactor,
             width: options.viewport.width,
         };
@@ -298,8 +299,8 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
         try {
             if (!window
                 || !window.addEventListener
-                || !("onbeforeprint" in window as any)
-                || !("onafterprint" in window as any)
+                || !("onbeforeprint" in <any>window)
+                || !("onafterprint" in <any>window)
             ) {
                 return;
             }
@@ -353,9 +354,9 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             this.currentChartName = seriesName;
             this.currentlyHoveringChartName = undefined;
 
-            this.startCoordinates = (coordinates
+            this.startCoordinates = <[number, number]>(coordinates
                 ? coordinates
-                : d3Mouse(this.element.node())) as [number, number];
+                : d3Mouse(this.element.node()));
 
             if (!this.constructorOptions
                 || !this.constructorOptions.eventDispatcher
@@ -387,7 +388,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
             this.onChartChangeHoverHandler(
                 currentlyHoveringChartName,
-                positions as [number, number],
+                <[number, number]>positions,
             );
         }
     }

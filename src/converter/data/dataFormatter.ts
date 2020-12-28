@@ -26,7 +26,7 @@
 
 import { displayUnitSystemType, valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { NumericDescriptor } from "../../settings/descriptors/numericDescriptor";
-import { isValueValid } from "../../utils/valueUtils";
+import { isValueValid } from "../../utils/isValueValid";
 
 const wholeUnits: displayUnitSystemType.DisplayUnitSystemType = displayUnitSystemType.DisplayUnitSystemType.WholeUnits;
 
@@ -55,7 +55,16 @@ export function getValueFormatter(value: number, settings: NumericDescriptor): v
     return valueFormatter.create({
         displayUnitSystemType: wholeUnits,
         format: settings.getFormat(),
-        precision: settings.precision,
+        precision: detectPrecision(value, settings),
         value: settings.displayUnits || value,
     });
+}
+
+export function detectPrecision(inputValue: number, settings: NumericDescriptor): number {
+    if (settings.autoPrecision) {
+        const format = settings.format || settings.defaultFormat || settings.columnFormat;
+        return valueFormatter.calculateExactDigitsPrecision(inputValue, format, settings.displayUnits, 3);
+    }
+
+    return settings.precision;
 }

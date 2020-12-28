@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import {
     dataViewObjects,
@@ -38,12 +38,12 @@ import { IDescriptor } from "./descriptors/descriptor";
 import { BaseDescriptor } from "./descriptors/baseDescriptor";
 
 export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
-    public static parseSettings(options: powerbi.DataView): SettingsBase {
+    public static PARSE_SETTINGS(options: powerbiVisualsApi.DataView): SettingsBase {
         const settings: SettingsBase = this.parse<SettingsBase>(options);
 
         Object.keys(settings).forEach((descriptorName: string) => {
-            if ((settings[descriptorName] as IDescriptor).parse) {
-                (settings[descriptorName] as IDescriptor).parse();
+            if ((<IDescriptor>settings[descriptorName]).parse) {
+                (<IDescriptor>settings[descriptorName]).parse();
             }
         });
 
@@ -56,12 +56,12 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
         // This function is required to update settings once they are parsed from a data view object
     }
 
-    public parseObjects(objects: powerbi.DataViewObjects): SettingsBase {
+    public parseObjects(objects: powerbiVisualsApi.DataViewObjects): SettingsBase {
         if (objects) {
             const properties: dataViewObjectsParser.DataViewProperties = this.getProperties();
 
-            for (const objectName in properties) {
-                for (const propertyName in properties[objectName]) {
+            for (const objectName of Object.keys(properties)) {
+                for (const propertyName of Object.keys(properties[objectName])) {
                     const defaultValue: any = this[objectName][propertyName];
 
                     this[objectName][propertyName] = dataViewObjects.getCommonValue(
@@ -70,8 +70,8 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
                         defaultValue);
                 }
 
-                if ((this[objectName] as IDescriptor).parse) {
-                    (this[objectName] as IDescriptor).parse();
+                if ((<IDescriptor>this[objectName]).parse) {
+                    (<IDescriptor>this[objectName]).parse();
                 }
             }
         }
@@ -81,8 +81,8 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
         return this;
     }
 
-    public enumerateObjectInstances(options: powerbi.EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumerationObject {
-        const enumerationObject: powerbi.VisualObjectInstanceEnumerationObject = {
+    public enumerateObjectInstances(options: powerbiVisualsApi.EnumerateVisualObjectInstancesOptions): powerbiVisualsApi.VisualObjectInstanceEnumerationObject {
+        const enumerationObject: powerbiVisualsApi.VisualObjectInstanceEnumerationObject = {
             containers: [],
             instances: [],
         };
@@ -101,18 +101,18 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
     }
 
     public enumerateObjectInstancesWithSelectionId(
-        options: powerbi.EnumerateVisualObjectInstancesOptions,
+        options: powerbiVisualsApi.EnumerateVisualObjectInstancesOptions,
         displayName: string,
-        selectionId: powerbi.visuals.ISelectionId,
-        enumerationObject: powerbi.VisualObjectInstanceEnumerationObject = {
+        selectionId: powerbiVisualsApi.visuals.ISelectionId,
+        enumerationObject: powerbiVisualsApi.VisualObjectInstanceEnumerationObject = {
             containers: [],
             instances: [],
         },
-    ): powerbi.VisualObjectInstanceEnumerationObject {
+    ): powerbiVisualsApi.VisualObjectInstanceEnumerationObject {
         if (this.areOptionsValid(options)) {
             const { objectName } = options;
 
-            const selector: powerbi.data.Selector = selectionId && selectionId.getSelector();
+            const selector: powerbiVisualsApi.data.Selector = selectionId && selectionId.getSelector();
 
             this.addSettingsToContainer(
                 objectName,
@@ -126,17 +126,17 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
         return enumerationObject;
     }
 
-    private areOptionsValid(options: powerbi.EnumerateVisualObjectInstancesOptions): boolean {
+    private areOptionsValid(options: powerbiVisualsApi.EnumerateVisualObjectInstancesOptions): boolean {
         return !!(options
             && options.objectName
             && this[options.objectName]
         );
     }
 
-    private getSettings(settings: BaseDescriptor): { [propertyName: string]: powerbi.DataViewPropertyValue } {
-        const properties: { [propertyName: string]: powerbi.DataViewPropertyValue; } = {};
+    private getSettings(settings: BaseDescriptor): { [propertyName: string]: powerbiVisualsApi.DataViewPropertyValue } {
+        const properties: { [propertyName: string]: powerbiVisualsApi.DataViewPropertyValue; } = {};
 
-        for (const descriptor in settings) {
+        for (const descriptor of Object.keys(settings)) {
             const value: any = settings.getValueByPropertyName
                 ? settings.getValueByPropertyName(descriptor)
                 : settings[descriptor];
@@ -159,9 +159,9 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
     private addSettingsToContainer(
         objectName: string,
         displayName: string,
-        selector: powerbi.data.Selector,
-        enumerationObject: powerbi.VisualObjectInstanceEnumerationObject,
-        properties: { [propertyName: string]: powerbi.DataViewPropertyValue },
+        selector: powerbiVisualsApi.data.Selector,
+        enumerationObject: powerbiVisualsApi.VisualObjectInstanceEnumerationObject,
+        properties: { [propertyName: string]: powerbiVisualsApi.DataViewPropertyValue },
     ): void {
         const containerIdx: number = enumerationObject.containers.push({ displayName }) - 1;
 
@@ -176,12 +176,12 @@ export class SettingsBase extends dataViewObjectsParser.DataViewObjectsParser {
 
     private addSettingsToInstances(
         objectName: string,
-        enumerationObject: powerbi.VisualObjectInstanceEnumerationObject,
-        properties: { [propertyName: string]: powerbi.DataViewPropertyValue },
-        selector: powerbi.data.Selector = null,
+        enumerationObject: powerbiVisualsApi.VisualObjectInstanceEnumerationObject,
+        properties: { [propertyName: string]: powerbiVisualsApi.DataViewPropertyValue },
+        selector: powerbiVisualsApi.data.Selector = null,
         containerIdx?: number,
     ): void {
-        const instance: powerbi.VisualObjectInstance = {
+        const instance: powerbiVisualsApi.VisualObjectInstance = {
             objectName,
             properties,
             selector,

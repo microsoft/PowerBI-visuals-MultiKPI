@@ -26,7 +26,7 @@
 
 import { Selection } from "d3-selection";
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
 import {
@@ -41,10 +41,10 @@ import { IVisualComponentConstructorOptions } from "../visualComponentConstructo
 
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 
-import { isValueValid } from "../../utils/valueUtils";
+import { isValueValid } from "../../utils/isValueValid";
 
 export interface IDotsComponentRenderOptions {
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
     points: IDataRepresentationPoint[];

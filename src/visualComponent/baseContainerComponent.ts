@@ -30,9 +30,13 @@ import { IVisualComponent } from "./visualComponent";
 export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptionsType, ComponentsRenderOptions>
     extends BaseComponent<ConstructorOptionsType, RenderOptionsType> {
 
-    protected components: Array<IVisualComponent<ComponentsRenderOptions>> = [];
+    protected components: IVisualComponent<ComponentsRenderOptions>[] = [];
 
-    public clear(components: Array<IVisualComponent<ComponentsRenderOptions>> = this.components): void {
+    public getComponents(): IVisualComponent<any>[] {
+        return this.components;
+    }
+
+    public clear(components: IVisualComponent<ComponentsRenderOptions>[] = this.components): void {
         this.forEach(
             components,
             (component: IVisualComponent<ComponentsRenderOptions>) => {
@@ -43,7 +47,7 @@ export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptio
         super.clear();
     }
 
-    public destroy(components: Array<IVisualComponent<ComponentsRenderOptions>> = this.components): void {
+    public destroy(components: IVisualComponent<ComponentsRenderOptions>[] = this.components): void {
         this.forEach(
             components.splice(0, components.length),
             (component: IVisualComponent<any>) => {
@@ -55,7 +59,7 @@ export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptio
     }
 
     protected forEach<ForEachComponentsRenderOptions>(
-        components: Array<IVisualComponent<ForEachComponentsRenderOptions>>,
+        components: IVisualComponent<ForEachComponentsRenderOptions>[],
         iterator: (
             component: IVisualComponent<ForEachComponentsRenderOptions>,
             index: number,
@@ -69,7 +73,7 @@ export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptio
     }
 
     protected initComponents<InitComponentsRenderOptions>(
-        components: Array<IVisualComponent<InitComponentsRenderOptions>>,
+        components: IVisualComponent<InitComponentsRenderOptions>[],
         expectedAmountOfComponents: number,
         initComponent: (index: number) => IVisualComponent<InitComponentsRenderOptions>,
     ): void {

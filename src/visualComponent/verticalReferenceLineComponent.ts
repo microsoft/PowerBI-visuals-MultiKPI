@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { Selection } from "d3-selection";
 
@@ -46,7 +46,7 @@ import { DataRepresentationScale } from "../converter/data/dataRepresentationSca
 
 export interface IVerticalReferenceLineComponentRenderOptions {
     offset: number;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     series: IDataRepresentationSeries;
     dataPoint: IDataRepresentationPoint;
     kpiSettings: KpiDescriptor;

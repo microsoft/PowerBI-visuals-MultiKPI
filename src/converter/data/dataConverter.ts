@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import {
     changeStartDateColumn,
@@ -32,6 +32,7 @@ import {
     tooltipColumn,
     valueColumn,
     warningStateColumn,
+    subtitleColumn,
 } from "../../columns/columns";
 
 import { AxisDescriptor } from "../../settings/descriptors/axisDescriptor";
@@ -55,7 +56,7 @@ import {
     DataRepresentationTypeEnum,
 } from "../data/dataRepresentationScale";
 
-import { createVarianceConverterByType } from "../variance";
+import { createVarianceConverterByType } from "../variance/createVarianceConverterByType";
 
 import {
     getFormattedDate,
@@ -65,7 +66,7 @@ import {
 export interface IColumnGroup {
     name: string;
     values: any[];
-    columns: Array<powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn>;
+    columns: (powerbiVisualsApi.DataViewValueColumn | powerbiVisualsApi.DataViewCategoryColumn)[];
 }
 
 export interface IColumnGroupByRole {
@@ -73,13 +74,13 @@ export interface IColumnGroupByRole {
 }
 
 export interface IDataConverterConstructorOptions {
-    createSelectionIdBuilder: () => powerbi.visuals.ISelectionIdBuilder;
+    createSelectionIdBuilder: () => powerbiVisualsApi.visuals.ISelectionIdBuilder;
 }
 
 export interface IDataConverterOptions {
-    dataView: powerbi.DataView;
+    dataView: powerbiVisualsApi.DataView;
     settings: Settings;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
 }
 
 export class DataConverter implements IConverter<IDataConverterOptions, IDataRepresentation> {
@@ -99,7 +100,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         const dataRepresentation: IDataRepresentation = this.getDefaultData(settings.kpi.percentCalcDate);
 
         if (this.isDataViewValid(dataView)) {
-            const columns: Array<powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn> = [
+            const columns: (powerbiVisualsApi.DataViewValueColumn | powerbiVisualsApi.DataViewCategoryColumn)[] = [
                 ...this.getColumns(dataView.categorical.categories),
                 ...this.getColumns(dataView.categorical.values),
             ];
@@ -154,7 +155,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         return closestDataPoint || defaultDataPoint;
     }
 
-    public isDataViewValid(dataView: powerbi.DataView): boolean {
+    public isDataViewValid(dataView: powerbiVisualsApi.DataView): boolean {
         return !!(dataView
             && dataView.categorical
             && dataView.categorical.categories
@@ -167,12 +168,12 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     protected getColumnGroupByRole(
-        columns: Array<powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn>,
+        columns: (powerbiVisualsApi.DataViewValueColumn | powerbiVisualsApi.DataViewCategoryColumn)[],
         index: number,
     ): IColumnGroupByRole {
         const columnGroups: IColumnGroupByRole = {};
 
-        columns.forEach((column: powerbi.DataViewValueColumn | powerbi.DataViewCategoryColumn, valueIndex: number) => {
+        columns.forEach((column: powerbiVisualsApi.DataViewValueColumn | powerbiVisualsApi.DataViewCategoryColumn, valueIndex: number) => {
             Object.keys(column.source.roles)
                 .forEach((roleName: string) => {
                     if (!columnGroups[roleName]) {
@@ -192,10 +193,10 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     private getColumns<Type>(columns: Type[]): Type[] {
-        return columns.map((column) => column); // TODO: Why is it using map to create a copy of array?
+        return columns.map((column) => column);
     }
 
-    private getViewportSize(viewport: powerbi.IViewport): ViewportSize {
+    private getViewportSize(viewport: powerbiVisualsApi.IViewport): ViewportSize {
         if (viewport.height < 120 || viewport.width < 120) {
             return ViewportSize.tiny;
         } else if (viewport.height < 180 || viewport.width < 300) {
@@ -229,7 +230,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         dataRepresentation: IDataRepresentation,
         columnGroupByRole: IColumnGroupByRole,
         settings: Settings,
-        valuesColumn: powerbi.DataViewValueColumns,
+        valuesColumn: powerbiVisualsApi.DataViewValueColumns,
     ): void {
         const dateColumnGroup: IColumnGroup = columnGroupByRole[dateColumn.name];
         const valueColumnGroup: IColumnGroup = columnGroupByRole[valueColumn.name];
@@ -252,157 +253,173 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
             createSelectionIdBuilder,
         } = this.constructorOptions;
 
-        valueColumnGroup.columns.forEach((column: powerbi.DataViewValueColumn, columnIndex: number) => {
-            const x: Date = dateColumnGroup.values[0] as Date;
+        valueColumnGroup.columns.forEach((column: powerbiVisualsApi.DataViewValueColumn, columnIndex: number) => {
+            const x: Date = <Date>(dateColumnGroup.values[0]);
 
             if (x instanceof Date && x !== undefined && x !== null) {
                 if (!dataRepresentation.series[columnIndex]) {
-                    const selectionId: powerbi.visuals.ISelectionId = createSelectionIdBuilder()
+                    const selectionId: powerbiVisualsApi.visuals.ISelectionId = createSelectionIdBuilder()
                         .withSeries(valuesColumn, column)
                         .withMeasure(column.source.queryName)
                         .createSelectionId();
 
-                    const seriesSettings: SeriesSettings = SeriesSettings.getDefault() as SeriesSettings;
-
-                    for (const propertyName in seriesSettings) {
-                        const descriptor: BaseDescriptor = seriesSettings[propertyName];
-                        const defaultDescriptor: BaseDescriptor = settings[propertyName];
-
-                        if (descriptor && descriptor.applyDefault && defaultDescriptor) {
-                            descriptor.applyDefault(defaultDescriptor);
-                        }
-                    }
-
-                    seriesSettings.parseObjects(column.source.objects);
-
-                    seriesSettings.values.setColumnFormat(column.source.format);
-                    seriesSettings.yAxis.setColumnFormat(column.source.format);
-                    seriesSettings.sparklineValue.setColumnFormat(column.source.format);
-                    seriesSettings.sparklineYAxis.setColumnFormat(column.source.format);
-
-                    const series: IDataRepresentationSeries = {
-                        current: undefined,
-                        dateDifference: undefined,
-                        formattedDate: "",
-                        formattedTooltip: undefined,
-                        formattedVariance: "",
-                        index: dataRepresentation.series.length,
-                        name: column.source.displayName,
-                        points: [],
+                    const seriesSettings: SeriesSettings = this.prepareSeriesSettings(settings, column);
+                    const series = this.initDataRepresentationSeries(
                         selectionId,
-                        settings: seriesSettings,
-                        smoothedPoints: [],
-                        x: {
-                            initialMax: undefined,
-                            initialMin: undefined,
-                            max: undefined,
-                            min: undefined,
-                            scale: DataRepresentationScale.create(),
-                        },
-                        y: {
-                            initialMax: undefined,
-                            initialMin: undefined,
-                            max: undefined,
-                            min: undefined,
-                            scale: DataRepresentationScale.create(),
-                        },
-                        ySparkline: {
-                            initialMax: undefined,
-                            initialMin: undefined,
-                            max: undefined,
-                            min: undefined,
-                            scale: DataRepresentationScale.create(),
-                        },
-
-                        tooltip: undefined,
-                        variance: undefined,
-                    };
+                        dataRepresentation.series.length,
+                        column.source.displayName,
+                        seriesSettings,
+                    );
 
                     dataRepresentation.series.push(series);
                     dataRepresentation.sortedSeries.push(series);
                 }
 
+                const seriesItem: IDataRepresentationSeries = dataRepresentation.series[columnIndex];
                 const y: number = this.parseValue(
                     valueColumnGroup.values[columnIndex],
-                    dataRepresentation.series[columnIndex].settings.values.treatEmptyValuesAsZero,
+                    seriesItem.settings.values.treatEmptyValuesAsZero,
                 );
 
                 const dataPoint: IDataRepresentationPoint = {
-                    index: dataRepresentation.series[columnIndex].points.length,
+                    index: seriesItem.points.length,
                     x,
                     y,
                 };
 
                 dataRepresentation.latestDate = x;
 
-                dataRepresentation.series[columnIndex].points.push(dataPoint);
+                if (seriesItem.points.length > 1 && (seriesItem.points[seriesItem.points.length - 1].y !== dataPoint.y)) {
+                    seriesItem.isLine = false;
+                }
 
-                if (dataRepresentation.series[columnIndex].settings.values.showLatterAvailableValue) {
+                seriesItem.points.push(dataPoint);
+
+                if (seriesItem.settings.values.showLatterAvailableValue) {
                     if (!isNaN(dataPoint.y)) {
-                        dataRepresentation.series[columnIndex].current = dataPoint;
+                        seriesItem.current = dataPoint;
                     }
                 } else {
-                    dataRepresentation.series[columnIndex].current = dataPoint;
+                    seriesItem.current = dataPoint;
                 }
 
-                dataRepresentation.series[columnIndex].x.min = this.getMin(
-                    dataRepresentation.series[columnIndex].x.min,
-                    x,
-                );
-
-                dataRepresentation.series[columnIndex].x.max = this.getMax(
-                    dataRepresentation.series[columnIndex].x.max,
-                    x,
-                );
-
-                if (!isNaN(y)) {
-                    dataRepresentation.series[columnIndex].y.min = this.getMin(
-                        dataRepresentation.series[columnIndex].y.min,
-                        y,
-                    );
-
-                    dataRepresentation.series[columnIndex].y.max = this.getMax(
-                        dataRepresentation.series[columnIndex].y.max,
-                        y,
-                    );
-
-                    dataRepresentation.series[columnIndex].ySparkline.min = this.getMin(
-                        dataRepresentation.series[columnIndex].ySparkline.min,
-                        y,
-                    );
-
-                    dataRepresentation.series[columnIndex].ySparkline.max = this.getMax(
-                        dataRepresentation.series[columnIndex].ySparkline.max,
-                        y,
-                    );
-                }
-
-                const tooltip: string = tooltipColumnGroup
-                    && tooltipColumnGroup.values
-                    && tooltipColumnGroup.values[columnIndex]
-                    || undefined;
-
+                seriesItem.x.min = this.getMin(seriesItem.x.min, x);
+                seriesItem.x.max = this.getMax(seriesItem.x.max, x);
+                this.setupYMinMax(y, seriesItem);
+                const tooltip: string = tooltipColumnGroup && tooltipColumnGroup.values && tooltipColumnGroup.values[columnIndex] || undefined;
                 dataRepresentation.series[columnIndex].tooltip = tooltip;
             }
         });
 
-        const warningColumnGroup: IColumnGroup = columnGroupByRole[warningStateColumn.name];
+        const subtitleColumnGroup: IColumnGroup = columnGroupByRole[subtitleColumn.name];
+        if (subtitleColumnGroup) {
+            dataRepresentation.subtitle = subtitleColumnGroup.values[0];
+        }
 
+        const warningColumnGroup: IColumnGroup = columnGroupByRole[warningStateColumn.name];
         if (warningColumnGroup) {
             dataRepresentation.warningState = warningColumnGroup.values[0];
         }
 
         const changeStartDateColumnGroup: IColumnGroup = columnGroupByRole[changeStartDateColumn.name];
-
         if (changeStartDateColumnGroup) {
             const date: Date = changeStartDateColumnGroup
                 && changeStartDateColumnGroup.values
                 && changeStartDateColumnGroup.values[0];
 
-            dataRepresentation.percentCalcDate = date instanceof Date
-                ? date
-                : dataRepresentation.percentCalcDate;
+            dataRepresentation.percentCalcDate = date instanceof Date ? date : dataRepresentation.percentCalcDate;
         }
+    }
+
+    private setupYMinMax(y: number, seriesItem: IDataRepresentationSeries): void {
+        if (!isNaN(y)) {
+            seriesItem.y.min = this.getMin(
+                seriesItem.y.min,
+                y,
+            );
+
+            seriesItem.y.max = this.getMax(
+                seriesItem.y.max,
+                y,
+            );
+
+            seriesItem.ySparkline.min = this.getMin(
+                seriesItem.ySparkline.min,
+                y,
+            );
+
+            seriesItem.ySparkline.max = this.getMax(
+                seriesItem.ySparkline.max,
+                y,
+            );
+        }
+    }
+
+    private prepareSeriesSettings(settings: Settings, column: powerbiVisualsApi.DataViewValueColumn): SeriesSettings {
+        const seriesSettings: SeriesSettings = <SeriesSettings>(SeriesSettings.getDefault());
+
+        for (const propertyName of Object.keys(seriesSettings)) {
+            const descriptor: BaseDescriptor = seriesSettings[propertyName];
+            const defaultDescriptor: BaseDescriptor = settings[propertyName];
+
+            if (descriptor && descriptor.applyDefault && defaultDescriptor) {
+                descriptor.applyDefault(defaultDescriptor);
+            }
+        }
+
+        seriesSettings.parseObjects(column.source.objects);
+        seriesSettings.values.setColumnFormat(column.source.format);
+        seriesSettings.yAxis.setColumnFormat(column.source.format);
+        seriesSettings.sparklineValue.setColumnFormat(column.source.format);
+        seriesSettings.sparklineYAxis.setColumnFormat(column.source.format);
+
+        return seriesSettings;
+    }
+
+    private initDataRepresentationSeries(
+        selectionId: powerbiVisualsApi.visuals.ISelectionId,
+        seriesLength: number,
+        sourceDispalyName: string,
+        seriesSettings: SeriesSettings
+    ): IDataRepresentationSeries {
+        return {
+            current: undefined,
+            dateDifference: undefined,
+            formattedDate: "",
+            formattedTooltip: undefined,
+            formattedVariance: "",
+            index: seriesLength,
+            isLine: true,
+            name: sourceDispalyName,
+            points: [],
+            selectionId,
+            settings: seriesSettings,
+            smoothedPoints: [],
+            x: {
+                initialMax: undefined,
+                initialMin: undefined,
+                max: undefined,
+                min: undefined,
+                scale: DataRepresentationScale.CREATE(),
+            },
+            y: {
+                initialMax: undefined,
+                initialMin: undefined,
+                max: undefined,
+                min: undefined,
+                scale: DataRepresentationScale.CREATE(),
+            },
+            ySparkline: {
+                initialMax: undefined,
+                initialMin: undefined,
+                max: undefined,
+                min: undefined,
+                scale: DataRepresentationScale.CREATE(),
+            },
+
+            tooltip: undefined,
+            variance: undefined,
+        };
     }
 
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
@@ -494,19 +511,19 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         axis: IDataRepresentationAxis,
         axisDescriptor: AxisDescriptor,
     ) {
-        if ((!isNaN(axisDescriptor.min as number) && axisDescriptor.min !== null)
-            || (!isNaN(axisDescriptor.defaultMin as number) && axisDescriptor.defaultMin !== null)) {
+        if ((!isNaN(<number>(axisDescriptor.min)) && axisDescriptor.min !== null)
+            || (!isNaN(<number>(axisDescriptor.defaultMin)) && axisDescriptor.defaultMin !== null)) {
             axis.min = axisDescriptor.getMin();
         }
-        else if (!isNaN(axis.min as number) && axis.min !== null) {
+        else if (!isNaN(<number>(axis.min)) && axis.min !== null) {
             axisDescriptor.defaultMin = axis.min;
         }
 
-        if ((!isNaN(axisDescriptor.max as number) && axisDescriptor.max !== null)
-            || (!isNaN(axisDescriptor.defaultMax as number) && axisDescriptor.defaultMax !== null)) {
+        if ((!isNaN(<number>(axisDescriptor.max)) && axisDescriptor.max !== null)
+            || (!isNaN(<number>(axisDescriptor.defaultMax)) && axisDescriptor.defaultMax !== null)) {
             axis.max = axisDescriptor.getMax();
-        } else if (!isNaN(axis.max as number) && axis.max !== null) {
-            axisDescriptor.defaultMax = (axis.max as number) + (axis.max as number) * this.increasedDomainValueInPercentage;
+        } else if (!isNaN(<number>(axis.max)) && axis.max !== null) {
+            axisDescriptor.defaultMax = (<number>(axis.max)) + (<number>(axis.max)) * this.increasedDomainValueInPercentage;
             axis.max = axisDescriptor.defaultMax;
         }
 

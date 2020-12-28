@@ -44,7 +44,7 @@ export enum DataRepresentationTypeEnum {
 }
 
 export class DataRepresentationScale {
-    public static create(): DataRepresentationScale {
+    public static CREATE(): DataRepresentationScale {
         return new DataRepresentationScale();
     }
 
@@ -75,7 +75,7 @@ export class DataRepresentationScale {
         }
 
         if (scale) {
-            (scale as any).domain(values); // "as any" is some kind of hack for TS to build it well
+            (<any>scale).domain(values); // "as any" is some kind of hack for TS to build it well
         }
 
         this.baseScale = scale;
@@ -97,7 +97,7 @@ export class DataRepresentationScale {
             return 0;
         }
 
-        return (this.baseScale as any)(value); // "as any" is some kind of hack for TS to build it well
+        return (<any>(this.baseScale))(value); // "as any" is some kind of hack for TS to build it well
     }
 
     public copy(): DataRepresentationScale {

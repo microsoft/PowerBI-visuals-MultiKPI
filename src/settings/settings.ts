@@ -97,7 +97,7 @@ export class Settings extends SettingsBase {
     }
 
     public parse(): void {
-        if (this.staleData.staleDataText === undefined) {
+        if (this.staleData.staleDataText === "") {
             this.staleData.staleDataText = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
         }
 

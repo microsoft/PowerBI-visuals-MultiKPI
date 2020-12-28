@@ -26,7 +26,7 @@
 
 import "../styles/styles.less";
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { dispatch, Dispatch } from "d3-dispatch";
 import { select as d3Select } from "d3-selection";
@@ -52,25 +52,24 @@ import { ScaleService } from "./services/scaleService";
 // powerbi.extensibility.utils.tooltip
 import { ITooltipServiceWrapper, TooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 
-export class MultiKpi implements powerbi.extensibility.visual.IVisual {
+export class MultiKpi implements powerbiVisualsApi.extensibility.visual.IVisual {
     private dataConverter: DataConverter;
 
-    private minViewport: powerbi.IViewport = {
+    private minViewport: powerbiVisualsApi.IViewport = {
         height: 95,
         width: 200,
     };
 
     private dataRepresentation: IDataRepresentation;
     private settings: Settings;
-    private viewport: powerbi.IViewport;
-
-    private rootComponent: IVisualComponent<IVisualComponentRenderOptions>;
-
+    private viewport: powerbiVisualsApi.IViewport;
     private eventDispatcher: Dispatch<any> = dispatch(...Object.keys(EventName));
-
     private tooltipServiceWrapper: ITooltipServiceWrapper;
+    private host: powerbiVisualsApi.extensibility.visual.IVisualHost;
 
-    constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
+    public rootComponent: IVisualComponent<IVisualComponentRenderOptions>;
+
+    constructor(options: powerbiVisualsApi.extensibility.visual.VisualConstructorOptions) {
         if (window.location !== window.parent.location) {
             require("core-js/stable");
         }
@@ -79,6 +78,8 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             element,
             host,
         } = options;
+
+        this.host = host;
 
         this.tooltipServiceWrapper = new TooltipServiceWrapper(
             {
@@ -115,33 +116,40 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
         });
     }
 
-    public update(options: powerbi.extensibility.visual.VisualUpdateOptions) {
+    public update(options: powerbiVisualsApi.extensibility.visual.VisualUpdateOptions) {
         if (!this.dataConverter || !this.rootComponent) {
             return;
         }
 
-        const dataView: powerbi.DataView = options
-            && options.dataViews
-            && options.dataViews[0];
+        try {
+            this.host.eventService.renderingStarted(options);
 
-        this.viewport = this.getViewport(options && options.viewport);
+            const dataView: powerbiVisualsApi.DataView = options
+                && options.dataViews
+                && options.dataViews[0];
 
-        this.settings = Settings.parseSettings(dataView) as Settings;
+            this.viewport = this.getViewport(options && options.viewport);
 
-        this.dataRepresentation = this.dataConverter.convert({
-            dataView,
-            settings: this.settings,
-            viewport: this.viewport,
-        });
+            this.settings = <Settings>(Settings.PARSE_SETTINGS(dataView));
 
-        this.render(
-            this.dataRepresentation,
-            this.settings,
-            this.viewport,
-        );
+            this.dataRepresentation = this.dataConverter.convert({
+                dataView,
+                settings: this.settings,
+                viewport: this.viewport,
+            });
+
+            this.render(
+                this.dataRepresentation,
+                this.settings,
+                this.viewport,
+            );
+        } catch (ex) {
+            this.host.eventService.renderingFailed(options, JSON.stringify(ex));
+        }
+        this.host.eventService.renderingFinished(options);
     }
 
-    public enumerateObjectInstances(options: powerbi.EnumerateVisualObjectInstancesOptions): powerbi.VisualObjectInstanceEnumeration {
+    public enumerateObjectInstances(options: powerbiVisualsApi.EnumerateVisualObjectInstancesOptions): powerbiVisualsApi.VisualObjectInstanceEnumeration {
         if (!this.settings) {
             return [];
         }
@@ -154,7 +162,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             return this.settings.enumerateObjectInstances(options);
         }
 
-        const enumerationObject: powerbi.VisualObjectInstanceEnumerationObject
+        const enumerationObject: powerbiVisualsApi.VisualObjectInstanceEnumerationObject
             = this.settings.enumerateObjectInstancesWithSelectionId(
                 options,
                 "[All]",
@@ -178,7 +186,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
     private render(
         data: IDataRepresentation,
         settings: Settings,
-        viewport: powerbi.IViewport,
+        viewport: powerbiVisualsApi.IViewport,
     ): void {
         this.rootComponent.render({
             data,
@@ -187,7 +195,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
         });
     }
 
-    private getViewport(currentViewport: powerbi.IViewport): powerbi.IViewport {
+    private getViewport(currentViewport: powerbiVisualsApi.IViewport): powerbiVisualsApi.IViewport {
         if (!currentViewport) {
             return { ...this.minViewport };
         }

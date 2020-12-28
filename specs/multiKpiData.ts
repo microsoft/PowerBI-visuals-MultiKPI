@@ -24,7 +24,7 @@
 *  THE SOFTWARE.
 */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { getRandomNumbers, testDataViewBuilder } from "powerbi-visuals-utils-testutils";
 import { valueType } from "powerbi-visuals-utils-typeutils";
@@ -32,6 +32,7 @@ import { valueType } from "powerbi-visuals-utils-typeutils";
 import {
     dateColumn,
     valueColumn,
+    subtitleColumn,
 } from "../src/columns/columns";
 
 export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
@@ -40,7 +41,10 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     public dates: Date[] = [];
     public seriesValues: number[][] = [];
 
-    constructor(withMisisngValues?: boolean, brokenMetricIndex: number = 0, howOlderDatesAreInDays: number = 0) {
+    constructor(
+        withMisisngValues: boolean = false,
+        brokenMetricIndex: number = 0,
+        howOlderDatesAreInDays: number = 0) {
         super();
 
         const today = new Date();
@@ -96,18 +100,57 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
         }
     }
 
-    public getDataView(columnNames?: string[]): powerbi.DataView {
-        const datesCategory = {
+    public getDataView(columnNames?: string[]): powerbiVisualsApi.DataView {
+        const datesCategory = this.buildDatesCategory(this.dates);
+        const valuesCategory = this.buildValuesCategory(this.seriesValues);
+
+        return this.createCategoricalDataViewBuilder(
+            [datesCategory],
+            valuesCategory,
+            columnNames,
+        ).build();
+    }
+
+    public getDataViewWithSubtitle(columnNames?: string[]): powerbiVisualsApi.DataView {
+        const datesCategory = this.buildDatesCategory(this.dates);
+        const valuesCategory = this.buildValuesCategory(this.seriesValues);
+        const repeatsNum: number = this.dates.length;
+        let subtitleArr: string[] = [];
+        for (let i = 0; i < repeatsNum; i++) {
+            subtitleArr.push("Subtitle form data");
+        }
+
+        valuesCategory.push({
+            source: {
+                displayName: subtitleColumn.name,
+                roles: { subtitleColumn: true },
+                type: valueType.ValueType.fromDescriptor({ text: true }),
+            },
+            values: subtitleArr,
+        });
+
+        return this.createCategoricalDataViewBuilder(
+            [datesCategory],
+            valuesCategory,
+            columnNames,
+        ).build();
+    }
+
+
+    private buildDatesCategory(dates: Date[]): any {
+        return {
             source: {
                 displayName: dateColumn.name,
                 format: "%M/%d/yyyy",
                 roles: { dateColumn: true },
                 type: valueType.ValueType.fromDescriptor({ dateTime: true }),
             },
-            values: this.dates,
-        };
+            values: dates,
+        }
+    }
 
-        const valuesCategory = this.seriesValues
+    private buildValuesCategory(seriesValues: number[][]): any {
+        return seriesValues
             .map((values: number[]) => {
                 return {
                     source: {
@@ -118,11 +161,5 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
                     values,
                 };
             });
-
-        return this.createCategoricalDataViewBuilder(
-            [datesCategory],
-            valuesCategory,
-            columnNames,
-        ).build();
     }
 }

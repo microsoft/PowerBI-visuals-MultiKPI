@@ -28,12 +28,11 @@ import { axisRight } from "d3-axis";
 import { ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
 import {
-    DataRepresentationAxisValueType,
     IDataRepresentationAxis,
     IDataRepresentationSeries,
 } from "../../converter/data/dataRepresentation";
@@ -44,9 +43,10 @@ import { AxisDescriptor } from "../../settings/descriptors/axisDescriptor";
 
 import { BaseComponent } from "../baseComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
+import { detectPrecision } from "../../converter/data/dataFormatter";
 
 export interface IAxisComponentRenderOptions {
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     settings: AxisDescriptor;
     series: IDataRepresentationSeries;
     y: IDataRepresentationAxis;
@@ -90,16 +90,16 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
             .copy()
             .range([viewport.height, 0]);
 
-        const domain: number[] = yScale.getDomain() as number[];
+        const domain: number[] = <number[]>(yScale.getDomain());
 
         const axisValueFormatter: valueFormatter.IValueFormatter = valueFormatter.create({
             displayUnitSystemType: 2,
             format: settings.getFormat(),
-            precision: settings.precision,
+            precision: detectPrecision(domain[1] || domain[0], settings),
             value: settings.displayUnits || domain[1] || domain[0],
         });
 
-        const yAxis = axisRight(yScale.getScale() as ScaleLinear<number, number>) // TODO: This is a place for potential issue
+        const yAxis = axisRight(<ScaleLinear<number, number>>(yScale.getScale()))
             .tickValues(domain)
             .tickFormat((value: number) => {
                 return axisValueFormatter.format(value);

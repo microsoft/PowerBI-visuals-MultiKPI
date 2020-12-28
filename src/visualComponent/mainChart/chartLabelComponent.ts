@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { FormatDescriptor } from "../../settings/descriptors/formatDescriptor";
 import { KpiDescriptor } from "../../settings/descriptors/kpi/kpiDescriptor";
@@ -37,13 +37,13 @@ import { ChartLabelBaseComponent } from "./chartLabelBaseComponent";
 
 import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
 import { EventName } from "../../event/eventName";
-import { isValueValid } from "../../utils/valueUtils";
+import { isValueValid } from "../../utils/isValueValid";
 
 export interface IChartLabelComponentRenderOptions {
     dateSettings: FormatDescriptor;
     kpiSettings: KpiDescriptor;
     series: IDataRepresentationSeries;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
 }
 
 export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComponentRenderOptions> {

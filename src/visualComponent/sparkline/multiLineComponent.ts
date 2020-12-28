@@ -82,6 +82,7 @@ export class MultiLineComponent
                     alternativeColor: currentSeries.settings.sparklineChart.alternativeColor,
                     color: currentSeries.settings.sparklineChart.color,
                     current: currentSeries.current,
+                    isLine: currentSeries.isLine,
                     points: currentSeries.smoothedPoints,
                     thickness: currentSeries.settings.sparklineChart.thickness,
                     type: DataRepresentationPointGradientType.line,

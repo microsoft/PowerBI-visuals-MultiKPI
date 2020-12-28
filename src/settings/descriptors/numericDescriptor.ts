@@ -34,6 +34,7 @@ export class NumericDescriptor
     public noValueLabel: string = "N/A";
     public displayUnits: number = 0;
     public precision: number = 0;
+    public autoPrecision: boolean = false;
 
     protected minPrecision: number = 0;
     protected maxPrecision: number = 17;
