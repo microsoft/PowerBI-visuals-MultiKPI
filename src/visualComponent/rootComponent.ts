@@ -26,7 +26,7 @@
 
 import powerbiVisualsApi from "powerbi-visuals-api";
 
-import { mouse as d3Mouse } from "d3-selection";
+import { pointer as d3Mouse } from "d3-selection";
 
 import { BaseContainerComponent } from "./baseContainerComponent";
 
@@ -153,9 +153,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
         this.subtitleComponent = null;
     }
 
-    private mousemoveHandler(): void {
-        const event: MouseEvent = require("d3").event;
-
+    private mousemoveHandler(event): void {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
@@ -164,7 +162,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             return;
         }
 
-        const coordinates: [number, number] = <[number, number]>d3Mouse(this.element.node());
+        const coordinates: [number, number] = <[number, number]>d3Mouse(event, this.element.node());
         const delay: number = this.getOnChartChangeDelay(coordinates);
 
         if (delay) {
@@ -173,6 +171,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             this.onChartChangeTimer = <number>(<unknown>setTimeout(
                 this.applyCurrentlyHoveringChartName.bind(
                     this,
+                    event,
                     this.currentlyHoveringChartName,
                     coordinates,
                 ),
@@ -180,6 +179,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             ));
         } else {
             this.applyCurrentlyHoveringChartName(
+                event,
                 this.currentlyHoveringChartName,
                 coordinates,
             );
@@ -338,6 +338,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
     }
 
     private onChartChangeHoverHandler(
+        event,
         seriesName: string,
         coordinates: number[],
     ): void {
@@ -356,7 +357,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
             this.startCoordinates = <[number, number]>(coordinates
                 ? coordinates
-                : d3Mouse(this.element.node()));
+                : d3Mouse(event, this.element.node()));
 
             if (!this.constructorOptions
                 || !this.constructorOptions.eventDispatcher
@@ -380,22 +381,21 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
         this.onChartChangeTimer = null;
     }
 
-    private applyCurrentlyHoveringChartName(currentlyHoveringChartName: string, positions: number[]): void {
+    private applyCurrentlyHoveringChartName(event, currentlyHoveringChartName: string, positions: number[]): void {
         this.clearOnChartChangeTimer();
 
         if (currentlyHoveringChartName) {
             this.currentChartName = undefined;
 
             this.onChartChangeHoverHandler(
+                event,
                 currentlyHoveringChartName,
                 <[number, number]>positions,
             );
         }
     }
 
-    private onChartViewReset(): void {
-        const event: MouseEvent = require("d3").event;
-
+    private onChartViewReset(event): void {
         if (event.target !== this.element.node()) {
             return;
         }

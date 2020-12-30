@@ -206,10 +206,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
         this.constructorOptions.tooltipServiceWrapper.addTooltip(
             iconSelection,
-            () => {
-                if (tooltipItems && tooltipItems.length > 0) {
-                    return tooltipItems;
-                }
-            });
+            (data) => tooltipItems ? tooltipItems : null
+        );
     }
 }

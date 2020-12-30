@@ -1146,10 +1146,10 @@ describe("Multi KPI", () => {
 });
 
 function createElement(viewport: powerbiVisualsApi.IViewport = { height: 600, width: 800 }): Selection<any, any, any, any> {
-    return d3Select(testDom(
+    return d3Select($(testDom(
         viewport.height.toString(),
         viewport.width.toString(),
-    ).get(0));
+    )).get(0));
 }
 
 function castZeroToNullOrReturnBack(dataView: powerbiVisualsApi.DataView): void {

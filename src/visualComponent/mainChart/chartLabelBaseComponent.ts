@@ -126,10 +126,7 @@ export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseCompone
 
         this.constructorOptions.tooltipServiceWrapper.addTooltip<IRenderGroup>(
             itemSelection,
-            (args) => {
-                if (args.data.tooltipDataItems) {
-                    return args.data.tooltipDataItems;
-                }
-            });
+            (data) => data.tooltipDataItems ? data.tooltipDataItems : null
+        );
     }
 }

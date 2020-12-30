@@ -26,7 +26,10 @@
 
 import "../styles/styles.less";
 
+import "regenerator-runtime/runtime.js";
 import powerbiVisualsApi from "powerbi-visuals-api";
+
+import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 
 import { dispatch, Dispatch } from "d3-dispatch";
 import { select as d3Select } from "d3-selection";
@@ -66,6 +69,7 @@ export class MultiKpi implements powerbiVisualsApi.extensibility.visual.IVisual 
     private eventDispatcher: Dispatch<any> = dispatch(...Object.keys(EventName));
     private tooltipServiceWrapper: ITooltipServiceWrapper;
     private host: powerbiVisualsApi.extensibility.visual.IVisualHost;
+    private selectionManager: ISelectionManager;
 
     public rootComponent: IVisualComponent<IVisualComponentRenderOptions>;
 
@@ -113,6 +117,18 @@ export class MultiKpi implements powerbiVisualsApi.extensibility.visual.IVisual 
             scaleService: new ScaleService(element),
             style: host.colorPalette,
             tooltipServiceWrapper: this.tooltipServiceWrapper,
+        });
+
+        this.selectionManager = this.host.createSelectionManager();
+
+        const visualSelection = d3Select(element);
+        visualSelection.on("contextmenu", (event) => {
+            let dataPoint: any = d3Select(event.target).datum();
+            this.selectionManager.showContextMenu(dataPoint ? dataPoint.selectionId : {}, {
+                x: event.clientX,
+                y: event.clientY
+            });
+            event.preventDefault();
         });
     }
 

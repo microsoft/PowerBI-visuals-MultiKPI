@@ -64,9 +64,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             element: this.element,
         };
 
-        this.element.on("click", () => {
-            const event: MouseEvent = require("d3").event;
-
+        this.element.on("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -125,14 +123,8 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
 
             this.constructorOptions.tooltipServiceWrapper.addTooltip(
                 this.element,
-                () => {
-                    if (tooltipText) {
-                        return [{
-                            displayName: null,
-                            value: tooltipText,
-                        }];
-                    }
-                });
+                (data) => tooltipText ? [{ displayName: null, value: tooltipText, }] : null
+            );
 
         } else {
             this.destroyComponents();
