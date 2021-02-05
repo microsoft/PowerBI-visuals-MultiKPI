@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
 import { IDataRepresentation, IDataRepresentationPoint, IDataRepresentationSeries, ViewportSize } from "../../converter/data/dataRepresentation";
 import { EventName } from "../../event/eventName";
@@ -40,7 +40,7 @@ export interface ISparklineComponentRenderOptions {
     series: IDataRepresentationSeries[];
     current: IDataRepresentationSeries;
     dataRepresentation: IDataRepresentation;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     position: number;
 }
 
@@ -64,9 +64,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             element: this.element,
         };
 
-        this.element.on("click", () => {
-            const event: MouseEvent = require("d3").event;
-
+        this.element.on("click", (event) => {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -125,14 +123,8 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
 
             this.constructorOptions.tooltipServiceWrapper.addTooltip(
                 this.element,
-                () => {
-                    if (tooltipText) {
-                        return [{
-                            displayName: null,
-                            value: tooltipText,
-                        }];
-                    }
-                });
+                (data) => tooltipText ? [{ displayName: null, value: tooltipText, }] : null
+            );
 
         } else {
             this.destroyComponents();
@@ -222,7 +214,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
     }
 
     private renderPlot(options: ISparklineComponentRenderOptions): void {
-        const plotComponentViewport: powerbi.IViewport = this.getReducedViewport(
+        const plotComponentViewport: powerbiVisualsApi.IViewport = this.getReducedViewport(
             { ...options.viewport },
             [this.topLabelComponent, this.bottomLabelComponent],
         );
@@ -269,12 +261,12 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         }
     }
 
-    private getReducedViewport(viewport: powerbi.IViewport, components: Array<IVisualComponent<any>>): powerbi.IViewport {
-        return components.reduce<powerbi.IViewport>((
-            previousViewport: powerbi.IViewport,
+    private getReducedViewport(viewport: powerbiVisualsApi.IViewport, components: IVisualComponent<any>[]): powerbiVisualsApi.IViewport {
+        return components.reduce<powerbiVisualsApi.IViewport>((
+            previousViewport: powerbiVisualsApi.IViewport,
             component: IVisualComponent<any>,
-        ): powerbi.IViewport => {
-            const componentViewport: powerbi.IViewport = component.getViewport();
+        ): powerbiVisualsApi.IViewport => {
+            const componentViewport: powerbiVisualsApi.IViewport = component.getViewport();
 
             return {
                 height: previousViewport.height - componentViewport.height,

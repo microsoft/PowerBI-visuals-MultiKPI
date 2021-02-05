@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 export interface IVisualComponent<RenderOptionsType> {
     isShown?: boolean;
@@ -35,5 +35,6 @@ export interface IVisualComponent<RenderOptionsType> {
     hide?(): void;
     show?(): void;
     toggle?(): void;
-    getViewport?(): powerbi.IViewport;
+    getViewport?(): powerbiVisualsApi.IViewport;
+    getComponents?(): IVisualComponent<any>[]
 }

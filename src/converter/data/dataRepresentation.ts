@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { SeriesSettings } from "../../settings/seriesSettings";
 import { DataRepresentationScale } from "./dataRepresentationScale";
@@ -66,8 +66,9 @@ export interface IDataRepresentationSeries {
     staleDateDifference?: number;
     tooltip: string;
     formattedTooltip: string;
-    selectionId: powerbi.visuals.ISelectionId;
+    selectionId: powerbiVisualsApi.visuals.ISelectionId;
     settings: SeriesSettings;
+    isLine: boolean; // There is a bag in SVG that hide line that has gradient attachment. The mark indicate to apply workaround
 }
 
 export enum ViewportSize {
@@ -87,7 +88,7 @@ export interface IDataRepresentation {
     latestDate: Date;
     staleDateDifference?: number;
     percentCalcDate: Date;
-
-    viewport: powerbi.IViewport;
+    subtitle?: string;
+    viewport: powerbiVisualsApi.IViewport;
     viewportSize: ViewportSize;
 }

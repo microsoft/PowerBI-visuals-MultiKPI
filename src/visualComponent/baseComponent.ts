@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import {
     CssConstants,
@@ -52,10 +52,10 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
     protected renderOptions: RenderOptionsType;
 
     protected minWidth: number = 20;
-    protected width: number = undefined;
+    protected width: number;
 
     protected minHeight: number = 20;
-    protected height: number = undefined;
+    protected height: number;
 
     private isComponentShown: boolean = true;
     private classNamePrefix: string = "multiKpi_";
@@ -136,7 +136,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
         this.updateSizeOfElement(this.width, this.height);
     }
 
-    public getViewport(): powerbi.IViewport {
+    public getViewport(): powerbiVisualsApi.IViewport {
         return {
             height: this.height,
             width: this.width,
@@ -186,7 +186,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
             .remove();
     }
 
-    protected updateViewport(viewport: powerbi.IViewport): void {
+    protected updateViewport(viewport: powerbiVisualsApi.IViewport): void {
         this.element
             .style("width", pixelConverter.toString(viewport.width))
             .style("height", pixelConverter.toString(viewport.height));

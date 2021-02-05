@@ -25,7 +25,7 @@
  */
 
 import { Dispatch } from "d3-dispatch";
-import { mouse as d3Mouse } from "d3-selection";
+import { pointer as d3Mouse } from "d3-selection";
 
 import { BaseContainerComponent } from "../baseContainerComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
@@ -98,23 +98,18 @@ export class MainChartComponent extends BaseContainerComponent<IVisualComponentC
     private initMouseEvents(): void {
         const eventDispatcher: Dispatch<any> = this.constructorOptions.eventDispatcher;
 
-        function onMouseMove(e: any) {
-            const event: MouseEvent = require("d3").event;
-
+        function onMouseMove(event) {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
-
-            eventDispatcher.call(EventName.onMouseMove, undefined, d3Mouse(this));
+            eventDispatcher.call(EventName.onMouseMove, undefined, d3Mouse(event, this));
         }
 
         this.element.on("mousemove", onMouseMove);
         this.element.on("touchmove", onMouseMove);
         this.element.on("touchstart", onMouseMove);
 
-        function onMouseOut(e: any) {
-            const event: MouseEvent = require("d3").event;
-
+        function onMouseOut(event) {
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();

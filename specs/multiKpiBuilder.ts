@@ -26,12 +26,14 @@
 
 import { VisualBuilderBase } from "powerbi-visuals-utils-testutils";
 
-import { MultiKpi } from "../src/visual";
+import { MultiKpi } from "../src/multiKpi";
+
+import * as $ from "jquery";
 
 export class MultiKpiBuilder extends VisualBuilderBase<MultiKpi> {
     protected build(): MultiKpi {
         return new MultiKpi({
-            element: this.element.get(0),
+            element: $(this.element).get(0),
             host: this.visualHost,
         });
     }
@@ -41,7 +43,7 @@ export class MultiKpiBuilder extends VisualBuilderBase<MultiKpi> {
     }
 
     public get $root(): JQuery {
-        return this.element.find(".multiKpi_multiKpi");
+        return $(this.element).find(".multiKpi_multiKpi");
     }
 
     public get $sparkline(): JQuery {

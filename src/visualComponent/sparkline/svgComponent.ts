@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 import { IMargin } from "powerbi-visuals-utils-svgutils";
 
 import {
@@ -51,7 +51,7 @@ import {
 import { EventName } from "../../event/eventName";
 import { MultiLineComponent } from "./multiLineComponent";
 
-import { isValueValid } from "../../utils/valueUtils";
+import { isValueValid } from "../../utils/isValueValid";
 
 export class SvgComponent extends BaseContainerComponent<
     IVisualComponentConstructorOptions,
@@ -63,7 +63,7 @@ export class SvgComponent extends BaseContainerComponent<
     private multiLineComponent: IVisualComponent<ISparklineComponentRenderOptions>;
     private axisComponent: IVisualComponent<IAxisComponentRenderOptions>;
 
-    private dynamicComponents: Array<IVisualComponent<IDotsComponentRenderOptions>> = [];
+    private dynamicComponents: IVisualComponent<IDotsComponentRenderOptions>[] = [];
 
     constructor(options: IVisualComponentConstructorOptions) {
         super();
@@ -119,7 +119,7 @@ export class SvgComponent extends BaseContainerComponent<
 
         const margin: IMargin = this.getMarginByThickness(maxThickness);
 
-        const viewport: powerbi.IViewport = {
+        const viewport: powerbiVisualsApi.IViewport = {
             height: Math.max(0, options.viewport.height - margin.top - margin.bottom),
             width: Math.max(0, options.viewport.width - margin.left - margin.right),
         };

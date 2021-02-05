@@ -26,7 +26,7 @@
 
 import { Selection } from "d3-selection";
 import { area, Area, line, Line } from "d3-shape";
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 import {
@@ -37,17 +37,18 @@ import {
 } from "../../converter/data/dataRepresentation";
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 import { EventName } from "../../event/eventName";
-import { isValueValid } from "../../utils/valueUtils";
+import { isValueValid } from "../../utils/isValueValid";
 import { BaseComponent } from "../baseComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
 export interface ILineComponentRenderOptions {
     alternativeColor: string;
     color: string;
+    isLine: boolean;
     points: IDataRepresentationPoint[];
     thickness: number;
     type: DataRepresentationPointGradientType;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
     current: IDataRepresentationPoint;
@@ -189,6 +190,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             y,
             viewport,
             color,
+            isLine,
         } = options;
 
         this.updateGradient([{
@@ -218,6 +220,10 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .merge(lineSelection)
             .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
                 const points: IDataRepresentationPoint[] = this.getValidPoints(lineRenderOptions.points);
+
+                if (isLine && points.length > 0) {
+                    points[0].y += 0.0000001;
+                }
 
                 switch (lineRenderOptions.type) {
                     case DataRepresentationPointGradientType.area: {
@@ -258,7 +264,8 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
-                        return pixelConverter.toString(lineRenderOptions.thickness);
+                        //return lineRenderOptions.thickness;
+                        pixelConverter.toString(lineRenderOptions.thickness);
                     }
                 }
             });
@@ -280,7 +287,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     private getArea(
         xScale: DataRepresentationScale,
         yScale: DataRepresentationScale,
-        viewport: powerbi.IViewport,
+        viewport: powerbiVisualsApi.IViewport,
         yMin: DataRepresentationAxisValueType,
     ): Area<IDataRepresentationPoint> {
         return area<IDataRepresentationPoint>()
@@ -302,7 +309,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     private getGradientUrl(): string {
         const href: string = window.location.href;
 
-        return `url(${href}#${this.gradientId})`;
+        return `url(#${this.gradientId})`;
     }
 
     private updateGradient(gradients: ILineComponentGradient[]): void {
@@ -328,7 +335,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     }
 
     private getId(): string {
-        const crypto: Crypto = window.crypto || (window as any).msCrypto;
+        const crypto: Crypto = window.crypto || (<any>window).msCrypto;
         const generatedIds: Uint32Array = new Uint32Array(2);
 
         crypto.getRandomValues(generatedIds);

@@ -24,13 +24,13 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { IDataRepresentation } from "../converter/data/dataRepresentation";
 import { Settings } from "../settings/settings";
 
 export interface IVisualComponentRenderOptions {
     settings: Settings;
-    viewport: powerbi.IViewport;
+    viewport: powerbiVisualsApi.IViewport;
     data: IDataRepresentation;
 }

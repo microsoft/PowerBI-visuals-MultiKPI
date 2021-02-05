@@ -33,6 +33,12 @@ export interface ISmoothConstructorOptions {
     accuracy?: number;
 }
 
+interface IAlphaBeta {
+    alpha: number;
+    beta: number;
+    w: number;
+}
+
 export class SmoothDataConverter implements IConverter<IDataRepresentationPoint[], IDataRepresentationPoint[]> {
     private bandwidth: number = 0.1;
     private robustnessIters: number = 2;
@@ -48,9 +54,7 @@ export class SmoothDataConverter implements IConverter<IDataRepresentationPoint[
 
     public convert(points: IDataRepresentationPoint[]): IDataRepresentationPoint[] {
         const length = points.length;
-
         const bandwidthInPoints = Math.floor(this.bandwidth * length);
-
         const resultPoints: IDataRepresentationPoint[] = [];
         const residuals: number[] = [];
         const robustnessWeights: number[] = [];
@@ -60,7 +64,7 @@ export class SmoothDataConverter implements IConverter<IDataRepresentationPoint[
             robustnessWeights[i] = 1;
         }
 
-        let w: number;
+        let alphaBeta: IAlphaBeta;
 
         for (let iter: number = 0; iter < this.robustnessIters; iter++) {
             const bandwidthInterval: number[] = [0, bandwidthInPoints - 1];
@@ -81,49 +85,12 @@ export class SmoothDataConverter implements IConverter<IDataRepresentationPoint[
                     && ileft >= 0
                     && iright >= 0
                 ) {
-                    const edge: number = (points[i].x.getTime() - points[ileft].x.getTime())
-                        > (points[iright].x.getTime() - points[i].x.getTime())
-                        ? ileft
-                        : iright;
+                    alphaBeta = this.calcAlphaBeta(robustnessWeights, i, x, ileft, iright, points);
 
-                    let sumWeights: number = 0;
-                    let sumX: number = 0;
-                    let sumXSquared: number = 0;
-                    let sumY: number = 0;
-                    let sumXY: number = 0;
-
-                    const denom: number = Math.abs(1 / (points[edge].x.getTime() - x));
-
-                    for (let k: number = ileft; k <= iright; ++k) {
-                        const xk: number = points[k].x.getTime();
-                        const yk: number = points[k].y;
-                        const dist: number = k < i ? x - xk : xk - x;
-
-                        w = this.science_stats_loessTricube(dist * denom) * robustnessWeights[k];
-
-                        const xkw: number = xk * w;
-
-                        sumWeights += w;
-                        sumX += xkw;
-                        sumXSquared += xk * xkw;
-                        sumY += yk * w;
-                        sumXY += yk * xkw;
-                    }
-
-                    const meanX: number = sumX / sumWeights;
-                    const meanY: number = sumY / sumWeights;
-                    const meanXY: number = sumXY / sumWeights;
-                    const meanXSquared: number = sumXSquared / sumWeights;
-
-                    const beta: number = (Math.sqrt(Math.abs(meanXSquared - meanX * meanX)) < this.accuracy)
-                        ? 0 : ((meanXY - meanX * meanY) / (meanXSquared - meanX * meanX));
-
-                    const alpha: number = meanY - beta * meanX;
-
-                    if (!isNaN(beta) && !isNaN(alpha)) {
+                    if (!isNaN(alphaBeta.beta) && !isNaN(alphaBeta.alpha)) {
                         resultPoints[i] = {
                             ...points[i],
-                            y: beta * x + alpha,
+                            y: alphaBeta.beta * x + alphaBeta.alpha,
                         };
                     } else {
                         resultPoints[i] = { ...points[i] };
@@ -151,11 +118,65 @@ export class SmoothDataConverter implements IConverter<IDataRepresentationPoint[
 
             for (let i: number = 0; i < length; i++) {
                 const arg: number = residuals[i] / (6 * medianResidual);
-                robustnessWeights[i] = (arg >= 1) ? 0 : ((w = 1 - arg * arg) * w);
+                robustnessWeights[i] = (arg >= 1) ? 0 : ((alphaBeta.w = 1 - arg * arg) * alphaBeta.w);
             }
         }
 
         return resultPoints;
+    }
+
+    private calcAlphaBeta(
+        robustnessWeights: number[],
+        itrn: number,
+        timePoint: number,
+        ileft: number,
+        iright: number,
+        points: IDataRepresentationPoint[],
+    ): IAlphaBeta {
+        const edge: number = (points[itrn].x.getTime() - points[ileft].x.getTime())
+            > (points[iright].x.getTime() - points[itrn].x.getTime())
+            ? ileft
+            : iright;
+        let w: number;
+        let sumWeights: number = 0;
+        let sumX: number = 0;
+        let sumXSquared: number = 0;
+        let sumY: number = 0;
+        let sumXY: number = 0;
+
+        const denom: number = Math.abs(1 / (points[edge].x.getTime() - timePoint));
+
+        for (let k: number = ileft; k <= iright; ++k) {
+            const xk: number = points[k].x.getTime();
+            const yk: number = points[k].y;
+            const dist: number = k < itrn ? timePoint - xk : xk - timePoint;
+
+            w = this.science_stats_loessTricube(dist * denom) * robustnessWeights[k];
+
+            const xkw: number = xk * w;
+
+            sumWeights += w;
+            sumX += xkw;
+            sumXSquared += xk * xkw;
+            sumY += yk * w;
+            sumXY += yk * xkw;
+        }
+
+        const meanX: number = sumX / sumWeights;
+        const meanY: number = sumY / sumWeights;
+        const meanXY: number = sumXY / sumWeights;
+        const meanXSquared: number = sumXSquared / sumWeights;
+
+        const beta: number = (Math.sqrt(Math.abs(meanXSquared - meanX * meanX)) < this.accuracy)
+            ? 0 : ((meanXY - meanX * meanY) / (meanXSquared - meanX * meanX));
+
+        const alpha: number = meanY - beta * meanX;
+
+        return {
+            alpha,
+            beta,
+            w
+        }
     }
 
     /**

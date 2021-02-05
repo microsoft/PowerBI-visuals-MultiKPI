@@ -53,3 +53,8 @@ export const changeStartDateColumn: IVisualDataRole = {
     displayName: "Change start date",
     name: "changeStartDateColumn",
 };
+
+export const subtitleColumn: IVisualDataRole = {
+    displayName: "Subtitle",
+    name: "subtitleColumn",
+};

@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 import { Selection } from "d3-selection";
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { IDataRepresentationSeries } from "../converter/data/dataRepresentation";
 import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor";
@@ -32,7 +32,7 @@ import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarni
 import { ISubtitleComponentRenderOptions, SubtitleComponent } from "./subtitleComponent";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
-import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
 
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
@@ -103,17 +103,17 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
         const isDataStale: boolean = this.isDataStale(
             staleDataDifference,
-            staleDataThreshold,
+            series,
         );
 
         let tooltipItems: VisualTooltipDataItem[] = [];
 
         const filterItemsFunc = (x: IDataRepresentationSeries) => {
+            if (!x.settings.staleData.isShown) {
+                return false;
+            }
             if (x.staleDateDifference) {
-                if (staleDataSettings.deductThresholdDays) {
-                    return (x.staleDateDifference - staleDataThreshold > 0);
-                }
-                return (x.staleDateDifference > 0);
+                return (x.staleDateDifference - x.settings.staleData.staleDataThreshold > 0);
             }
             return false;
         };
@@ -132,17 +132,15 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         if (!isTheSameStaledays) {
             tooltipItems = series.filter(filterItemsFunc).map((s) => {
                 const title: string = this.getTitle(
-                    staleDataText,
+                    s.settings.staleData.staleDataText,
                     s.staleDateDifference,
-                    staleDataSettings.deductThresholdDays ? staleDataThreshold : 0,
+                    s.settings.staleData.deductThresholdDays ? s.settings.staleData.staleDataThreshold : 0,
                 );
 
-                const tolltipItem: VisualTooltipDataItem = {
+                return {
                     displayName: s.name,
                     value: title,
                 };
-
-                return tolltipItem;
             });
         } else {
             tooltipItems = [
@@ -166,11 +164,17 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         });
     }
 
-    private isDataStale(dateDifference: number, staleDataThreshold: number): boolean {
-        return dateDifference > staleDataThreshold;
+    private isDataStale(dateDifference: number, series: IDataRepresentationSeries[]): boolean {
+        let isStale: boolean = false;
+        series.forEach((s) => {
+            if (dateDifference > s.settings.staleData.staleDataThreshold) {
+                isStale = true;
+            }
+        })
+        return isStale;
     }
 
-    private getTitle(stringTemplate: string, dateDifference: number, staleDataThreshold: number): string {
+    public getTitle(stringTemplate: string, dateDifference: number, staleDataThreshold: number): string {
         const days: number = dateDifference - staleDataThreshold;
         return stringTemplate && stringTemplate.replace
             ? stringTemplate.replace("${1}", `${days}`)
@@ -202,10 +206,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
         this.constructorOptions.tooltipServiceWrapper.addTooltip(
             iconSelection,
-            () => {
-                if (tooltipItems && tooltipItems.length > 0) {
-                    return tooltipItems;
-                }
-            });
+            (data) => tooltipItems ? tooltipItems : null
+        );
     }
 }

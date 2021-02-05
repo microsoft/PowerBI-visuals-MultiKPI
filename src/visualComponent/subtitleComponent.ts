@@ -26,7 +26,7 @@
 
 import { Selection } from "d3-selection";
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
@@ -38,6 +38,7 @@ import { IVisualComponentConstructorOptions } from "./visualComponentConstructor
 
 export interface ISubtitleComponentRenderOptions {
     subtitleSettings: SubtitleDescriptor;
+    subtitle?: string;
 }
 
 export class SubtitleComponent extends BaseComponent<IVisualComponentConstructorOptions, ISubtitleComponentRenderOptions> {
@@ -60,19 +61,19 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     }
 
     public render(options: ISubtitleComponentRenderOptions): void {
-        const { subtitleSettings: settings } = options;
+        const { subtitleSettings: settings, subtitle } = options;
 
         if (settings.shouldBeShown) {
             this.show();
-            this.renderComponent(settings);
+            this.renderComponent(settings, subtitle);
         } else {
             this.hide();
         }
     }
 
-    public getViewport(): powerbi.IViewport {
+    public getViewport(): powerbiVisualsApi.IViewport {
         const height: number = this.element && this.isShown
-            ? (this.element.node() as HTMLElement).clientHeight
+            ? (<HTMLElement>(this.element.node())).clientHeight
             : 0;
 
         return {
@@ -81,7 +82,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
         };
     }
 
-    private renderComponent(settings: SubtitleDescriptor): void {
+    private renderComponent(settings: SubtitleDescriptor, subtitle?: string): void {
         const subtitleSelection: Selection<any, any, any, any> = this.element
             .selectAll(this.subtitleSelector.selectorName)
             .data(settings.shouldBeShown ? [[]] : []);
@@ -90,12 +91,14 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
             .exit()
             .remove();
 
+        const subtitleText: string = `${settings.titleText}${(subtitle ?? "")}`;
+
         subtitleSelection
             .enter()
             .append("div")
             .classed(this.subtitleSelector.className, true)
             .merge(subtitleSelection)
-            .text(settings.titleText)
+            .text(subtitleText)
             .style("text-align", settings.alignment);
 
         this.updateFormatting(this.element, settings);

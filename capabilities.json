@@ -24,6 +24,10 @@
     "displayName": "Change start date",
     "name": "changeStartDateColumn",
     "kind": "Grouping"
+  }, {
+    "displayName": "Subtitle",
+    "name": "subtitleColumn",
+    "kind": "Measure"
   }],
   "objects": {
     "date": {
@@ -54,6 +58,12 @@
             "formatting": {
               "labelDisplayUnits": true
             }
+          }
+        },
+        "autoPrecision": {
+          "displayName": "Auto precision",
+          "type": {
+            "bool": true
           }
         },
         "precision": {
@@ -99,6 +109,12 @@
             "formatting": {
               "labelDisplayUnits": true
             }
+          }
+        },
+        "autoPrecision": {
+          "displayName": "Auto precision",
+          "type": {
+            "bool": true
           }
         },
         "precision": {
@@ -169,6 +185,12 @@
             "formatting": {
               "labelDisplayUnits": true
             }
+          }
+        },
+        "autoPrecision": {
+          "displayName": "Auto precision",
+          "type": {
+            "bool": true
           }
         },
         "precision": {
@@ -733,6 +755,12 @@
             }
           }
         },
+        "autoPrecision": {
+          "displayName": "Auto precision",
+          "type": {
+            "bool": true
+          }
+        },
         "precision": {
           "displayName": "Precision",
           "type": {
@@ -787,6 +815,12 @@
             "formatting": {
               "labelDisplayUnits": true
             }
+          }
+        },
+        "autoPrecision": {
+          "displayName": "Auto precision",
+          "type": {
+            "bool": true
           }
         },
         "precision": {
@@ -893,7 +927,7 @@
       "displayName": "Stale Data",
       "description": "To turn on Stale Data make sure to turn on Subtitle first",
       "properties": {
-        "show": {
+        "isShown": {
           "displayName": "Show",
           "type": {
             "bool": true
@@ -920,7 +954,7 @@
           }
         },
         "color": {
-          "displayName": "Color",
+          "displayName": "Color (for all only)",
           "type": {
             "fill": {
               "solid": {
@@ -930,7 +964,7 @@
           }
         },
         "background": {
-          "displayName": "Background Color",
+          "displayName": "Background Color (for all only)",
           "type": {
             "fill": {
               "solid": {
@@ -972,6 +1006,9 @@
       },
       "changeStartDateColumn": {
         "max": 0
+      },
+      "subtitleColumn": {
+        "max": 0
       }
     }, {
       "dateColumn": {
@@ -990,6 +1027,9 @@
       },
       "changeStartDateColumn": {
         "max": 1
+      },
+      "subtitleColumn": {
+        "max": 1
       }
     }],
     "categorical": {
@@ -1005,6 +1045,10 @@
         }, {
           "for": {
             "in": "changeStartDateColumn"
+          }
+        }, {
+          "for": {
+            "in": "subtitleColumn"
           }
         }],
         "dataReductionAlgorithm": {
@@ -1033,5 +1077,6 @@
         "direction": 1
       }]
     }
-  }
+  },
+  "supportsMultiVisualSelection": true
 }

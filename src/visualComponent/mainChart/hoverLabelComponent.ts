@@ -24,11 +24,11 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
 import { ChartLabelBaseComponent, IRenderGroup } from "./chartLabelBaseComponent";
 
-import { createVarianceConverterByType } from "../../converter/variance";
+import { createVarianceConverterByType } from "../../converter/variance/createVarianceConverterByType";
 
 import { IDataRepresentationPoint } from "../../converter/data/dataRepresentation";
 
@@ -37,7 +37,7 @@ import {
     getFormattedValueWithFallback,
 } from "../../converter/data/dataFormatter";
 
-import { isValueValid } from "../../utils/valueUtils";
+import { isValueValid } from "../../utils/isValueValid";
 
 import { IVerticalReferenceLineComponentRenderOptions } from "../verticalReferenceLineComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
@@ -45,7 +45,7 @@ import { IVisualComponentConstructorOptions } from "../visualComponentConstructo
 import { KpiOnHoverDescriptor } from "../../settings/descriptors/kpi/kpiOnHoverDescriptor";
 import { VarianceDescriptor } from "../../settings/descriptors/varianceDescriptor";
 
-import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
 
 export interface IHoverLabelComponentRenderOptions extends IVerticalReferenceLineComponentRenderOptions {
     kpiOnHoverSettings: KpiOnHoverDescriptor;
@@ -75,14 +75,12 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
 
         if (!series || !series.points || !dataPoint || !series.points.length) {
             this.hide();
-
             return;
         } else {
             this.show();
         }
 
         const latestDataPoint: IDataRepresentationPoint = series.current;
-
         const variance: number = createVarianceConverterByType(varianceSettings.shouldCalculateDifference)
             .convert({
                 firstDataPoint: dataPoint,
@@ -103,7 +101,6 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
         );
 
         const isVarianceValid: boolean = isValueValid(variance);
-
         const tooltipText: string = series && series.formattedTooltip || null;
         let tooltipDataItems: VisualTooltipDataItem[];
 

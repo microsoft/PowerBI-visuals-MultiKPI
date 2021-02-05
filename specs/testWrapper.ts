@@ -24,20 +24,25 @@
  *  THE SOFTWARE.
  */
 
-import powerbi from "powerbi-visuals-api";
+import powerbiVisualsApi from "powerbi-visuals-api";
 
-import { MultiKpiData } from "./dataBuilder";
-import { MultiKpiBuilder } from "./visualBuilder";
+import { MultiKpiData } from "./multiKpiData";
+import { MultiKpiBuilder } from "./multiKpiBuilder";
 
 export class TestWrapper {
-    public static create(
+    public static CREATE(
         withMisisngValues: boolean = false,
         brokenMetricIndex: number = 0,
-        howOlderDatesAreInDays: number = 0): TestWrapper {
-        return new TestWrapper(withMisisngValues, brokenMetricIndex, howOlderDatesAreInDays);
+        howOlderDatesAreInDays: number = 0,
+        attachSubtitleData: boolean = false): TestWrapper {
+        return new TestWrapper(
+            withMisisngValues,
+            brokenMetricIndex,
+            howOlderDatesAreInDays,
+            attachSubtitleData);
     }
 
-    public dataView: powerbi.DataView;
+    public dataView: powerbiVisualsApi.DataView;
     public dataViewBuilder: MultiKpiData;
     public visualBuilder: MultiKpiBuilder;
 
@@ -45,12 +50,20 @@ export class TestWrapper {
         withMisisngValues: boolean = false,
         brokenMetricIndex: number = 0,
         howOlderDatesAreInDays: number = 0,
+        attachSubtitleData: boolean = false,
         width: number = 1024,
         height: number = 768) {
 
         this.visualBuilder = new MultiKpiBuilder(width, height);
-        this.dataViewBuilder = new MultiKpiData(withMisisngValues, brokenMetricIndex, howOlderDatesAreInDays);
+        this.dataViewBuilder = new MultiKpiData(
+            withMisisngValues,
+            brokenMetricIndex,
+            howOlderDatesAreInDays);
 
-        this.dataView = this.dataViewBuilder.getDataView();
+        if (attachSubtitleData) {
+            this.dataView = this.dataViewBuilder.getDataViewWithSubtitle();
+        } else {
+            this.dataView = this.dataViewBuilder.getDataView();
+        }
     }
 }
