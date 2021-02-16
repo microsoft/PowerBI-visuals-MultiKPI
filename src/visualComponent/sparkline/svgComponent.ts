@@ -101,11 +101,12 @@ export class SvgComponent extends BaseContainerComponent<
             this.onCurrentDataPointIndexChange.bind(this),
         );
 
-        this.element.on("mouseenter", () => {
+        this.element.on("mouseenter", (event) => {
             this.constructorOptions.eventDispatcher.call(
                 EventName.onChartChangeHover,
                 undefined,
-                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name,
+                event,
+                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name
             );
         });
     }

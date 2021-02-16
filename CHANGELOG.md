@@ -1,3 +1,6 @@
+## 2.3.1
+* FIX (Regression): Hovering on sparklines did not cause changing of main grap for preview
+
 ## 2.3.0
 * API 3.5.1
 * Packages update
