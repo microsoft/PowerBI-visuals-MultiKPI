@@ -1,34 +1,44 @@
 {
-  "dataRoles": [{
-    "displayName": "Date",
-    "name": "dateColumn",
-    "kind": "Grouping"
-  }, {
-    "displayName": "Values",
-    "name": "valueColumn",
-    "kind": "Measure",
-    "requiredTypes": [{
-      "numeric": true
-    }, {
-      "integer": true
-    }]
-  }, {
-    "displayName": "Warning state",
-    "name": "warningStateColumn",
-    "kind": "Measure"
-  }, {
-    "displayName": "Tooltip",
-    "name": "tooltipColumn",
-    "kind": "GroupingOrMeasure"
-  }, {
-    "displayName": "Change start date",
-    "name": "changeStartDateColumn",
-    "kind": "Grouping"
-  }, {
-    "displayName": "Subtitle",
-    "name": "subtitleColumn",
-    "kind": "Measure"
-  }],
+  "dataRoles": [
+    {
+      "displayName": "Date",
+      "name": "dateColumn",
+      "kind": "Grouping"
+    },
+    {
+      "displayName": "Values",
+      "name": "valueColumn",
+      "kind": "Measure",
+      "requiredTypes": [
+        {
+          "numeric": true
+        },
+        {
+          "integer": true
+        }
+      ]
+    },
+    {
+      "displayName": "Warning state",
+      "name": "warningStateColumn",
+      "kind": "Measure"
+    },
+    {
+      "displayName": "Tooltip",
+      "name": "tooltipColumn",
+      "kind": "GroupingOrMeasure"
+    },
+    {
+      "displayName": "Change start date",
+      "name": "changeStartDateColumn",
+      "kind": "Grouping"
+    },
+    {
+      "displayName": "Subtitle",
+      "name": "subtitleColumn",
+      "kind": "Measure"
+    }
+  ],
   "objects": {
     "date": {
       "displayName": "Date",
@@ -219,13 +229,16 @@
         "chartType": {
           "displayName": "Type",
           "type": {
-            "enumeration": [{
-              "value": "area",
-              "displayName": "Area"
-            }, {
-              "value": "line",
-              "displayName": "Line"
-            }]
+            "enumeration": [
+              {
+                "value": "area",
+                "displayName": "Area"
+              },
+              {
+                "value": "line",
+                "displayName": "Line"
+              }
+            ]
           }
         },
         "color": {
@@ -990,93 +1003,109 @@
       }
     }
   },
-  "dataViewMappings": [{
-    "conditions": [{
-      "dateColumn": {
-        "max": 1
-      },
-      "valueColumn": {
-        "max": 0
-      },
-      "warningStateColumn": {
-        "max": 0
-      },
-      "tooltipColumn": {
-        "max": 0
-      },
-      "changeStartDateColumn": {
-        "max": 0
-      },
-      "subtitleColumn": {
-        "max": 0
-      }
-    }, {
-      "dateColumn": {
-        "max": 1
-      },
-      "valueColumn": {
-        "min": 0,
-        "max": 16
-      },
-      "warningStateColumn": {
-        "max": 1
-      },
-      "tooltipColumn": {
-        "min": 0,
-        "max": 16
-      },
-      "changeStartDateColumn": {
-        "max": 1
-      },
-      "subtitleColumn": {
-        "max": 1
-      }
-    }],
-    "categorical": {
-      "categories": {
-        "select": [{
-          "for": {
-            "in": "dateColumn"
+  "dataViewMappings": [
+    {
+      "conditions": [
+        {
+          "dateColumn": {
+            "max": 1
+          },
+          "valueColumn": {
+            "max": 0
+          },
+          "warningStateColumn": {
+            "max": 0
+          },
+          "tooltipColumn": {
+            "max": 0
+          },
+          "changeStartDateColumn": {
+            "max": 0
+          },
+          "subtitleColumn": {
+            "max": 0
           }
-        }, {
-          "for": {
-            "in": "tooltipColumn"
-          }
-        }, {
-          "for": {
-            "in": "changeStartDateColumn"
-          }
-        }, {
-          "for": {
-            "in": "subtitleColumn"
-          }
-        }],
-        "dataReductionAlgorithm": {
-          "top": {
-            "count": 30000
+        },
+        {
+          "dateColumn": {
+            "max": 1
+          },
+          "valueColumn": {
+            "min": 0,
+            "max": 16
+          },
+          "warningStateColumn": {
+            "max": 1
+          },
+          "tooltipColumn": {
+            "min": 0,
+            "max": 16
+          },
+          "changeStartDateColumn": {
+            "max": 1
+          },
+          "subtitleColumn": {
+            "max": 1
           }
         }
-      },
-      "values": {
-        "select": [{
-          "for": {
-            "in": "valueColumn"
+      ],
+      "categorical": {
+        "categories": {
+          "select": [
+            {
+              "for": {
+                "in": "dateColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "tooltipColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "changeStartDateColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "subtitleColumn"
+              }
+            }
+          ],
+          "dataReductionAlgorithm": {
+            "top": {
+              "count": 30000
+            }
           }
-        }, {
-          "for": {
-            "in": "warningStateColumn"
-          }
-        }]
+        },
+        "values": {
+          "select": [
+            {
+              "for": {
+                "in": "valueColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "warningStateColumn"
+              }
+            }
+          ]
+        }
       }
     }
-  }],
+  ],
   "sorting": {
     "implicit": {
-      "clauses": [{
-        "role": "dateColumn",
-        "direction": 1
-      }]
+      "clauses": [
+        {
+          "role": "dateColumn",
+          "direction": 1
+        }
+      ]
     }
   },
-  "supportsMultiVisualSelection": true
+  "supportsMultiVisualSelection": true,
+  "privileges": []
 }

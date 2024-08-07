@@ -1,14 +1,15 @@
 {
   "visual": {
     "name": "MultiKpi",
-    "displayName": "Multi KPI 2.3.1",
+    "displayName": "Multi KPI 3.0.0.0",
     "guid": "multiKpiEA8DA325489E436991F0E411F2D85FF3",
     "visualClassName": "MultiKpi",
-    "version": "2.3.1",
+    "version": "3.0.0.0",
     "description": "Shows a KPI metric along with other metrics as sparklines",
     "supportUrl": "https://aka.ms/customvisualscommunity",
     "gitHubUrl": "https://github.com/Microsoft/PowerBI-visuals-MultiKPI"
   },
+  "apiVersion": "5.11.0",
   "author": {
     "name": "Microsoft",
     "email": "pbicvsupport@microsoft.com"
