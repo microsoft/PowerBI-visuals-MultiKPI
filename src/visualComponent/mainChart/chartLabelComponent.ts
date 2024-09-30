@@ -24,7 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { FormatDescriptor } from "../../settings/descriptors/formatDescriptor";
 import { KpiDescriptor } from "../../settings/descriptors/kpi/kpiDescriptor";
@@ -43,7 +44,7 @@ export interface IChartLabelComponentRenderOptions {
     dateSettings: FormatDescriptor;
     kpiSettings: KpiDescriptor;
     series: IDataRepresentationSeries;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
 }
 
 export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComponentRenderOptions> {
@@ -90,10 +91,12 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComp
             this.headerSelector,
             [
                 {
-                    color: kpiSettings.seriesNameColor,
+                    color: kpiSettings.seriesNameColor.value.value,
                     data: series.name,
-                    fontSizeInPt: kpiSettings.seriesNameFontSize,
-                    isShown: kpiSettings.isSeriesNameShown,
+                    fontSizeInPt: kpiSettings.autoAdjustFontSize.value
+                        ? null
+                        : kpiSettings.seriesNameFontSize.value,
+                    isShown: kpiSettings.isSeriesNameShown.value,
                 },
             ],
         );
@@ -104,21 +107,25 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComp
             this.bodySelector,
             [
                 {
-                    color: kpiSettings.valueColor,
+                    color: kpiSettings.valueColor.value.value,
                     data: getFormattedValueWithFallback(value, series.settings.values),
-                    fontSizeInPt: kpiSettings.valueFontSize,
-                    isShown: kpiSettings.isValueShown,
+                    fontSizeInPt: kpiSettings.autoAdjustFontSize.value
+                        ? null
+                        : kpiSettings.valueFontSize.value,
+                    isShown: kpiSettings.isValueShown.value,
                 },
                 {
                     color: isVarianceValid
-                        ? kpiSettings.varianceColor
-                        : kpiSettings.varianceNotAvailableColor,
+                        ? kpiSettings.varianceColor.value.value
+                        : kpiSettings.varianceNotAvailableColor.value.value,
                     data: `(${series.formattedVariance})`,
-                    fontSizeInPt: isVarianceValid
-                        ? kpiSettings.varianceFontSize
-                        : kpiSettings.varianceNotAvailableFontSize,
-                    isShown: kpiSettings.isVarianceShown,
-                    selector: isVarianceValid || !kpiSettings.autoAdjustFontSize
+                    fontSizeInPt: kpiSettings.autoAdjustFontSize.value
+                        ? null
+                        : isVarianceValid 
+                            ? kpiSettings.varianceFontSize.value
+                            : kpiSettings.varianceNotAvailableFontSize.value,
+                    isShown: kpiSettings.isVarianceShown.value,
+                    selector: isVarianceValid || !kpiSettings.autoAdjustFontSize.value
                         ? undefined
                         : this.varianceNotAvailableSelector,
                 },
@@ -129,10 +136,12 @@ export class ChartLabelComponent extends ChartLabelBaseComponent<IChartLabelComp
             this.footerSelector,
             [
                 {
-                    color: kpiSettings.dateColor,
+                    color: kpiSettings.dateColor.value.value,
                     data: `${series.dateDifference} days`,
-                    fontSizeInPt: kpiSettings.dateFontSize,
-                    isShown: kpiSettings.isDateShown,
+                    fontSizeInPt: kpiSettings.autoAdjustFontSize.value
+                        ? null
+                        : kpiSettings.dateFontSize.value,
+                    isShown: kpiSettings.isDateShown.value,
                 },
             ],
         );

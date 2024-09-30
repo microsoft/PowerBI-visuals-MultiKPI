@@ -23,28 +23,33 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsCard = formattingSettings.SimpleCard;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
-export class BaseDescriptor {
-    public show: boolean = true;
-    public isShown: boolean = true;
+export class BaseDescriptor extends FormattingSettingsCard {
+    public show: ToggleSwitch = new ToggleSwitch({
+        name: "show",
+        displayNameKey: "Visual_Show",
+        value: true
+    });
+
+    public isShown: ToggleSwitch = new ToggleSwitch({
+        name: "isShown",
+        displayNameKey: "Visual_Show",
+        value: true
+    });
 
     public get shouldBeShown(): boolean {
-        return this.show && this.isShown;
+        return this.show.value && this.isShown.value;
     }
 
-    public applyDefault(defaultSettings: BaseDescriptor) {
-        if (!defaultSettings) {
-            return;
+    constructor(defaultBaseDescriptor?: BaseDescriptor){
+        super();
+
+        if (defaultBaseDescriptor){
+            this.show.value = defaultBaseDescriptor.show.value;
+            this.isShown.value = defaultBaseDescriptor.isShown.value;
         }
-
-        Object
-            .keys(defaultSettings)
-            .forEach((propertyName: string) => {
-                this[propertyName] = defaultSettings[propertyName];
-            });
-    }
-
-    public getValueByPropertyName(propertyName: string): any {
-        return this[propertyName];
     }
 }

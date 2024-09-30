@@ -24,7 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import {
     CssConstants,
@@ -136,7 +137,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
         this.updateSizeOfElement(this.width, this.height);
     }
 
-    public getViewport(): powerbiVisualsApi.IViewport {
+    public getViewport(): IViewport {
         return {
             height: this.height,
             width: this.width,
@@ -153,8 +154,8 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
 
         selection
             .style("font-size", settings.fontSizePx)
-            .style("font-family", settings.fontFamily)
-            .style("color", settings.color)
+            .style("font-family", settings.font.fontFamily.value)
+            .style("color", settings.color.value.value)
             .classed(this.boldClassName, settings.isBold)
             .classed(this.italicClassName, settings.isItalic)
             .classed(this.underlinedClassName, settings.isUnderlined);
@@ -186,7 +187,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
             .remove();
     }
 
-    protected updateViewport(viewport: powerbiVisualsApi.IViewport): void {
+    protected updateViewport(viewport: IViewport): void {
         this.element
             .style("width", pixelConverter.toString(viewport.width))
             .style("height", pixelConverter.toString(viewport.height));

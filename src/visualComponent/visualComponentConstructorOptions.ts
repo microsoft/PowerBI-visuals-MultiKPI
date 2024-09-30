@@ -25,7 +25,8 @@
  */
 
 import { Dispatch } from "d3-dispatch";
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IColorPalette = powerbi.extensibility.IColorPalette;
 
 import { ScaleService } from "../services/scaleService";
 import { Settings } from "../settings/settings";
@@ -36,7 +37,7 @@ export interface IVisualComponentConstructorOptions extends IVisualComponentBase
     eventDispatcher?: Dispatch<any>; // TODO
     id?: number | string;
     scaleService?: ScaleService;
-    style?: powerbiVisualsApi.extensibility.IColorPalette; // TODO: must be renamed
+    style?: IColorPalette; // TODO: must be renamed
     getSettings?: () => Settings;
     tooltipServiceWrapper?: ITooltipServiceWrapper;
 }

@@ -23,20 +23,34 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
-import { TextFormattingDescriptor } from "./textFormattingDescriptor";
+import { SubtitleAlignment, SubtitleBaseContainerItem } from "./subtitleBaseDescriptor";
 
-export enum SubtitleAlignment {
-    left = "left",
-    center = "center",
-    right = "right",
-}
+export class SubtitleItemContainer extends SubtitleBaseContainerItem {
+    public name: string = "subtitle";
+    public displayNameKey: string = "Visual_Subtitle";
+    
+    public defaultWarningText: string = "Warning Message";
+    public staleDataText: string = ""; // We keep it here just for compatibility with old reports
+    public defaultFontFamily: string = "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif";
 
-export class SubtitleDescriptor extends TextFormattingDescriptor {
-    public titleText: string = "";
-    public background: string = "";
-    public alignment: SubtitleAlignment = SubtitleAlignment.left;
+    topLevelSlice: ToggleSwitch = this.show;
+    public slices: FormattingSettingsSlice[] = [
+        this.font, this.color, this.titleText, 
+        this.backgroundColor, this.alignment,
+        this.warningText
+    ];
 
-    public paddingTop: number = 0;
-    public paddingBottom: number = 0;
+    constructor(){
+        super();
+        this.show.value = false;
+        this.alignment.value = SubtitleAlignment.left;
+        this.font.fontSize.value = 8.25;
+        this.font.fontFamily.value = this.defaultFontFamily;
+        this.color.value.value  = "#4F4F4F";
+        this.warningText.value = this.defaultWarningText;
+    }
 }

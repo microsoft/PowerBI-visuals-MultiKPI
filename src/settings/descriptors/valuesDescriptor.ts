@@ -23,10 +23,48 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import { NumericDescriptor } from "./numericDescriptor";
+import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
-export class ValuesDescriptor extends NumericDescriptor {
-    public treatEmptyValuesAsZero: boolean = true;
-    public showLatterAvailableValue: boolean = false;
+export class ValuesContainerItem extends NumericDescriptor {
+    public displayName: string = "All";
+
+    public treatEmptyValuesAsZero: ToggleSwitch = new ToggleSwitch({
+        name: "treatEmptyValuesAsZero",
+        displayNameKey: "Visual_TreatEmptyValuesAsZero",
+        value: true
+    });
+
+    public showLatterAvailableValue: ToggleSwitch = new ToggleSwitch({
+        name: "showLatterAvailableValue",
+        displayNameKey: "Visual_ShowLatestAvailableValue",
+        value: false
+    });
+
+    public slices: FormattingSettingsSlice[] = [
+        this.format, this.noValueLabel, this.displayUnits, this.precision,
+        this.treatEmptyValuesAsZero, this.showLatterAvailableValue
+    ];
+
+    constructor(defaultValuesContainerItem?: ValuesContainerItem){
+        super(defaultValuesContainerItem);
+
+        if (defaultValuesContainerItem){
+            this.treatEmptyValuesAsZero.value = defaultValuesContainerItem.treatEmptyValuesAsZero.value;
+            this.showLatterAvailableValue.value = defaultValuesContainerItem.showLatterAvailableValue.value;
+        }
+    }
+}
+
+export class ValuesDescriptor extends BaseContainerDescriptor<ValuesContainerItem> {
+    public name: string = "values";
+    public displayNameKey: string = "Visual_Values";
+
+    public getNewContainerItem(defaultContainerItem: ValuesContainerItem): ValuesContainerItem {
+        return new ValuesContainerItem(defaultContainerItem);
+    }
 }

@@ -23,15 +23,32 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
 
-import powerbi from "powerbi-visuals-api";
-import IViewport = powerbi.IViewport;
+import { SubtitleBaseContainerItem } from "./subtitleBaseDescriptor";
+import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
-import { IDataRepresentation } from "../converter/data/dataRepresentation";
-import { Settings } from "../settings/settings";
+export class SparklineValueContainerItem extends SubtitleBaseContainerItem {
+    public name: string = "sparklineValue";
 
-export interface IVisualComponentRenderOptions {
-    settings: Settings;
-    viewport: IViewport;
-    data: IDataRepresentation;
+    public slices: FormattingSettingsSlice[] = [
+        this.isShown, this.format, this.displayUnits,
+        this.precision, this.autoAdjustFontSize,
+        this.font, this.color, this.alignment
+    ];
+}
+
+export class SparklineValueDescriptor extends BaseContainerDescriptor<SparklineValueContainerItem> {
+    public name: string = "sparklineValue";
+    public displayNameKey: string = "Visual_SparklineValue";
+
+    public getNewContainerItem(defaultContainerItem: SparklineValueContainerItem): SparklineValueContainerItem {
+        return new SparklineValueContainerItem(defaultContainerItem);
+    }
+
+    constructor(){
+        super();
+        this.defaultContainerItem.autoAdjustFontSize.value = true;
+    }
 }

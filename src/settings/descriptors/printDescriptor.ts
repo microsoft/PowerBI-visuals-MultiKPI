@@ -23,15 +23,22 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import ToggleSwitch = formattingSettings.ToggleSwitch;
+import FormattingSettingsSlice = formattingSettings.Slice;
 
-import powerbi from "powerbi-visuals-api";
-import IViewport = powerbi.IViewport;
+import { BaseDescriptor } from "./baseDescriptor";
 
-import { IDataRepresentation } from "../converter/data/dataRepresentation";
-import { Settings } from "../settings/settings";
-
-export interface IVisualComponentRenderOptions {
-    settings: Settings;
-    viewport: IViewport;
-    data: IDataRepresentation;
+export class PrintDescriptor extends BaseDescriptor {
+    public name: string = "printMode";
+    public displayNameKey: string = "Visual_PrintMode";
+    public descriptionKey: string = "Visual_PrintModeDescription";
+    public topLevelSlice?: ToggleSwitch = this.show;
+    
+    public slices: FormattingSettingsSlice[] = []
+    
+    constructor(){
+        super();
+        this.show.value = false;
+    }
 }

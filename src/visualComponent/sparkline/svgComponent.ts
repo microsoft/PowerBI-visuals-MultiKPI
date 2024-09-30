@@ -24,7 +24,9 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
+
 import { IMargin } from "powerbi-visuals-utils-svgutils";
 
 import {
@@ -53,10 +55,11 @@ import { MultiLineComponent } from "./multiLineComponent";
 
 import { isValueValid } from "../../utils/isValueValid";
 
+type SvgComponentsRenderOptions = ISparklineComponentRenderOptions | IAxisComponentRenderOptions | IDotsComponentRenderOptions;
 export class SvgComponent extends BaseContainerComponent<
     IVisualComponentConstructorOptions,
     ISparklineComponentRenderOptions,
-    {}
+    SvgComponentsRenderOptions
     > {
     private className: string = "svgComponentContainer";
 
@@ -120,7 +123,7 @@ export class SvgComponent extends BaseContainerComponent<
 
         const margin: IMargin = this.getMarginByThickness(maxThickness);
 
-        const viewport: powerbiVisualsApi.IViewport = {
+        const viewport: IViewport = {
             height: Math.max(0, options.viewport.height - margin.top - margin.bottom),
             width: Math.max(0, options.viewport.width - margin.left - margin.right),
         };

@@ -26,7 +26,10 @@
 
 import { Selection } from "d3-selection";
 import { area, Area, line, Line } from "d3-shape";
-import powerbiVisualsApi from "powerbi-visuals-api";
+
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
+
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 import {
@@ -48,7 +51,7 @@ export interface ILineComponentRenderOptions {
     points: IDataRepresentationPoint[];
     thickness: number;
     type: DataRepresentationPointGradientType;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
     current: IDataRepresentationPoint;
@@ -264,8 +267,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
                     }
                     case DataRepresentationPointGradientType.line:
                     default: {
-                        //return lineRenderOptions.thickness;
-                        pixelConverter.toString(lineRenderOptions.thickness);
+                        return pixelConverter.toString(lineRenderOptions.thickness);
                     }
                 }
             });
@@ -287,14 +289,14 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     private getArea(
         xScale: DataRepresentationScale,
         yScale: DataRepresentationScale,
-        viewport: powerbiVisualsApi.IViewport,
+        viewport: IViewport,
         yMin: DataRepresentationAxisValueType,
     ): Area<IDataRepresentationPoint> {
         return area<IDataRepresentationPoint>()
             .x((dataPoint: IDataRepresentationPoint) => {
                 return xScale.scale(dataPoint.x);
             })
-            .y0((dataPoint: IDataRepresentationPoint) => {
+            .y0(() => {
                 if (yMin.valueOf() < 0) {
                     return yScale.scale(0);
                 }
@@ -307,8 +309,6 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     }
 
     private getGradientUrl(): string {
-        const href: string = window.location.href;
-
         return `url(#${this.gradientId})`;
     }
 

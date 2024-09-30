@@ -23,24 +23,18 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
 
-import { SubtitleDescriptor } from "./subtitleDescriptor";
+import { FormatDescriptor } from "./formatDescriptor";
 
-export class SubtitleWarningDescriptor extends SubtitleDescriptor {
-    public warningText: string = "Warning Message";
-    public staleDataText: string = ""; // We keep it here just for compatibility with old reports
+export class DateDescriptor extends FormatDescriptor {
+    public name: string = "date";
+    public displayNameKey: string = "Visual_Date";
+    public slices: FormattingSettingsSlice[] = [this.format]
 
-    public parse(): void {
-        super.parse();
-
-        // Hide staleDataText from Format Panel
-        Object.defineProperty(
-            this,
-            "staleDataText",
-            {
-                configurable: true,
-                enumerable: false,
-            },
-        );
+    constructor(){
+        super();
+        this.format.value = "%M/%d/yyyy";
     }
 }

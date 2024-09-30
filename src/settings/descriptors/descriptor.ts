@@ -23,8 +23,11 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import powerbi from "powerbi-visuals-api";
+import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
 
 export interface IDescriptor {
     parse?(): void;
     setDefault?(): void;
+    setLocalizedDisplayName?(localizationManager: ILocalizationManager): void;
 }

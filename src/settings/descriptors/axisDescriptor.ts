@@ -23,50 +23,13 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { AxisBaseContainerItem, AxisBaseDescriptor } from "./axisBaseDescriptor";
 
-import { DataRepresentationAxisValueType } from "../../converter/data/dataRepresentation";
-import { TextFormattingDescriptor } from "./textFormattingDescriptor";
+export class AxisDescriptor extends AxisBaseDescriptor<AxisBaseContainerItem> {
+    public name: string = "yAxis";
+    public displayNameKey: string = "Visual_YAxis";
 
-export class AxisDescriptor extends TextFormattingDescriptor {
-    public axisLabelX: number = 3;
-    public axisLabelY: number = 6;
-
-    public min: DataRepresentationAxisValueType = null;
-    public defaultMin: DataRepresentationAxisValueType = null;
-    public max: DataRepresentationAxisValueType = null;
-    public defaultMax: DataRepresentationAxisValueType = null;
-
-    constructor() {
-        super();
-
-        this.precision = 0;
-        this.fontFamily = "wf_standard-font, helvetica, arial, sans-serif";
-        this.fontSize = 7.5;
-        this.color = "#4F4F4F";
-    }
-
-    public getMin(): DataRepresentationAxisValueType {
-        return this.min == null
-            ? this.defaultMin
-            : this.min;
-    }
-
-    public getMax(): DataRepresentationAxisValueType {
-        return this.max == null
-            ? this.defaultMax
-            : this.max;
-    }
-
-    public getValueByPropertyName(propertyName: string): any {
-        switch (propertyName) {
-            case "min": {
-                return this.getMin();
-            }
-            case "max": {
-                return this.getMax();
-            }
-        }
-
-        return super.getValueByPropertyName(propertyName);
+    public getNewContainerItem(defaultContainerItem: AxisBaseContainerItem): AxisBaseContainerItem {
+        return new AxisBaseContainerItem(defaultContainerItem);
     }
 }

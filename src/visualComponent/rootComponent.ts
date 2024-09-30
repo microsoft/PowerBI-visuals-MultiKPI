@@ -24,7 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { pointer as d3Mouse } from "d3-selection";
 
@@ -44,7 +45,13 @@ import { SubtitleWarningComponent } from "./subtitleWarningComponent";
 
 import { ViewportSize } from "../converter/data/dataRepresentation";
 
-export class RootComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, IVisualComponentRenderOptions, any> {
+export type RootComponentsRenderOptions = IVisualComponentRenderOptions | ISubtitleWarningComponentRenderOptions;
+
+export class RootComponent extends BaseContainerComponent<
+    IVisualComponentConstructorOptions,
+    IVisualComponentRenderOptions,
+    RootComponentsRenderOptions
+    > {
     private className: string = "multiKpi";
 
     private printModeClassName: string = this.getClassNameWithPrefix("printMode");
@@ -55,7 +62,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
     private isPrintModeActivated: boolean = false;
 
-    private mainChartComponentViewport: powerbiVisualsApi.IViewport;
+    private mainChartComponentViewport: IViewport;
 
     private onChartChangeDelay: number = 300;
     private onChartChangeTimer: number = null;
@@ -187,7 +194,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
     }
 
     private getOnChartChangeDelay([x, y]): number {
-        const scale: powerbiVisualsApi.IViewport = this.constructorOptions.scaleService.getScale();
+        const scale: IViewport = this.constructorOptions.scaleService.getScale();
 
         const scaledX: number = x / scale.width;
         const scaledY: number = y / scale.height;
@@ -222,7 +229,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
         const viewportFactor: number = this.getViewportFactorByViewportSize(data.viewportSize);
 
-        const viewport: powerbiVisualsApi.IViewport = {
+        const viewport: IViewport = {
             height: options.viewport.height / viewportFactor,
             width: options.viewport.width,
         };
@@ -275,7 +282,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             || !this.renderOptions
             || !this.renderOptions.settings
             || !this.renderOptions.settings.printMode
-            || !this.renderOptions.settings.printMode.show
+            || !this.renderOptions.settings.printMode.show.value
         ) {
             return;
         }
@@ -345,7 +352,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
         const toggleSparklineOnHover: boolean = this.renderOptions
             && this.renderOptions.settings
             && this.renderOptions.settings.grid
-            && this.renderOptions.settings.grid.toggleSparklineOnHover;
+            && this.renderOptions.settings.grid.toggleSparklineOnHover.value;
 
         if (!toggleSparklineOnHover) {
             return;

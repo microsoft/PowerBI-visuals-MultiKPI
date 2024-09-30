@@ -24,7 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { BaseContainerComponent } from "../baseContainerComponent";
 import { ISparklineComponentRenderOptions } from "./sparklineComponent";
@@ -59,7 +60,7 @@ export class PlotComponent
 
         this.updateSize(viewport.width, viewport.height);
 
-        const componentViewport: powerbiVisualsApi.IViewport = { ...viewport };
+        const componentViewport: IViewport = { ...viewport };
 
         this.forEach(
             this.components,
@@ -69,7 +70,7 @@ export class PlotComponent
                     viewport: { ...componentViewport },
                 });
 
-                const margins: powerbiVisualsApi.IViewport = component.getViewport();
+                const margins: IViewport = component.getViewport();
 
                 componentViewport.height -= margins.height;
             },

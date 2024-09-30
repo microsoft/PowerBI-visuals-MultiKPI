@@ -24,12 +24,13 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 export class ScaleService {
     constructor(private rootElement: HTMLElement) { }
 
-    public getScale(): powerbiVisualsApi.IViewport {
+    public getScale(): IViewport {
         if (!this.rootElement) {
             return {
                 height: 1,
@@ -37,7 +38,7 @@ export class ScaleService {
             };
         }
 
-        const rect: ClientRect = this.rootElement.getBoundingClientRect();
+        const rect: DOMRect = this.rootElement.getBoundingClientRect();
 
         let clientWidth: number;
         let clientHeight: number;

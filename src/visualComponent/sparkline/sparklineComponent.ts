@@ -24,27 +24,31 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
+
 import { getFormattedValueWithFallback } from "../../converter/data/dataFormatter";
 import { IDataRepresentation, IDataRepresentationPoint, IDataRepresentationSeries, ViewportSize } from "../../converter/data/dataRepresentation";
 import { EventName } from "../../event/eventName";
-import { SubtitleDescriptor } from "../../settings/descriptors/subtitleDescriptor";
-import { ValuesDescriptor } from "../../settings/descriptors/valuesDescriptor";
+import { ValuesContainerItem } from "../../settings/descriptors/valuesDescriptor";
 import { BaseContainerComponent } from "../baseContainerComponent";
 import { ISubtitleComponentRenderOptions, SubtitleComponent } from "../subtitleComponent";
 import { IVisualComponent } from "../visualComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 import { PlotComponent } from "./plotComponent";
+import { SparklineValueContainerItem } from "../../settings/descriptors/sparklineValueDescriptor";
+import { SubtitleBaseContainerItem } from "../../settings/descriptors/subtitleBaseDescriptor";
 
 export interface ISparklineComponentRenderOptions {
     series: IDataRepresentationSeries[];
     current: IDataRepresentationSeries;
     dataRepresentation: IDataRepresentation;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
     position: number;
 }
 
-export class SparklineComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, any> {
+type SparklineComponentsRenderOptions = ISubtitleComponentRenderOptions | ISubtitleComponentRenderOptions;
+export class SparklineComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, SparklineComponentsRenderOptions> {
     private className: string = "sparklineComponent";
 
     private topLabelComponent: IVisualComponent<ISubtitleComponentRenderOptions>;
@@ -123,7 +127,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
 
             this.constructorOptions.tooltipServiceWrapper.addTooltip(
                 this.element,
-                (data) => tooltipText ? [{ displayName: null, value: tooltipText, }] : null
+                () => tooltipText ? [{ displayName: null, value: tooltipText, }] : null
             );
 
         } else {
@@ -166,7 +170,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             && this.renderOptions.current.points
             && this.renderOptions.current.points[index];
 
-        const sparklineValue: SubtitleDescriptor = this.renderOptions
+        const sparklineValue: SparklineValueContainerItem = this.renderOptions
             && this.renderOptions.current
             && this.renderOptions.current.settings
             && this.renderOptions.current.settings.sparklineValue;
@@ -175,7 +179,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             && this.renderOptions.dataRepresentation
             && this.renderOptions.dataRepresentation.viewportSize;
 
-        const valuesSettings: ValuesDescriptor = this.renderOptions
+        const valuesSettings: ValuesContainerItem = this.renderOptions
             && this.renderOptions.current
             && this.renderOptions.current.settings
             && this.renderOptions.current.settings.values;
@@ -188,11 +192,11 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
     private renderTopLabel(
         name: string,
         viewportSize: ViewportSize,
-        settings: SubtitleDescriptor,
+        settings: SubtitleBaseContainerItem,
     ): void {
         const fontSize: number = this.getFontSizeByViewportSize(viewportSize);
 
-        settings.titleText = name;
+        settings.titleText.value = name;
         settings.autoFontSizeValue = fontSize;
 
         this.topLabelComponent.render({ subtitleSettings: settings });
@@ -201,20 +205,20 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
     private renderBottomLabel(
         value: number,
         viewportSize: ViewportSize,
-        subtitleSettings: SubtitleDescriptor,
-        valueSettings: ValuesDescriptor,
+        subtitleSettings: SubtitleBaseContainerItem,
+        valueSettings: ValuesContainerItem,
     ): void {
         const fontSize: number = this.getFontSizeByViewportSize(viewportSize);
         const actualValueKPIFontSize: number = fontSize * this.getActualValueKPIFactorByViewportSize(viewportSize);
 
-        subtitleSettings.titleText = getFormattedValueWithFallback(value, valueSettings);
+        subtitleSettings.titleText.value = getFormattedValueWithFallback(value, valueSettings);
         subtitleSettings.autoFontSizeValue = actualValueKPIFontSize;
 
         this.bottomLabelComponent.render({ subtitleSettings });
     }
 
     private renderPlot(options: ISparklineComponentRenderOptions): void {
-        const plotComponentViewport: powerbiVisualsApi.IViewport = this.getReducedViewport(
+        const plotComponentViewport: IViewport = this.getReducedViewport(
             { ...options.viewport },
             [this.topLabelComponent, this.bottomLabelComponent],
         );
@@ -242,7 +246,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             case ViewportSize.big: {
                 return 20;
             }
-            case ViewportSize.big: {
+            case ViewportSize.huge: {
                 return 24;
             }
         }
@@ -261,12 +265,12 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
         }
     }
 
-    private getReducedViewport(viewport: powerbiVisualsApi.IViewport, components: IVisualComponent<any>[]): powerbiVisualsApi.IViewport {
-        return components.reduce<powerbiVisualsApi.IViewport>((
-            previousViewport: powerbiVisualsApi.IViewport,
-            component: IVisualComponent<any>,
-        ): powerbiVisualsApi.IViewport => {
-            const componentViewport: powerbiVisualsApi.IViewport = component.getViewport();
+    private getReducedViewport(viewport: IViewport, components: IVisualComponent<SparklineComponentsRenderOptions>[]): IViewport {
+        return components.reduce<IViewport>((
+            previousViewport: IViewport,
+            component: IVisualComponent<SparklineComponentsRenderOptions>,
+        ): IViewport => {
+            const componentViewport: IViewport = component.getViewport();
 
             return {
                 height: previousViewport.height - componentViewport.height,
@@ -278,7 +282,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
     private destroyComponents(): void {
         this.forEach(
             this.components.splice(0, this.components.length),
-            (component: IVisualComponent<{}>) => {
+            (component: IVisualComponent<SparklineComponentsRenderOptions>) => {
                 component.destroy();
             },
         );

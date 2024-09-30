@@ -23,12 +23,63 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import TextInput = formattingSettings.TextInput;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import { BaseDescriptor } from "./baseDescriptor";
+import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
-export class TooltipDescriptor extends BaseDescriptor {
-    public label: string = null;
-    public showDateDifference: boolean = true;
-    public showVariance: boolean = true;
-    public showDate: boolean = true;
+export class TooltipContainerItem extends BaseDescriptor {
+    public displayName: string = "All";
+
+    public label: TextInput = new TextInput({
+        name: "label",
+        displayNameKey: "Visual_Label",
+        value: null,
+        placeholder: null
+    });
+
+    public showDateDifference: ToggleSwitch = new ToggleSwitch({
+        name: "showDateDifference",
+        displayNameKey: "Visual_DateDifference",
+        value: true
+    });
+
+    public showVariance: ToggleSwitch = new ToggleSwitch({
+        name: "showVariance",
+        displayNameKey: "Visual_Variance",
+        value: true
+    });
+
+    public showDate: ToggleSwitch = new ToggleSwitch({
+        name: "showDate",
+        displayNameKey: "Visual_Date",
+        value: true
+    });
+
+    public slices: FormattingSettingsSlice[] = [
+        this.isShown, this.label, this.showDateDifference, this.showVariance, this.showDate
+    ];
+
+    constructor(defaultTooltipContainerItem?: TooltipContainerItem){
+        super(defaultTooltipContainerItem);
+
+        if(defaultTooltipContainerItem){
+            this.label.value = defaultTooltipContainerItem.label.value;
+            this.showDateDifference.value = defaultTooltipContainerItem.showDateDifference.value;
+            this.showVariance.value = defaultTooltipContainerItem.showVariance.value;
+            this.showDate.value = defaultTooltipContainerItem.showDate.value;
+        }
+    }
+}
+
+export class TooltipDescriptor extends BaseContainerDescriptor<TooltipContainerItem> {
+    public name: string = "tooltip";
+    public displayNameKey: string = "Visual_Tooltip";
+
+    public getNewContainerItem(defaultContainerItem: TooltipContainerItem): TooltipContainerItem {
+        return new TooltipContainerItem(defaultContainerItem);
+    }
 }

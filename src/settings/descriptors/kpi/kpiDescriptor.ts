@@ -27,14 +27,21 @@
 import { KpiBaseDescriptor } from "./kpiBaseDescriptor";
 
 export class KpiDescriptor extends KpiBaseDescriptor {
-    public percentCalcDateStr: string = null;
+    public name: string = "kpi";
+    public displayNameKey: string = "Visual_KPI";
+
+    constructor(){
+        super();
+
+        this.slices.push(this.startDate);
+    }
 
     public get percentCalcDate(): Date {
-        if (!this.percentCalcDateStr) {
+        if (!this.startDate.value) {
             return undefined;
         }
 
-        const date: Date = new Date(this.percentCalcDateStr);
+        const date: Date = new Date(this.startDate.value);
 
         if (!date || isNaN(date.getTime())) {
             return undefined;

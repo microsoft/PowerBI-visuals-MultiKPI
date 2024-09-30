@@ -23,29 +23,68 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import powerbi from "powerbi-visuals-api";
+import ValidatorType = powerbi.visuals.ValidatorType;
+
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import NumUpDown = formattingSettings.NumUpDown;
 
 import { BaseDescriptor } from "../baseDescriptor";
 import { IDescriptor } from "../descriptor";
 import { GridDescriptor } from "../gridDescriptor";
+import { BaseContainerDescriptor } from "../container/baseContainerDescriptor";
 
-export class SparklineDescriptor
-    extends BaseDescriptor
-    implements IDescriptor {
-
-    public position: number = null;
+export class SparklineContainerItem extends BaseDescriptor implements IDescriptor{
+    public displayName: string = "All";
 
     private minPosition: number = 1;
     private maxPosition: number = GridDescriptor.MaxColumns + 1;
 
-    public parse() {
-        this.position = isNaN(this.position) || this.position === null
-            ? this.position
+    public position = new NumUpDown({
+        name: "position",
+        displayNameKey: "Visual_Position",
+        value: NaN,
+        options: {
+            maxValue: {
+                type: ValidatorType.Max,
+                value: this.maxPosition
+            },
+            minValue: {
+                type: ValidatorType.Min,
+                value: this.minPosition
+            }
+        }
+    });
+
+    public slices: FormattingSettingsSlice[] = [this.position];
+
+    public parse(): void {
+        this.position.value = isNaN(this.position.value) || this.position.value === null
+            ? this.position.value
             : Math.max(
                 this.minPosition,
                 Math.min(
                     this.maxPosition,
-                    this.position,
+                    this.position.value,
                 ),
             );
+    }
+
+    constructor(defaultSparklineContainerItem?: SparklineContainerItem){
+        super(defaultSparklineContainerItem);
+
+        if(defaultSparklineContainerItem){
+            this.position.value = defaultSparklineContainerItem.position.value;
+        }
+    }
+}
+
+export class SparklineDescriptor extends BaseContainerDescriptor<SparklineContainerItem> {
+    public name = "sparkline";
+    public displayNameKey = "Visual_Sparkline";
+
+    public getNewContainerItem(defaultContainerItem: SparklineContainerItem): SparklineContainerItem {
+        return new SparklineContainerItem(defaultContainerItem);
     }
 }

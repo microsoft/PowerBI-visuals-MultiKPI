@@ -45,7 +45,13 @@ import {
     IChartLabelComponentRenderOptions,
 } from "./chartLabelComponent";
 
-export class MainChartComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, IVisualComponentRenderOptions, any> {
+export type MainChartComponentsRenderOptions = IChartComponentRenderOptions | IChartLabelComponentRenderOptions;
+
+export class MainChartComponent extends BaseContainerComponent<
+    IVisualComponentConstructorOptions,
+    IVisualComponentRenderOptions,
+    MainChartComponentsRenderOptions
+    > {
     private chart: IVisualComponent<IChartComponentRenderOptions>;
     private chartLabel: IVisualComponent<IChartLabelComponentRenderOptions>;
 

@@ -23,18 +23,45 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
+import ColorPicker = formattingSettings.ColorPicker;
 
 import { BaseDescriptor } from "../baseDescriptor";
+import { BaseContainerDescriptor } from "../container/baseContainerDescriptor";
 
-export class SparklineChartDescriptor extends BaseDescriptor {
-    public color: string = "#217cc9";
-    public alternativeColor: string = "#c7def1";
-    public shouldInterpolate: boolean = true;
+export class SparklineChartContainerItem extends BaseDescriptor {
+    public displayName: string = "All";
+
+    public defaultColorValue: string = "#217cc9";
+    public defaultAlternativeColorValue: string = "#c7def1";
+    public defaultShouldInterpolate: boolean = true;
     public thickness: number = 1;
     public dotRadiusFactor: number = 2;
 
     private minThickness: number = 0.25;
     private maxThickness: number = 25;
+
+    public color: ColorPicker = new ColorPicker({
+        name: "color",
+        displayNameKey: "Visual_Color",
+        value: {value:this.defaultColorValue}
+    });
+
+    public alternativeColor: ColorPicker = new ColorPicker({
+        name: "alternativeColor",
+        displayNameKey: "Visual_AlternativeColor",
+        value: {value: this.defaultAlternativeColorValue}
+    });
+
+    public shouldInterpolate: ToggleSwitch = new ToggleSwitch({
+        name: "shouldInterpolate",
+        displayNameKey: "Visual_Interpolate",
+        value: this.defaultShouldInterpolate
+    });
+
+    public slices: FormattingSettingsSlice[] = [this.color, this.alternativeColor, this.shouldInterpolate];
 
     public getRadius(): number {
         return this.thickness * this.dotRadiusFactor;
@@ -48,5 +75,24 @@ export class SparklineChartDescriptor extends BaseDescriptor {
                 this.thickness,
             ),
         );
+    }
+
+    constructor(defaultSparklineChartContainerItem?: SparklineChartContainerItem){
+        super(defaultSparklineChartContainerItem);
+
+        if(defaultSparklineChartContainerItem){
+            this.color.value = defaultSparklineChartContainerItem.color.value;
+            this.alternativeColor.value = defaultSparklineChartContainerItem.alternativeColor.value;
+            this.shouldInterpolate.value = defaultSparklineChartContainerItem.shouldInterpolate.value;
+        }
+    }
+}
+
+export class SparklineChartDescriptor extends BaseContainerDescriptor<SparklineChartContainerItem> {
+    public name: string = "sparklineChart";
+    public displayNameKey: string = "Visual_SparklineChart";
+    
+    public getNewContainerItem(defaultContainerItem: SparklineChartContainerItem): SparklineChartContainerItem {
+        return new SparklineChartContainerItem(defaultContainerItem);
     }
 }

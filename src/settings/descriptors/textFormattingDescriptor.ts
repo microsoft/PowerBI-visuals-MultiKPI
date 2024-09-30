@@ -26,52 +26,85 @@
 
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FontControl = formattingSettings.FontControl;
+import FontPicker = formattingSettings.FontPicker;
+import NumUpDown = formattingSettings.NumUpDown;
+import ColorPicker = formattingSettings.ColorPicker;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
+
+import ValidatorType = powerbi.visuals.ValidatorType;
+
 import { NumericDescriptor } from "./numericDescriptor";
 
 export class TextFormattingDescriptor extends NumericDescriptor {
-    public autoAdjustFontSize: boolean = false;
+    public defaultAutoAdjustFontSize: boolean = false;
     public autoFontSizeValue: number = 8;
-    public fontSize: number = 8;
+    public defaultFontSize: number = 8;
+    public defaultFontFamily: string = "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif";
+    public defaultFontColor: string = "#666666";
 
     public isBold: boolean = false;
     public isItalic: boolean = false;
     public isUnderlined: boolean = false;
 
-    public fontFamily: string = `"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif`;
+    protected minFontSize: number = 4;
+    protected maxFontSize: number = 72;
 
-    public color: string = "#666666";
+    public fontSize: NumUpDown = new NumUpDown({
+        name: "fontSize",
+        value: this.defaultFontSize,
+        options: {
+            minValue: {
+                type: ValidatorType.Min,
+                value: this.minFontSize,
+            },
+            maxValue: {
+                type: ValidatorType.Max,
+                value: this.maxFontSize
+            }
+        }
+    });
 
-    private minFontSize: number = 4;
-    private maxFontSize: number = 72;
+    public fontFamily: FontPicker = new FontPicker({
+        name: "fontFamily",
+        value: this.defaultFontFamily
+    });
+
+    public font: FontControl = new FontControl({
+        name: "font",
+        displayNameKey: "Visual_Font",
+        fontFamily: this.fontFamily,
+        fontSize: this.fontSize
+    });
+
+    public color: ColorPicker = new ColorPicker({
+        name: "color",
+        displayNameKey: "Visual_FontColor",
+        value: { value: this.defaultFontColor }
+    });
+
+    public autoAdjustFontSize: ToggleSwitch = new ToggleSwitch({
+        name: "autoAdjustFontSize",
+        displayNameKey: "Visual_AutoFontSize",
+        value: this.defaultAutoAdjustFontSize
+    });
 
     public parse(): void {
         super.parse();
-
-        this.fontSize = this.getValidFontSize(this.fontSize);
-
-        this.fontSize = Math.max(
-            this.minFontSize,
-            Math.min(
-                this.maxFontSize,
-                this.fontSize,
-            ),
-        );
-    }
-
-    public getFontSizeInPx(fontSize: number): number {
-        return pixelConverter.fromPointToPixel(fontSize);
+        this.font.fontSize.value = this.getValidFontSize(this.font.fontSize.value);
     }
 
     public get fontSizePx(): string {
         return pixelConverter.toString(this.fontSizeInPx);
     }
 
-    public get fontSizeInPx(): number {
-        const fontSize: number = this.autoAdjustFontSize
+    private get fontSizeInPx(): number {
+        const fontSize: number = this.autoAdjustFontSize.value
             ? this.autoFontSizeValue
-            : this.fontSize;
+            : this.font.fontSize.value;
 
-        return this.getFontSizeInPx(fontSize);
+        return pixelConverter.fromPointToPixel(fontSize);
     }
 
     protected getValidFontSize(fontSize: number): number {
@@ -82,5 +115,16 @@ export class TextFormattingDescriptor extends NumericDescriptor {
                 fontSize,
             ),
         );
+    }
+
+    constructor(defaultTextDescriptor?: TextFormattingDescriptor){
+        super(defaultTextDescriptor);
+
+        if (defaultTextDescriptor){
+            this.fontSize.value = defaultTextDescriptor.fontSize.value;
+            this.fontFamily.value = defaultTextDescriptor.fontFamily.value;
+            this.color.value = defaultTextDescriptor.color.value;
+            this.autoAdjustFontSize.value = defaultTextDescriptor.autoAdjustFontSize.value;
+        }
     }
 }

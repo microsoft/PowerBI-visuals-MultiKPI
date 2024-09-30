@@ -23,13 +23,60 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
+import NumUpDown = formattingSettings.NumUpDown;
+import ColorPicker = formattingSettings.ColorPicker;
+import TextInput = formattingSettings.TextInput;
 
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class StaleDataDescriptor extends BaseDescriptor {
-    public staleDataText: string = "";
-    public staleDataThreshold: number = 0;
-    public deductThresholdDays: boolean = false;
-    public color: string = "#3599b8";
-    public background: string = "";
+    public name: string = "staleData";
+    public displayNameKey: string = "Visual_StaleData";
+    public descriptionKey: string = "Visual_StaleDataDescription";
+
+    public defaultColorValue: string = "#3599b8";
+    public defaultBackgroundValue: string = "";
+
+    public staleDataText: TextInput = new TextInput({
+        name: "staleDataText",
+        displayNameKey: "Visual_Title",
+        descriptionKey: "Visual_StaleDataTextDescription",
+        value: "",
+        placeholder: ""
+    });
+
+    public staleDataThreshold: NumUpDown = new NumUpDown({
+        name: "staleDataThreshold",
+        displayNameKey: "Visual_Threshold",
+        descriptionKey: "Visual_ThresholdDescription",
+        value: 0
+    });
+
+    public color: ColorPicker = new ColorPicker({
+        name: "color",
+        displayNameKey: "Visual_Color",
+        value: {value: this.defaultColorValue}
+    });
+
+    public backgroundColor: ColorPicker = new ColorPicker({
+        name: "background",
+        displayNameKey: "Visual_BackgroundColor",
+        value: {value: this.defaultBackgroundValue}
+    });
+
+    public deductThresholdDays: ToggleSwitch = new ToggleSwitch({
+        name: "deductThresholdDays",
+        displayNameKey: "Visual_DeductThresholdDays",
+        value: false
+    });
+
+    topLevelSlice: ToggleSwitch = this.isShown;
+
+    public slices: FormattingSettingsSlice[] = [
+        this.staleDataText, this.deductThresholdDays,
+        this.staleDataThreshold, this.color, this.backgroundColor
+    ];
 }

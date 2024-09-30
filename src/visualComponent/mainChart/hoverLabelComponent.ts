@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
 
 import { ChartLabelBaseComponent, IRenderGroup } from "./chartLabelBaseComponent";
 
@@ -43,13 +43,13 @@ import { IVerticalReferenceLineComponentRenderOptions } from "../verticalReferen
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 
 import { KpiOnHoverDescriptor } from "../../settings/descriptors/kpi/kpiOnHoverDescriptor";
-import { VarianceDescriptor } from "../../settings/descriptors/varianceDescriptor";
+import { VarianceContainerItem } from "../../settings/descriptors/varianceDescriptor";
 
-import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
+import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 
 export interface IHoverLabelComponentRenderOptions extends IVerticalReferenceLineComponentRenderOptions {
     kpiOnHoverSettings: KpiOnHoverDescriptor;
-    varianceSettings: VarianceDescriptor;
+    varianceSettings: VarianceContainerItem;
 }
 
 export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComponentRenderOptions> {
@@ -81,7 +81,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
         }
 
         const latestDataPoint: IDataRepresentationPoint = series.current;
-        const variance: number = createVarianceConverterByType(varianceSettings.shouldCalculateDifference)
+        const variance: number = createVarianceConverterByType(varianceSettings.shouldCalculateDifference.value)
             .convert({
                 firstDataPoint: dataPoint,
                 secondDataPoint: latestDataPoint,
@@ -91,10 +91,12 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             this.headerSelector,
             [
                 {
-                    color: kpiOnHoverSettings.seriesNameColor,
+                    color: kpiOnHoverSettings.seriesNameColor.value.value,
                     data: series.name,
-                    fontSizeInPt: kpiOnHoverSettings.seriesNameFontSize,
-                    isShown: kpiOnHoverSettings.isSeriesNameShown,
+                    fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
+                        ? null
+                        : kpiOnHoverSettings.seriesNameFontSize.value,
+                    isShown: kpiOnHoverSettings.isSeriesNameShown.value,
                 },
             ],
 
@@ -115,22 +117,26 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             this.bodySelector,
             [
                 {
-                    color: kpiOnHoverSettings.valueColor,
+                    color: kpiOnHoverSettings.valueColor.value.value,
                     data: getFormattedValueWithFallback((latestDataPoint ? latestDataPoint.y : NaN), series.settings.values),
-                    fontSizeInPt: kpiOnHoverSettings.valueFontSize,
-                    isShown: kpiOnHoverSettings.isValueShown,
+                    fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
+                        ? null
+                        : kpiOnHoverSettings.valueFontSize.value,
+                    isShown: kpiOnHoverSettings.isValueShown.value,
                     tooltipDataItems,
                 },
                 {
                     color: isVarianceValid
-                        ? kpiOnHoverSettings.varianceColor
-                        : kpiOnHoverSettings.varianceNotAvailableColor,
+                        ? kpiOnHoverSettings.varianceColor.value.value
+                        : kpiOnHoverSettings.varianceNotAvailableColor.value.value,
                     data: `(${getFormattedValueWithFallback(variance, varianceSettings)})`,
-                    fontSizeInPt: isVarianceValid
-                        ? kpiOnHoverSettings.varianceFontSize
-                        : kpiOnHoverSettings.varianceNotAvailableFontSize,
-                    isShown: kpiOnHoverSettings.isVarianceShown,
-                    selector: isVarianceValid || !kpiOnHoverSettings.autoAdjustFontSize
+                    fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
+                        ? null
+                        : isVarianceValid 
+                            ? kpiOnHoverSettings.varianceFontSize.value
+                            : kpiOnHoverSettings.varianceNotAvailableFontSize.value,
+                    isShown: kpiOnHoverSettings.isVarianceShown.value,
+                    selector: isVarianceValid || !kpiOnHoverSettings.autoAdjustFontSize.value
                         ? undefined
                         : this.varianceNotAvailableSelector,
                     tooltipDataItems,
@@ -140,20 +146,24 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
 
         const dateGroup: IRenderGroup[] = [
             {
-                color: kpiOnHoverSettings.currentValueColor,
+                color: kpiOnHoverSettings.currentValueColor.value.value,
                 data: getFormattedValueWithFallback(dataPoint.y, series.settings.values),
-                fontSizeInPt: kpiOnHoverSettings.currentValueFontSize,
-                isShown: kpiOnHoverSettings.isCurrentValueShown,
+                fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
+                    ? null
+                    : kpiOnHoverSettings.currentValueFontSize.value,
+                isShown: kpiOnHoverSettings.isCurrentValueShown.value,
             },
             {
-                color: kpiOnHoverSettings.dateColor,
+                color: kpiOnHoverSettings.dateColor.value.value,
                 data: getFormattedDate(dataPoint.x, dateSettings.getFormat()),
-                fontSizeInPt: kpiOnHoverSettings.dateFontSize,
-                isShown: kpiOnHoverSettings.isDateShown,
+                fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
+                    ? null
+                    : kpiOnHoverSettings.dateFontSize.value,
+                isShown: kpiOnHoverSettings.isDateShown.value,
             },
         ];
 
-        const dateGroupToRender: IRenderGroup[] = kpiOnHoverSettings.isCurrentValueLeftAligned
+        const dateGroupToRender: IRenderGroup[] = kpiOnHoverSettings.isCurrentValueLeftAligned.value
             ? dateGroup
             : [...dateGroup].reverse(); // Makes dateGroupBase array immutable
 

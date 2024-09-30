@@ -23,16 +23,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import TextInput = formattingSettings.TextInput;
 
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class FormatDescriptor extends BaseDescriptor {
-    public format: string = null;
     public defaultFormat: string = null;
+    public defaultPlaceholderFormat: string = "Auto";
     public columnFormat: string = null;
 
+    public format: TextInput = new TextInput({
+        name: "format",
+        displayNameKey: "Visual_Format",
+        value: this.defaultFormat,
+        placeholder: this.defaultPlaceholderFormat
+    });
+
     public getFormat(): string {
-        return this.format || this.columnFormat || this.defaultFormat;
+        return this.format.value || this.columnFormat || this.defaultFormat;
     }
 
     public setColumnFormat(format: string) {
@@ -43,21 +52,11 @@ export class FormatDescriptor extends BaseDescriptor {
         this.columnFormat = format;
     }
 
-    public getValueByPropertyName(propertyName: string): any {
-        if (propertyName === "format") {
-            return this.getFormat();
+    constructor(defaultFormatDescriptor?: FormatDescriptor){
+        super(defaultFormatDescriptor);
+        
+        if (defaultFormatDescriptor){
+            this.format.value = defaultFormatDescriptor.format.value;
         }
-
-        return super.getValueByPropertyName(propertyName);
-    }
-
-    protected hideFormatProperty(): void {
-        Object.defineProperty(
-            this,
-            "format", {
-                configurable: true,
-                enumerable: false,
-            },
-        );
     }
 }

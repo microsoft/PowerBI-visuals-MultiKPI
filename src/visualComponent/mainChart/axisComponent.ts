@@ -28,7 +28,8 @@ import { axisRight } from "d3-axis";
 import { ScaleLinear } from "d3-scale";
 import { select as d3Select } from "d3-selection";
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
@@ -39,15 +40,15 @@ import {
 
 import { DataRepresentationScale } from "../../converter/data/dataRepresentationScale";
 
-import { AxisDescriptor } from "../../settings/descriptors/axisDescriptor";
+import { AxisBaseContainerItem } from "../../settings/descriptors/axisBaseDescriptor";
 
 import { BaseComponent } from "../baseComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
 import { detectPrecision } from "../../converter/data/dataFormatter";
 
 export interface IAxisComponentRenderOptions {
-    viewport: powerbiVisualsApi.IViewport;
-    settings: AxisDescriptor;
+    viewport: IViewport;
+    settings: AxisBaseContainerItem;
     series: IDataRepresentationSeries;
     y: IDataRepresentationAxis;
 }
@@ -77,14 +78,9 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
     private renderComponent(options: IAxisComponentRenderOptions) {
         const {
             y,
-            series,
             settings,
             viewport,
         } = options;
-
-        const xScale: DataRepresentationScale = options.series.x.scale
-            .copy()
-            .range([0, viewport.width]);
 
         const yScale: DataRepresentationScale = y.scale
             .copy()
@@ -96,7 +92,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
             displayUnitSystemType: 2,
             format: settings.getFormat(),
             precision: detectPrecision(domain[1] || domain[0], settings),
-            value: settings.displayUnits || domain[1] || domain[0],
+            value: settings.displayUnits.value || domain[1] || domain[0],
         });
 
         const yAxis = axisRight(<ScaleLinear<number, number>>(yScale.getScale()))
@@ -115,7 +111,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
                     .attr("y", elementIndex
                         ? settings.axisLabelY
                         : -settings.axisLabelY)
-                    .style("fill", settings.color);
+                    .style("fill", settings.color.value.value);
             });
 
         this.updateFormatting(this.element, settings);
