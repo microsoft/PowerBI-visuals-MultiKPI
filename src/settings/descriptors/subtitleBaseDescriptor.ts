@@ -78,14 +78,16 @@ export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
     
     constructor(defaultSubtitleDescriptor?: SubtitleBaseContainerItem){
         super(defaultSubtitleDescriptor);
-        this.color.value.value = this.defaultFontColor;
-        this.font.fontFamily.value = this.defaultFontFamily;
 
         if (defaultSubtitleDescriptor){
             this.titleText.value = defaultSubtitleDescriptor.titleText.value;
             this.backgroundColor.value = defaultSubtitleDescriptor.backgroundColor.value;
             this.alignment.value = defaultSubtitleDescriptor.alignment.value;
             this.warningText.value = defaultSubtitleDescriptor.warningText.value;
+        }
+        else {
+            this.color.value.value = this.defaultFontColor;
+            this.font.fontFamily.value = this.defaultFontFamily;
         }
     }
 }
