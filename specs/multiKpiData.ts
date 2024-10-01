@@ -24,7 +24,7 @@
 *  THE SOFTWARE.
 */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
 
 import { getRandomNumbers, testDataViewBuilder } from "powerbi-visuals-utils-testutils";
 import { valueType } from "powerbi-visuals-utils-typeutils";
@@ -100,7 +100,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
         }
     }
 
-    public getDataView(columnNames?: string[]): powerbiVisualsApi.DataView {
+    public getDataView(columnNames?: string[]): powerbi.DataView {
         const datesCategory = this.buildDatesCategory(this.dates);
         const valuesCategory = this.buildValuesCategory(this.seriesValues);
 
@@ -111,7 +111,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
         ).build();
     }
 
-    public getDataViewWithSubtitle(columnNames?: string[]): powerbiVisualsApi.DataView {
+    public getDataViewWithSubtitle(columnNames?: string[]): powerbi.DataView {
         const datesCategory = this.buildDatesCategory(this.dates);
         const valuesCategory = this.buildValuesCategory(this.seriesValues);
         const repeatsNum: number = this.dates.length;
@@ -151,10 +151,10 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
 
     private buildValuesCategory(seriesValues: number[][]): any {
         return seriesValues
-            .map((values: number[]) => {
+            .map((values: number[], index: number) => {
                 return {
                     source: {
-                        displayName: valueColumn.name,
+                        displayName: valueColumn.name + index,
                         roles: { valueColumn: true },
                         type: valueType.ValueType.fromDescriptor({ integer: true }),
                     },

@@ -26,7 +26,7 @@
 
 "use strict";
 
-process.env.CHROME_BIN = require("puppeteer").executablePath();
+process.env.CHROME_BIN = require("playwright-chromium").chromium.executablePath();
 
 const path = require("path");
 
@@ -37,6 +37,7 @@ const coverageFolder = "coverage";
 
 module.exports = (config) => {
     config.set({
+        browserNoActivityTimeout: 100000,
         browsers: ["ChromeHeadless"],
         colors: true,
         coverageIstanbulReporter: {
@@ -76,7 +77,6 @@ module.exports = (config) => {
         reporters: [
             "progress",
             "junit",
-            "coverage-istanbul",
         ],
         preprocessors: {
             [testRecursivePath]: ["webpack", "sourcemap"],

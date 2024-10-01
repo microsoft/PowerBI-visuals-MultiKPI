@@ -24,25 +24,13 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
 
 import { MultiKpiData } from "./multiKpiData";
 import { MultiKpiBuilder } from "./multiKpiBuilder";
 
 export class TestWrapper {
-    public static CREATE(
-        withMisisngValues: boolean = false,
-        brokenMetricIndex: number = 0,
-        howOlderDatesAreInDays: number = 0,
-        attachSubtitleData: boolean = false): TestWrapper {
-        return new TestWrapper(
-            withMisisngValues,
-            brokenMetricIndex,
-            howOlderDatesAreInDays,
-            attachSubtitleData);
-    }
-
-    public dataView: powerbiVisualsApi.DataView;
+    public dataView: powerbi.DataView;
     public dataViewBuilder: MultiKpiData;
     public visualBuilder: MultiKpiBuilder;
 

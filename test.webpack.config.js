@@ -5,19 +5,7 @@ module.exports = {
     devtool: 'inline-source-map',
     mode: 'development',
     module: {
-        rules: [{
-                test: /\.ts$/,
-                enforce: 'pre',
-                exclude: /node_modules/,
-                use: [{
-                    loader: 'tslint-loader',
-                    options: {
-                        emitErrors: true,
-                        failOnHint: true,
-                        fix: false
-                    }
-                }]
-            },
+        rules: [
             {
                 test: /\.ts$/,
                 use: 'ts-loader',
@@ -27,11 +15,9 @@ module.exports = {
                 test: /\.ts$/i,
                 enforce: 'post',
                 include: /(src)/,
-                exclude: /(specs|node_modules|resources\/js\/vendor)/,
-                loader: 'istanbul-instrumenter-loader',
-                options: {
-                    esModules: true
-                }
+                exclude: /(node_modules|resources\/js\/vendor)/,
+                loader: 'coverage-istanbul-loader',
+                options: { esModules: true }
             },
             {
                 test: /\.less$/,
@@ -44,7 +30,9 @@ module.exports = {
                     {
                         loader: 'less-loader',
                         options: {
-                            paths: [path.resolve(__dirname, 'node_modules')]
+                            lessOptions: {
+                               paths: [path.resolve(__dirname, 'node_modules')] 
+                            } 
                         }
                     }
                 ]
@@ -58,8 +46,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js', '.css']
     },
     output: {
-        path: path.resolve(__dirname, ".tmp"),
-        filename: "specs.js"
+        path: path.resolve(__dirname, ".tmp")
     },
     plugins: [
         new webpack.ProvidePlugin({
