@@ -1018,7 +1018,9 @@ describe("Multi KPI", () => {
     describe("DataFormatter", () => {
         describe("getFormattedVariance", () => {
             it("should return N/A if a variance is not valid", () => {
-                expect(getFormattedValueWithFallback(NaN, null)).toBe("N/A");
+                const numericDescriptor: NumericDescriptor = new NumericDescriptor();
+                numericDescriptor.noValueLabel.value = null;
+                expect(getFormattedValueWithFallback(NaN, numericDescriptor)).toBe("N/A");
             });
 
             it("should return 12.34K if precision is 2 and display units are 1000", () => {

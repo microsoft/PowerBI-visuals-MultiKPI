@@ -27,7 +27,6 @@
 import powerbi from "powerbi-visuals-api";
 import DataView = powerbi.DataView;
 import IViewport = powerbi.IViewport;
-import DataViewObjects = powerbi.DataViewObjects;
 import DataViewValueColumn = powerbi.DataViewValueColumn;
 import DataViewValueColumns = powerbi.DataViewValueColumns;
 import DataViewCategoryColumn= powerbi.DataViewCategoryColumn;
@@ -164,15 +163,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     public isDataViewValid(dataView: DataView): boolean {
-        return !!(dataView
-            && dataView.categorical
-            && dataView.categorical.categories
-            && dataView.categorical.categories[0]
-            && dataView.categorical.categories[0].values
-            && dataView.categorical.categories[0].values.length
-            && dataView.categorical.values
-            && dataView.categorical.values.length
-        );
+        return !!(dataView?.categorical?.categories?.[0]?.values?.length && dataView?.categorical?.values?.length);
     }
 
     protected getColumnGroupByRole(

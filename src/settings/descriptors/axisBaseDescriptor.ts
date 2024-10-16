@@ -58,15 +58,13 @@ export class AxisBaseContainerItem extends TextFormattingDescriptor {
     ];
 
     public getMin(): number {
-        return this.min.value == null
-            ? this.defaultMin
-            : this.min.value;
+        this.min.value = this.min.value ?? this.defaultMin;
+        return this.min.value;
     }
 
     public getMax(): number {
-        return this.max.value == null
-            ? this.defaultMax
-            : this.max.value;
+        this.max.value = this.max.value ?? this.defaultMax;
+        return this.max.value;
     }
 
     constructor(defaultAxisContainerItem?: AxisBaseContainerItem){

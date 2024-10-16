@@ -2,6 +2,7 @@ import powerbi from "powerbi-visuals-api";
 import ISelectionId = powerbi.visuals.ISelectionId;
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import Selector = powerbi.data.Selector;
+import FormattingComponent = powerbi.visuals.FormattingComponent;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import FormattingSettingsCard = formattingSettings.SimpleCard;
@@ -56,9 +57,11 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
 
     private setSliceSelector(slice: FormattingSettingsSlice, selector: Selector) {
         if (slice instanceof formattingSettings.CompositeSlice){
-            const fontControlSlice: FontControl = slice as FontControl;
-            fontControlSlice.fontFamily.selector = selector;
-            fontControlSlice.fontSize.selector = selector;
+            if (slice.type === FormattingComponent.FontControl){
+                const fontControlSlice: FontControl = slice as FontControl;
+                fontControlSlice.fontFamily.selector = selector;
+                fontControlSlice.fontSize.selector = selector;
+            }
         }
         else {
             slice.selector = selector;

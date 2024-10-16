@@ -32,10 +32,7 @@ const wholeUnits: displayUnitSystemType.DisplayUnitSystemType = displayUnitSyste
 
 export function getFormattedValueWithFallback(variance: number, settings: NumericDescriptor): string {
     if (!isValueValid(variance)) {
-        if (settings && settings.noValueLabel.value) {
-            return settings.noValueLabel.value;
-        }
-        return "N/A";
+        return settings.noValueLabel.value || "N/A";
     }
 
     return getFormattedValue(variance, settings);
