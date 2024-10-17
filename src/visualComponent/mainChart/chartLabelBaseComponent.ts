@@ -26,7 +26,8 @@
 
 import powerbi from "powerbi-visuals-api";
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType} from "d3-selection";
+type Selection<T> = d3Selection<BaseType, T, BaseType, unknown>;
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
@@ -75,36 +76,20 @@ export abstract class ChartLabelBaseComponent<RenderOptions> extends BaseCompone
         selector: CssConstants.ClassAndSelector,
         renderGroupData: IRenderGroup[],
     ): void {
-        const selection: Selection<any, IRenderGroup[], any, any> = this.element
+        const selection: Selection<IRenderGroup[]> = this.element
             .selectAll(selector.selectorName)
-            .data([renderGroupData]);
+            .data([renderGroupData])
+            .join("div")
+            .classed(selector.className, true);
 
-        selection
-            .exit()
-            .remove();
-
-        const mergedSelection = selection
-            .enter()
-            .append("div")
-            .classed(selector.className, true)
-            .merge(selection);
-
-        const itemSelection: Selection<any, IRenderGroup, any, any> = mergedSelection
+        const itemSelection: Selection<IRenderGroup> = selection
             .selectAll(this.itemSelector.selectorName)
             .data((data: IRenderGroup[]) => {
                 return data.filter((renderGroup: IRenderGroup) => {
-                    return renderGroup && renderGroup.isShown;
+                    return renderGroup?.isShown;
                 });
-            });
-
-        itemSelection
-            .exit()
-            .remove();
-
-        itemSelection
-            .enter()
-            .append("div")
-            .merge(itemSelection)
+            })
+            .join("div")
             .attr("class", (data: IRenderGroup) => {
                 const baseSelector: string = this.itemSelector.className;
 

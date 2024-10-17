@@ -37,5 +37,5 @@ export interface IVisualComponent<RenderOptionsType> {
     show?(): void;
     toggle?(): void;
     getViewport?(): IViewport;
-    getComponents?(): IVisualComponent<any>[]
+    getComponents?(): IVisualComponent<unknown>[]
 }

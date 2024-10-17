@@ -69,7 +69,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
     private settings: Settings;
     private formattingSettingsService: FormattingSettingsService;
     private viewport: powerbi.IViewport;
-    private eventDispatcher: Dispatch<any> = dispatch(...Object.keys(EventName));
+    private eventDispatcher: Dispatch<object> = dispatch(...Object.keys(EventName));
     private tooltipServiceWrapper: ITooltipServiceWrapper;
     private host: powerbi.extensibility.visual.IVisualHost;
     private selectionManager: ISelectionManager;
@@ -77,10 +77,6 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
     public rootComponent: IVisualComponent<IVisualComponentRenderOptions>;
 
     constructor(options: powerbi.extensibility.visual.VisualConstructorOptions) {
-        if (window.location !== window.parent.location) {
-            require("core-js/stable");
-        }
-
         const {
             element,
             host,
@@ -128,9 +124,8 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
         this.selectionManager = this.host.createSelectionManager();
 
         const visualSelection = d3Select(element);
-        visualSelection.on("contextmenu", (event) => {
-            const dataPoint: any = d3Select(event.target).datum();
-            this.selectionManager.showContextMenu(dataPoint ? dataPoint.selectionId : {}, {
+        visualSelection.on("contextmenu", (event: PointerEvent, dataPoint) => {
+            this.selectionManager.showContextMenu(dataPoint ? dataPoint : {}, {
                 x: event.clientX,
                 y: event.clientY
             });
@@ -146,11 +141,9 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
         try {
             this.host.eventService.renderingStarted(options);
 
-            const dataView: powerbi.DataView = options
-                && options.dataViews
-                && options.dataViews[0];
+            const dataView: powerbi.DataView = options?.dataViews?.[0];
 
-            this.viewport = this.getViewport(options && options.viewport);
+            this.viewport = this.getViewport(options?.viewport);
 
             this.settings = this.formattingSettingsService.populateFormattingSettingsModel(Settings, options.dataViews[0]);
             this.settings.parse();

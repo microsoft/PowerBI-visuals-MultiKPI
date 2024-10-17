@@ -27,6 +27,7 @@
 import powerbi from "powerbi-visuals-api";
 import DataView = powerbi.DataView;
 import IViewport = powerbi.IViewport;
+import PrimitiveValue = powerbi.PrimitiveValue;
 import DataViewValueColumn = powerbi.DataViewValueColumn;
 import DataViewValueColumns = powerbi.DataViewValueColumns;
 import DataViewCategoryColumn= powerbi.DataViewCategoryColumn;
@@ -72,7 +73,7 @@ import {
 
 export interface IColumnGroup {
     name: string;
-    values: any[];
+    values: PrimitiveValue[];
     columns: (DataViewValueColumn | DataViewCategoryColumn)[];
 }
 
@@ -305,26 +306,24 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 seriesItem.x.min = this.getMin(seriesItem.x.min, x);
                 seriesItem.x.max = this.getMax(seriesItem.x.max, x);
                 this.setupYMinMax(y, seriesItem);
-                const tooltip: string = tooltipColumnGroup && tooltipColumnGroup.values && tooltipColumnGroup.values[columnIndex] || undefined;
+                const tooltip: string = tooltipColumnGroup?.values?.[columnIndex].toString();
                 dataRepresentation.series[columnIndex].tooltip = tooltip;
             }
         });
 
         const subtitleColumnGroup: IColumnGroup = columnGroupByRole[subtitleColumn.name];
         if (subtitleColumnGroup) {
-            dataRepresentation.subtitle = subtitleColumnGroup.values[0];
+            dataRepresentation.subtitle = subtitleColumnGroup.values[0].toString();
         }
 
         const warningColumnGroup: IColumnGroup = columnGroupByRole[warningStateColumn.name];
         if (warningColumnGroup) {
-            dataRepresentation.warningState = warningColumnGroup.values[0];
+            dataRepresentation.warningState = <number>warningColumnGroup.values[0];
         }
 
         const changeStartDateColumnGroup: IColumnGroup = columnGroupByRole[changeStartDateColumn.name];
         if (changeStartDateColumnGroup) {
-            const date: Date = changeStartDateColumnGroup
-                && changeStartDateColumnGroup.values
-                && changeStartDateColumnGroup.values[0];
+            const date: Date = <Date>changeStartDateColumnGroup?.values?.[0];
 
             dataRepresentation.percentCalcDate = date instanceof Date ? date : dataRepresentation.percentCalcDate;
         }
@@ -413,7 +412,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         dataRepresentation.staleDateDifference = 0;
 
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
-            if (series.current && series.current.x) {
+            if (series?.current?.x) {
                 series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
                 if (series.staleDateDifference > dataRepresentation.staleDateDifference) {
                     dataRepresentation.staleDateDifference = series.staleDateDifference;
@@ -568,9 +567,9 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         return value != null;
     }
 
-    private parseValue(value: number, treatEmptyValuesAsZero: boolean): number {
-        if (isFinite(value) && value != null) {
-            return value;
+    private parseValue(value: PrimitiveValue, treatEmptyValuesAsZero: boolean): number {
+        if (isFinite(<number>value) && value != null) {
+            return <number>value;
         }
 
         if (treatEmptyValuesAsZero) {

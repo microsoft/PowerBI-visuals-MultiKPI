@@ -37,7 +37,7 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
             (newContainerItem as FormatDescriptor).setColumnFormat(format);
         }
 
-        const selector: Selector = ColorHelper.normalizeSelector(selectionId && selectionId.getSelector());
+        const selector: Selector = ColorHelper.normalizeSelector(selectionId?.getSelector());
         newContainerItem.slices.forEach((slice: FormattingSettingsSlice) => {
             slice.setPropertiesValues(objects, this.name);
             this.setSliceSelector(slice, selector);

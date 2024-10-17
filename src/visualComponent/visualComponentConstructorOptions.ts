@@ -34,7 +34,7 @@ import { IVisualComponentBaseConstructorOptions } from "./visualComponentBaseCon
 import { ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 
 export interface IVisualComponentConstructorOptions extends IVisualComponentBaseConstructorOptions {
-    eventDispatcher?: Dispatch<any>; // TODO
+    eventDispatcher?: Dispatch<object>; // TODO
     id?: number | string;
     scaleService?: ScaleService;
     style?: IColorPalette; // TODO: must be renamed

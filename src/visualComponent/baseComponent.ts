@@ -34,7 +34,8 @@ import {
 
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType } from "d3-selection";
+type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
 
 import { IVisualComponent } from "./visualComponent";
 
@@ -47,7 +48,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
     protected italicClassName: string = this.getClassNameWithPrefix("italic");
     protected underlinedClassName: string = this.getClassNameWithPrefix("underlined");
 
-    protected element: Selection<any, any, any, any>;
+    protected element: Selection;
 
     protected constructorOptions: ConstructorOptionsType;
     protected renderOptions: RenderOptionsType;
@@ -64,7 +65,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
     public abstract render(options: RenderOptionsType): void;
 
     public initElement(
-        baseElement: Selection<any, any, any, any>,
+        baseElement: Selection,
         className: string,
         tagName: string = "div",
     ): void {
@@ -145,7 +146,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
     }
 
     public updateFormatting(
-        selection: Selection<any, any, any, any>,
+        selection: Selection,
         settings: TextFormattingDescriptor,
     ): void {
         if (!selection || !settings) {
@@ -162,10 +163,10 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
     }
 
     protected createElement(
-        baseElement: Selection<any, any, any, any>,
+        baseElement: Selection,
         className: string,
         tagName: string = "div",
-    ): Selection<any, any, any, any> {
+    ): Selection {
         return baseElement
             .append(tagName)
             .classed(this.getClassNameWithPrefix(className), true);
@@ -181,7 +182,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
         return CssConstants.createClassAndSelector(this.getClassNameWithPrefix(className));
     }
 
-    protected clearElement(element: Selection<any, any, any, any>): void {
+    protected clearElement(element: Selection): void {
         element
             .selectAll("*")
             .remove();
@@ -197,7 +198,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
         return this.isComponentShown;
     }
 
-    protected updateBackgroundColor(element: Selection<any, any, any, any>, color: string): void {
+    protected updateBackgroundColor(element: Selection, color: string): void {
         if (!element) {
             return;
         }
@@ -227,7 +228,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
             .style("height", formatedHeight);
     }
 
-    protected updateElementOrder(element: Selection<any, any, any, any>, order: number): void {
+    protected updateElementOrder(element: Selection, order: number): void {
         if (!element) {
             return;
         }
@@ -240,7 +241,7 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
             .style("order", order);
     }
 
-    protected updateMargin(element: Selection<any, any, any, any>, margin: IMargin): void {
+    protected updateMargin(element: Selection, margin: IMargin): void {
         if (!element) {
             return;
         }

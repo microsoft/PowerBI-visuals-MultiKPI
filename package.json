@@ -39,7 +39,6 @@
     "@types/d3-shape": "^3.1.6",
     "@types/jasmine": "5.1.4",
     "@types/karma": "6.3.8",
-    "core-js": "3.38.0",
     "coverage-istanbul-loader": "^3.0.5",
     "css-loader": "7.1.2",
     "eslint": "^8.57.1",

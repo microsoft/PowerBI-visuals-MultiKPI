@@ -24,8 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
-
 import powerbi from "powerbi-visuals-api";
 import IViewport = powerbi.IViewport;
 
@@ -83,21 +81,14 @@ export class DotsComponent extends BaseComponent<IVisualComponentConstructorOpti
             .copy()
             .range([viewport.height, 0]);
 
-        const dotSelection: Selection<any, IDataRepresentationPoint, any, any> = this.element
+        // dots selection
+        this.element
             .selectAll(this.dotSelector.selectorName)
             .data(points.filter((point: IDataRepresentationPoint) => {
                 return point && isValueValid(point.y);
-            }));
-
-        dotSelection
-            .exit()
-            .remove();
-
-        dotSelection
-            .enter()
-            .append("circle")
+            }))
+            .join("circle")
             .classed(this.dotSelector.className, true)
-            .merge(dotSelection)
             .attr("cx", (point: IDataRepresentationPoint) => xScale.scale(point.x))
             .attr("cy", (point: IDataRepresentationPoint) => yScale.scale(point.y))
             .attr("r", settings.getRadius())

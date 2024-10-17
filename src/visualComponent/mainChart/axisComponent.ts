@@ -95,7 +95,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
             value: settings.displayUnits.value || domain[1] || domain[0],
         });
 
-        const yAxis = axisRight(<ScaleLinear<number, number>>(yScale.getScale()))
+        const yAxis: (selection) => void = axisRight(<ScaleLinear<number, number>>(yScale.getScale()))
             .tickValues(domain)
             .tickFormat((value: number) => {
                 return axisValueFormatter.format(value);

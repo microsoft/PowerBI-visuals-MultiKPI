@@ -61,7 +61,7 @@ export class DataRepresentationScale {
     ): DataRepresentationScale {
         let scale: DataRepresentationAxisScale;
 
-        if (values && values.length) {
+        if (values?.length) {
             switch (type) {
                 case DataRepresentationTypeEnum.DateType: {
                     scale = scaleTime();
@@ -75,7 +75,7 @@ export class DataRepresentationScale {
         }
 
         if (scale) {
-            (<any>scale).domain(values); // "as any" is some kind of hack for TS to build it well
+            scale.domain(values);
         }
 
         this.baseScale = scale;
@@ -97,11 +97,11 @@ export class DataRepresentationScale {
             return 0;
         }
 
-        return (<any>(this.baseScale))(value); // "as any" is some kind of hack for TS to build it well
+        return this.baseScale(value);
     }
 
     public copy(): DataRepresentationScale {
-        return new DataRepresentationScale(this.baseScale && this.baseScale.copy());
+        return new DataRepresentationScale(this.baseScale?.copy());
     }
 
     public range(rangeValues): DataRepresentationScale {
