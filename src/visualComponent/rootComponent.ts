@@ -139,12 +139,6 @@ export class RootComponent extends BaseContainerComponent<
             options.data.viewportSize,
             previousViewportSize,
         );
-
-        if (this.isExecutedInPhantomJs()) {
-            this.turnOnPrintMode();
-        } else {
-            this.turnOffPrintMode();
-        }
     }
 
     public destroy(): void {
@@ -307,18 +301,6 @@ export class RootComponent extends BaseContainerComponent<
 
         window.addEventListener("beforeprint", this.turnOnPrintMode.bind(this));
         window.addEventListener("afterprint", this.turnOffPrintMode.bind(this));
-    }
-
-    /**
-     * We detect Phantom JS in order to detect PBI Snapshot Service
-     * This is required to force Print Mode in Snapshot Service
-     */
-    private isExecutedInPhantomJs(): boolean {
-        try {
-            return /PhantomJS/.test(window.navigator.userAgent);
-        } catch (_) {
-            return false;
-        }
     }
 
     private onChartChangeClickHandler(seriesName: string): void {
