@@ -11,7 +11,6 @@ import FormattingSettingsSlice = formattingSettings.Slice;
 import FontControl = formattingSettings.FontControl;
 import { ColorHelper } from "powerbi-visuals-utils-colorutils";
 
-
 import { FormatDescriptor } from "../formatDescriptor";
 import { BaseDescriptor } from "../baseDescriptor";
 

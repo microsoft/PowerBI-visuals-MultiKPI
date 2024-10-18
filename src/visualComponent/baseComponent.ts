@@ -60,7 +60,6 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
     protected height: number;
 
     private isComponentShown: boolean = true;
-    private classNamePrefix: string = "multiKpi_";
 
     public abstract render(options: RenderOptionsType): void;
 
@@ -155,11 +154,11 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
 
         selection
             .style("font-size", settings.fontSizePx)
-            .style("font-family", settings.font.fontFamily.value)
+            .style("font-family", settings.fontFamily.value)
             .style("color", settings.color.value.value)
-            .classed(this.boldClassName, settings.isBold)
-            .classed(this.italicClassName, settings.isItalic)
-            .classed(this.underlinedClassName, settings.isUnderlined);
+            .classed(this.boldClassName, settings.isBold.value)
+            .classed(this.italicClassName, settings.isItalic.value)
+            .classed(this.underlinedClassName, settings.isUnderlined.value);
     }
 
     protected createElement(
@@ -174,8 +173,12 @@ export abstract class BaseComponent<ConstructorOptionsType, RenderOptionsType> i
 
     protected getClassNameWithPrefix(className: string): string {
         return className
-            ? `${this.classNamePrefix}${className}`
+            ? `${this.getClassNamePrefix()}${className}`
             : className;
+    }
+
+    protected getClassNamePrefix(): string {
+        return "multiKpi_";
     }
 
     protected getSelectorWithPrefix(className: string): CssConstants.ClassAndSelector {

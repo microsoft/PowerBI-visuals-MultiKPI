@@ -111,7 +111,10 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
                     .attr("y", elementIndex
                         ? settings.axisLabelY
                         : -settings.axisLabelY)
-                    .style("fill", settings.color.value.value);
+                    .style("fill", settings.color.value.value)
+                    .style("font-weight", settings.isBold.value ? "bold" : "normal")
+                    .style("font-style", settings.isItalic.value ? "italic" : "normal")
+                    .style("text-decoration", settings.isUnderlined.value ? "underline" : "none")
             });
 
         this.updateFormatting(this.element, settings);
