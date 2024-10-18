@@ -26,6 +26,7 @@
   "Visual_DisplayUnits": "Display units",
   "Visual_Font": "Font",
   "Visual_FontColor": "Font color",
+  "Visual_FontFamily": "Font family",
   "Visual_Format": "Format",
   "Visual_Interpolate": "Interpolate",
   "Visual_KPI": "KPI",
