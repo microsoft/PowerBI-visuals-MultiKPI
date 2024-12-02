@@ -37,7 +37,7 @@ export interface IVisualComponentConstructorOptions extends IVisualComponentBase
     eventDispatcher?: Dispatch<object>; // TODO
     id?: number | string;
     scaleService?: ScaleService;
-    style?: IColorPalette; // TODO: must be renamed
+    colorPalette?: IColorPalette;
     getSettings?: () => Settings;
     tooltipServiceWrapper?: ITooltipServiceWrapper;
 }

@@ -117,7 +117,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
             element: d3Select(element),
             eventDispatcher: this.eventDispatcher,
             scaleService: new ScaleService(element),
-            style: host.colorPalette,
+            colorPalette: host.colorPalette,
             tooltipServiceWrapper: this.tooltipServiceWrapper,
         });
 
