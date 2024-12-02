@@ -61,7 +61,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     public render(options: ISubtitleComponentRenderOptions): void {
         const { subtitleSettings: settings, subtitle } = options;
 
-        if (settings.shouldBeShown) {
+        if (settings.show.value && settings.isShown.value) {
             this.show();
             this.renderComponent(settings, subtitle);
         } else {
@@ -86,7 +86,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
         // subtitle selection
         this.element
             .selectAll(this.subtitleSelector.selectorName)
-            .data(settings.shouldBeShown ? [[]] : [])
+            .data(settings.show.value && settings.isShown.value ? [[]] : [])
             .join("div")
             .classed(this.subtitleSelector.className, true)
             .text(subtitleText)

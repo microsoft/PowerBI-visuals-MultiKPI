@@ -45,7 +45,7 @@ import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDe
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
 import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
-import { SubtitleItemContainer } from "./descriptors/subtitleDescriptor";
+import { SubtitleContainerItem } from "./descriptors/subtitleDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
 import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
@@ -70,7 +70,7 @@ export class Settings extends FormattingSettingsModel {
     public sparklineChart: SparklineChartDescriptor = new SparklineChartDescriptor();
     public sparklineYAxis: SparklineAxisDescriptor = new SparklineAxisDescriptor();
     public sparklineValue: SparklineValueDescriptor = new SparklineValueDescriptor();
-    public subtitle: SubtitleItemContainer = new SubtitleItemContainer();
+    public subtitle: SubtitleContainerItem = new SubtitleContainerItem();
     public staleData: StaleDataDescriptor = new StaleDataDescriptor();
     public printMode: PrintDescriptor = new PrintDescriptor();
 
@@ -88,7 +88,7 @@ export class Settings extends FormattingSettingsModel {
             this.staleData.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
         }
 
-        if (!this.subtitle.shouldBeShown) {
+        if (!this.subtitle.show.value) {
             this.staleData.isShown.value = false;
         }
 

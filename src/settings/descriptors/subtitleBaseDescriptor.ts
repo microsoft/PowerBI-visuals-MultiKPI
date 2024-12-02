@@ -26,6 +26,7 @@
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import TextInput = formattingSettings.TextInput;
 import ColorPicker = formattingSettings.ColorPicker;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 import AlignmentGroup = formattingSettings.AlignmentGroup;
 
 import { TextFormattingDescriptor } from "./textFormattingDescriptor";
@@ -75,6 +76,12 @@ export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
         value: this.defaultWarningText,
         placeholder: this.defaultWarningText
     });
+
+    public show: ToggleSwitch = new ToggleSwitch({
+        name: "show",
+        displayNameKey: "Visual_Show",
+        value: true
+    });
     
     constructor(defaultSubtitleDescriptor?: SubtitleBaseContainerItem){
         super(defaultSubtitleDescriptor);
@@ -84,6 +91,7 @@ export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
             this.backgroundColor.value = defaultSubtitleDescriptor.backgroundColor.value;
             this.alignment.value = defaultSubtitleDescriptor.alignment.value;
             this.warningText.value = defaultSubtitleDescriptor.warningText.value;
+            this.show.value = defaultSubtitleDescriptor.show.value;
         }
         else {
             this.color.value.value = this.defaultFontColor;

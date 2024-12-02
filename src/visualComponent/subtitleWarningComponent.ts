@@ -98,7 +98,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         const {
             backgroundColor,
             color,
-            shouldBeShown,
+            isShown,
             staleDataText,
             staleDataThreshold,
         } = staleDataSettings;
@@ -160,7 +160,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         this.renderIcon({
             backgroundColor: backgroundColor.value.value,
             color: color.value.value,
-            isShown: shouldBeShown && isDataStale,
+            isShown: isShown && isDataStale,
             selector: this.dataAgeSelector,
             tooltipItems,
         });

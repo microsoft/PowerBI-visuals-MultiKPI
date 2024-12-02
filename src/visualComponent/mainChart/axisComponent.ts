@@ -67,7 +67,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
     public render(options: IAxisComponentRenderOptions): void {
         const { settings } = options;
 
-        if (settings.shouldBeShown) {
+        if (settings.isShown.value) {
             this.show();
             this.renderComponent(options);
         } else {

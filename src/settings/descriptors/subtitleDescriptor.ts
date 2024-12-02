@@ -29,7 +29,7 @@ import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import { SubtitleAlignment, SubtitleBaseContainerItem } from "./subtitleBaseDescriptor";
 
-export class SubtitleItemContainer extends SubtitleBaseContainerItem {
+export class SubtitleContainerItem extends SubtitleBaseContainerItem {
     public name: string = "subtitle";
     public displayNameKey: string = "Visual_Subtitle";
     

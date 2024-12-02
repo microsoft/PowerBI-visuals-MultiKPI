@@ -28,27 +28,16 @@ import FormattingSettingsCard = formattingSettings.SimpleCard;
 import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 export class BaseDescriptor extends FormattingSettingsCard {
-    public show: ToggleSwitch = new ToggleSwitch({
-        name: "show",
-        displayNameKey: "Visual_Show",
-        value: true
-    });
-
     public isShown: ToggleSwitch = new ToggleSwitch({
         name: "isShown",
         displayNameKey: "Visual_Show",
         value: true
     });
 
-    public get shouldBeShown(): boolean {
-        return this.show.value && this.isShown.value;
-    }
-
     constructor(defaultBaseDescriptor?: BaseDescriptor){
         super();
 
         if (defaultBaseDescriptor){
-            this.show.value = defaultBaseDescriptor.show.value;
             this.isShown.value = defaultBaseDescriptor.isShown.value;
         }
     }

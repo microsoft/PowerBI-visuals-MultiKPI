@@ -24,17 +24,21 @@
  *  THE SOFTWARE.
  */
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsCard = formattingSettings.SimpleCard;
 import ToggleSwitch = formattingSettings.ToggleSwitch;
 import FormattingSettingsSlice = formattingSettings.Slice;
 
-import { BaseDescriptor } from "./baseDescriptor";
-
-export class PrintDescriptor extends BaseDescriptor {
+export class PrintDescriptor extends FormattingSettingsCard {
     public name: string = "printMode";
     public displayNameKey: string = "Visual_PrintMode";
     public descriptionKey: string = "Visual_PrintModeDescription";
+
+    public show: ToggleSwitch = new ToggleSwitch({
+        name: "show",
+        displayNameKey: "Visual_Show",
+        value: true
+    });
     public topLevelSlice?: ToggleSwitch = this.show;
-    
     public slices: FormattingSettingsSlice[] = []
     
     constructor(){
