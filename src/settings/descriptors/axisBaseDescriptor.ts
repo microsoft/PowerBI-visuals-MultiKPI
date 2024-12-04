@@ -32,6 +32,7 @@ import { TextFormattingDescriptor } from "./textFormattingDescriptor";
 
 export class AxisBaseContainerItem extends TextFormattingDescriptor {
     public displayName: string = "All";
+    public defaultDomainColor: string = "#4F4F4F"
     
     public axisLabelX: number = 3;
     public axisLabelY: number = 6;

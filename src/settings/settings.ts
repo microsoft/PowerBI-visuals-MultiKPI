@@ -27,6 +27,7 @@ import powerbi from "powerbi-visuals-api";
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import ISelectionId = powerbi.visuals.ISelectionId;
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import FormattingSettingsModel = formattingSettings.Model;
@@ -83,7 +84,7 @@ export class Settings extends FormattingSettingsModel {
         this.subtitle, this.staleData, this.printMode
     ]
 
-    public parse(): void {
+    public parse(colorPalette: ISandboxExtendedColorPalette, localizationManager: ILocalizationManager): void {
         if (this.staleData.staleDataText.value === "") {
             this.staleData.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
         }
@@ -92,6 +93,7 @@ export class Settings extends FormattingSettingsModel {
             this.staleData.isShown.value = false;
         }
 
+        this.updateFormatPropertyValue();
 
         this.cards.forEach((card) => {
             const settings: IDescriptor = card as IDescriptor;
@@ -99,10 +101,19 @@ export class Settings extends FormattingSettingsModel {
             if (settings.parse) {
                 settings.parse();
             }
+
+            if (settings.processHighContrastMode) {
+                settings.processHighContrastMode(colorPalette);
+            }
+
+            if (settings.setLocalizedDisplayName) {
+                settings.setLocalizedDisplayName(localizationManager);
+            }
+
         });
     }
 
-    public updateFormatPropertyValue(): void {
+    private updateFormatPropertyValue(): void {
         this.cards.forEach((card) => {
             if (card instanceof BaseContainerDescriptor){
                 card.container.containerItems.forEach((item) => {
@@ -138,15 +149,5 @@ export class Settings extends FormattingSettingsModel {
         
         currentSettings.staleData = this.staleData;
         return currentSettings;
-    }
-
-    public setLocalizedOptions(localizationManager: ILocalizationManager): void {
-        this.cards.forEach((card) => {
-            const settings: IDescriptor = card as IDescriptor;
-    
-            if (settings.setLocalizedDisplayName) {
-                settings.setLocalizedDisplayName(localizationManager);
-            }
-        });
     }
 }

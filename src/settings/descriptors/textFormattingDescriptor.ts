@@ -34,6 +34,7 @@ import ColorPicker = formattingSettings.ColorPicker;
 import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import ValidatorType = powerbi.visuals.ValidatorType;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { NumericDescriptor } from "./numericDescriptor";
 
@@ -108,6 +109,12 @@ export class TextFormattingDescriptor extends NumericDescriptor {
     public parse(): void {
         super.parse();
         this.font.fontSize.value = this.getValidFontSize(this.font.fontSize.value);
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+        this.color.visible = isHighContrast ? false : this.color.visible;
+        this.color.value = isHighContrast ? colorPalette.foreground : this.color.value;
     }
 
     public get fontSizePx(): string {

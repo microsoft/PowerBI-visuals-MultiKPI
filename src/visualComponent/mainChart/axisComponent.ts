@@ -57,6 +57,8 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
     constructor(options: IVisualComponentConstructorOptions) {
         super();
 
+        this.constructorOptions = options;
+
         this.initElement(
             options.element,
             "axisComponent",
@@ -116,6 +118,11 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
                     .style("font-style", settings.isItalic.value ? "italic" : "normal")
                     .style("text-decoration", settings.isUnderlined.value ? "underline" : "none")
             });
+
+        const isHighContrast: boolean = this.constructorOptions.colorPalette.isHighContrast;
+        this.element
+            .select("path.domain")
+            .style("stroke", isHighContrast ? settings.color.value.value : settings.defaultDomainColor);
 
         this.updateFormatting(this.element, settings);
     }

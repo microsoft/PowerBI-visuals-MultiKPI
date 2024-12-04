@@ -84,7 +84,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
 
         this.host = host;
 
-        this.localizationManager = options.host.createLocalizationManager()
+        this.localizationManager = options.host.createLocalizationManager();
         this.formattingSettingsService = new FormattingSettingsService(this.localizationManager);
 
         this.tooltipServiceWrapper = new TooltipServiceWrapper(
@@ -153,7 +153,7 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
                 viewport: this.viewport,
             });
 
-            this.settings.parse();
+            this.settings.parse(this.host.colorPalette, this.localizationManager);
 
             this.render(
                 this.dataRepresentation,
@@ -167,9 +167,6 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
     }
 
     public getFormattingModel(): powerbi.visuals.FormattingModel {
-        this.settings.updateFormatPropertyValue();
-        this.settings.setLocalizedOptions(this.localizationManager);
-        
         return this.formattingSettingsService.buildFormattingModel(this.settings);
     }    
 

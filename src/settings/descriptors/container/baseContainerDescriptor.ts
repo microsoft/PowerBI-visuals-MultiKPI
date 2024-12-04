@@ -34,8 +34,8 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
         const newContainerItem: BaseContainerItem = this.getNewContainerItem(this.defaultContainerItem);
         newContainerItem.displayName = displayName;
 
-        if ((newContainerItem as FormatDescriptor)?.setColumnFormat){
-            (newContainerItem as FormatDescriptor).setColumnFormat(format);
+        if (newContainerItem instanceof FormatDescriptor){
+            newContainerItem.setColumnFormat(format);
         }
 
         const selector: Selector = ColorHelper.normalizeSelector(selectionId?.getSelector());
@@ -61,6 +61,15 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
             const settings = item as IDescriptor;
             if (settings.parse) {
                 settings.parse();
+            }
+        });
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        this.container.containerItems.forEach((item) => {
+            const settings = item as IDescriptor;
+            if (settings.processHighContrastMode) {
+                settings.processHighContrastMode(colorPalette);
             }
         });
     }

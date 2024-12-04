@@ -25,6 +25,7 @@
  */
 import powerbi from "powerbi-visuals-api";
 import ValidatorType = powerbi.visuals.ValidatorType;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import ToggleSwitch = formattingSettings.ToggleSwitch;
@@ -87,6 +88,14 @@ export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
         super.parse();
 
         this.currentValueFontSize.value = this.getValidFontSize(this.currentValueFontSize.value);
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        super.processHighContrastMode(colorPalette);
+
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+        this.currentValueColor.visible = isHighContrast ? false : this.currentValueColor.visible;
+        this.currentValueColor.value = isHighContrast ? colorPalette.foreground : this.currentValueColor.value;
     }
 
     onPreProcess(): void {

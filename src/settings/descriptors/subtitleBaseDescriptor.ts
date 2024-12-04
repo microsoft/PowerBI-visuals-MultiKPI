@@ -31,6 +31,8 @@ import AlignmentGroup = formattingSettings.AlignmentGroup;
 
 import { TextFormattingDescriptor } from "./textFormattingDescriptor";
 
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
+
 export enum SubtitleAlignment {
     left = "left",
     center = "center",
@@ -97,5 +99,13 @@ export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
             this.color.value.value = this.defaultFontColor;
             this.font.fontFamily.value = this.defaultFontFamily;
         }
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        super.processHighContrastMode(colorPalette);
+
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+        this.backgroundColor.visible = isHighContrast ? false : this.backgroundColor.visible;
+        this.backgroundColor.value = isHighContrast ? colorPalette.background : this.backgroundColor.value;
     }
 }

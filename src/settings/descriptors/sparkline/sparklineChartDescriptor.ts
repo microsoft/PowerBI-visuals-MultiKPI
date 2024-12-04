@@ -31,6 +31,8 @@ import ColorPicker = formattingSettings.ColorPicker;
 import { BaseDescriptor } from "../baseDescriptor";
 import { BaseContainerDescriptor } from "../container/baseContainerDescriptor";
 
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
+
 export class SparklineChartContainerItem extends BaseDescriptor {
     public displayName: string = "All";
 
@@ -75,6 +77,17 @@ export class SparklineChartContainerItem extends BaseDescriptor {
                 this.thickness,
             ),
         );
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+
+        this.slices.forEach((slice) => {
+            if (slice instanceof ColorPicker){
+                slice.visible = isHighContrast ? false : slice.visible;
+                slice.value = isHighContrast ? colorPalette.foreground : slice.value;
+            }
+        })
     }
 
     constructor(defaultSparklineChartContainerItem?: SparklineChartContainerItem){

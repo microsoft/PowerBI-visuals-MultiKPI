@@ -26,7 +26,7 @@
 
 import { Dispatch } from "d3-dispatch";
 import powerbi from "powerbi-visuals-api";
-import IColorPalette = powerbi.extensibility.IColorPalette;
+import IColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { ScaleService } from "../services/scaleService";
 import { Settings } from "../settings/settings";
