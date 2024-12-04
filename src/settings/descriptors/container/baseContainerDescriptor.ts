@@ -3,6 +3,7 @@ import ISelectionId = powerbi.visuals.ISelectionId;
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import Selector = powerbi.data.Selector;
 import FormattingComponent = powerbi.visuals.FormattingComponent;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import FormattingSettingsCard = formattingSettings.SimpleCard;
@@ -13,10 +14,11 @@ import { ColorHelper } from "powerbi-visuals-utils-colorutils";
 
 import { FormatDescriptor } from "../formatDescriptor";
 import { BaseDescriptor } from "../baseDescriptor";
+import { IDescriptor } from "../descriptor";
 
 export type BaseContainerItemType = FormatDescriptor | BaseDescriptor;
 
-export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseContainerItemType> extends FormattingSettingsCard {
+export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseContainerItemType> extends FormattingSettingsCard implements IDescriptor{
     protected abstract getNewContainerItem(defaultContainerItem?: BaseContainerItem): BaseContainerItem;
     
     public defaultContainerItem: BaseContainerItem = this.getNewContainerItem();
@@ -40,7 +42,7 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
         newContainerItem.slices.forEach((slice: FormattingSettingsSlice) => {
             slice.setPropertiesValues(objects, this.name);
             this.setSliceSelector(slice, selector);
-        })
+        });
 
         return newContainerItem;
     }
@@ -52,6 +54,15 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
     public getCurrentContainer(containerName: string): BaseContainerItem {
         const currentContainer = this.container.containerItems.find(el => el.displayName === containerName);
         return (currentContainer as BaseContainerItem);
+    }
+
+    public parse(): void {
+        this.container.containerItems.forEach((item) => {
+            const settings = item as IDescriptor;
+            if (settings.parse) {
+                settings.parse();
+            }
+        });
     }
 
     private setSliceSelector(slice: FormattingSettingsSlice, selector: Selector) {

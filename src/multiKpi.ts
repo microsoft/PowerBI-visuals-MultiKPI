@@ -145,14 +145,15 @@ export class MultiKpi implements powerbi.extensibility.visual.IVisual {
 
             this.viewport = this.getViewport(options?.viewport);
 
-            this.settings = this.formattingSettingsService.populateFormattingSettingsModel(Settings, options.dataViews[0]);
-            this.settings.parse();
+            this.settings = this.formattingSettingsService.populateFormattingSettingsModel(Settings, dataView);
 
             this.dataRepresentation = this.dataConverter.convert({
                 dataView,
                 settings: this.settings,
                 viewport: this.viewport,
             });
+
+            this.settings.parse();
 
             this.render(
                 this.dataRepresentation,
