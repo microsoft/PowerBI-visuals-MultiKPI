@@ -37,6 +37,7 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
 
         if (newContainerItem instanceof FormatDescriptor){
             newContainerItem.setColumnFormat(format);
+            newContainerItem.format.value = newContainerItem.getFormat();
         }
 
         const selector: Selector = ColorHelper.normalizeSelector(selectionId?.getSelector());

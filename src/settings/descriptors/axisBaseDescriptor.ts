@@ -37,9 +37,6 @@ export class AxisBaseContainerItem extends TextFormattingDescriptor {
     public axisLabelX: number = 3;
     public axisLabelY: number = 6;
 
-    public defaultMin: number = null;
-    public defaultMax: number = null;
-
     public min = new NumUpDown({
         name: "min",
         displayNameKey: "Visual_Min",
@@ -57,16 +54,6 @@ export class AxisBaseContainerItem extends TextFormattingDescriptor {
         this.precision, this.font, this.color,
         this.min, this.max
     ];
-
-    public getMin(): number {
-        this.min.value = this.min.value ?? this.defaultMin;
-        return this.min.value;
-    }
-
-    public getMax(): number {
-        this.max.value = this.max.value ?? this.defaultMax;
-        return this.max.value;
-    }
 
     constructor(defaultAxisContainerItem?: AxisBaseContainerItem){
         super(defaultAxisContainerItem);

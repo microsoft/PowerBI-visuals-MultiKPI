@@ -51,10 +51,8 @@ import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
 import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 import { IDescriptor } from "./descriptors/descriptor";
-import { AxisBaseContainerItem } from "./descriptors/axisBaseDescriptor";
 import { BaseContainerDescriptor } from "./descriptors/container/baseContainerDescriptor";
 import { SeriesSettings } from "./seriesSettings";
-import { FormatDescriptor } from "./descriptors/formatDescriptor";
 
 export class Settings extends FormattingSettingsModel {
     public date: DateDescriptor = new DateDescriptor();
@@ -93,8 +91,6 @@ export class Settings extends FormattingSettingsModel {
             this.staleData.isShown.value = false;
         }
 
-        this.updateFormatPropertyValue();
-
         this.cards.forEach((card) => {
             const settings: IDescriptor = card as IDescriptor;
     
@@ -110,22 +106,6 @@ export class Settings extends FormattingSettingsModel {
                 settings.setLocalizedDisplayName(localizationManager);
             }
 
-        });
-    }
-
-    private updateFormatPropertyValue(): void {
-        this.cards.forEach((card) => {
-            if (card instanceof BaseContainerDescriptor){
-                card.container.containerItems.forEach((item) => {
-                    if (item instanceof FormatDescriptor){
-                        item.format.value = item.getFormat();
-                    }
-                    if (item instanceof AxisBaseContainerItem){
-                        item.min.value = item.getMin();
-                        item.max.value = item.getMax();   
-                    }
-                })
-            }
         });
     }
 

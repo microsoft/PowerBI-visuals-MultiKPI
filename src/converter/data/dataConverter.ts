@@ -436,8 +436,8 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
             this.applyScale(series.y, series.settings.yAxis);
 
             if (series.settings.sparklineYAxis.shouldInheritValues.value) {
-                series.settings.sparklineYAxis.defaultMin = series.settings.yAxis.getMin();
-                series.settings.sparklineYAxis.defaultMax = series.settings.yAxis.getMax();
+                series.settings.sparklineYAxis.min.value = series.settings.sparklineYAxis.min.value ?? series.settings.yAxis.min.value;
+                series.settings.sparklineYAxis.max.value = series.settings.sparklineYAxis.max.value ?? series.settings.yAxis.max.value;
             }
 
             this.applyScale(series.ySparkline, series.settings.sparklineYAxis);
@@ -497,20 +497,18 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         axis: IDataRepresentationAxis,
         axisDescriptor: AxisBaseContainerItem,
     ) {
-        if ((!isNaN(<number>(axisDescriptor.min.value)) && axisDescriptor.min.value !== null)
-            || (!isNaN(<number>(axisDescriptor.defaultMin)) && axisDescriptor.defaultMin !== null)) {
-            axis.min = axisDescriptor.getMin();
+        if (!isNaN(<number>(axisDescriptor.min.value)) && axisDescriptor.min.value !== null) {
+            axis.min = axisDescriptor.min.value;
         }
         else if (!isNaN(<number>(axis.min)) && axis.min !== null) {
-            axisDescriptor.defaultMin = <number>axis.min;
+            axisDescriptor.min.value = <number>axis.min;
         }
 
-        if ((!isNaN(<number>(axisDescriptor.max.value)) && axisDescriptor.max.value !== null)
-            || (!isNaN(<number>(axisDescriptor.defaultMax)) && axisDescriptor.defaultMax !== null)) {
-            axis.max = axisDescriptor.getMax();
+        if (!isNaN(<number>(axisDescriptor.max.value)) && axisDescriptor.max.value !== null) {
+            axis.max = axisDescriptor.max.value;
         } else if (!isNaN(<number>(axis.max)) && axis.max !== null) {
-            axisDescriptor.defaultMax = (<number>(axis.max)) + (<number>(axis.max)) * this.increasedDomainValueInPercentage;
-            axis.max = axisDescriptor.defaultMax;
+            axisDescriptor.max.value = (<number>(axis.max)) + (<number>(axis.max)) * this.increasedDomainValueInPercentage;
+            axis.max = axisDescriptor.max.value;
         }
 
         if (axis.min > axis.max) {
