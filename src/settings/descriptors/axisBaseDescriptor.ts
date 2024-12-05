@@ -31,7 +31,7 @@ import {BaseContainerDescriptor} from "../descriptors/container/baseContainerDes
 import { TextFormattingDescriptor } from "./textFormattingDescriptor";
 
 export class AxisBaseContainerItem extends TextFormattingDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
     public defaultDomainColor: string = "#4F4F4F"
     
     public axisLabelX: number = 3;

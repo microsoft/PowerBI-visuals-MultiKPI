@@ -40,7 +40,7 @@ export enum SubtitleAlignment {
 }
 
 export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     public defaultTitleText: string = "";
     public defaultBackgroundColor: string = "";

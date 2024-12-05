@@ -33,6 +33,7 @@ export abstract class BaseContainerDescriptor<BaseContainerItem extends BaseCont
 
         const newContainerItem: BaseContainerItem = this.getNewContainerItem(this.defaultContainerItem);
         newContainerItem.displayName = displayName;
+        newContainerItem.displayNameKey = null;
 
         if (newContainerItem instanceof FormatDescriptor){
             newContainerItem.setColumnFormat(format);

@@ -31,7 +31,7 @@ import { NumericDescriptor } from "./numericDescriptor";
 import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
 export class ValuesContainerItem extends NumericDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     public treatEmptyValuesAsZero: ToggleSwitch = new ToggleSwitch({
         name: "treatEmptyValuesAsZero",

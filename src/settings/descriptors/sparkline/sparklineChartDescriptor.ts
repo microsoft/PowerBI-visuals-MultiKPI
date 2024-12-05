@@ -34,7 +34,7 @@ import { BaseContainerDescriptor } from "../container/baseContainerDescriptor";
 import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 export class SparklineChartContainerItem extends BaseDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     public defaultColorValue: string = "#217cc9";
     public defaultAlternativeColorValue: string = "#c7def1";

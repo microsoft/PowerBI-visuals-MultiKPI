@@ -32,7 +32,7 @@ import { BaseDescriptor } from "./baseDescriptor";
 import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
 export class TooltipContainerItem extends BaseDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     public label: TextInput = new TextInput({
         name: "label",
