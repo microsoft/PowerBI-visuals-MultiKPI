@@ -51,7 +51,7 @@ export function getFormattedValue(value: number, settings: NumericDescriptor): s
 export function getValueFormatter(value: number, settings: NumericDescriptor): valueFormatter.IValueFormatter {
     return valueFormatter.create({
         displayUnitSystemType: wholeUnits,
-        format: settings.getFormat(),
+        format: settings.format.value,
         precision: detectPrecision(value, settings),
         value: settings.displayUnits.value || value,
     });
@@ -59,7 +59,7 @@ export function getValueFormatter(value: number, settings: NumericDescriptor): v
 
 export function detectPrecision(inputValue: number, settings: NumericDescriptor): number {
     if (settings.autoPrecision) {
-        const format = settings.format.value || settings.defaultFormat || settings.columnFormat;
+        const format = settings.format.value;
         return valueFormatter.calculateExactDigitsPrecision(inputValue, format, +settings.displayUnits.value, 3);
     }
 

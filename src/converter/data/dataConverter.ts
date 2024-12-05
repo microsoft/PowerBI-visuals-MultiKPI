@@ -245,7 +245,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
             return;
         }
 
-        settings.date.setColumnFormat(dateColumnGroup.columns[0].source.format);
+        settings.date.format.value = settings.date.format.value ?? dateColumnGroup.columns[0].source.format;
 
         const tooltipColumnGroup: IColumnGroup = columnGroupByRole[tooltipColumn.name];
 
@@ -456,7 +456,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     secondDataPoint: endDataPoint,
                 });
 
-            series.formattedDate = getFormattedDate(startDataPoint.x, settings.date.getFormat());
+            series.formattedDate = getFormattedDate(startDataPoint.x, settings.date.format.value);
             series.formattedVariance = getFormattedValueWithFallback(series.variance, series.settings.variance);
 
             series.dateDifference = this.getDaysBetween(endDataPoint.x, startDataPoint.x);

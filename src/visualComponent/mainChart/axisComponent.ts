@@ -92,7 +92,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
 
         const axisValueFormatter: valueFormatter.IValueFormatter = valueFormatter.create({
             displayUnitSystemType: 2,
-            format: settings.getFormat(),
+            format: settings.format.value,
             precision: detectPrecision(domain[1] || domain[0], settings),
             value: settings.displayUnits.value || domain[1] || domain[0],
         });

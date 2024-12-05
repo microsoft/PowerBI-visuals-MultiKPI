@@ -155,7 +155,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             },
             {
                 color: kpiOnHoverSettings.dateColor.value.value,
-                data: getFormattedDate(dataPoint.x, dateSettings.getFormat()),
+                data: getFormattedDate(dataPoint.x, dateSettings.format.value),
                 fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
                     ? null
                     : kpiOnHoverSettings.dateFontSize.value,
