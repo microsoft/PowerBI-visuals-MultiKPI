@@ -23,7 +23,9 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType} from "d3-selection";
+type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
+
 import powerbi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { IDataRepresentationSeries } from "../converter/data/dataRepresentation";
@@ -96,7 +98,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         const {
             backgroundColor,
             color,
-            shouldBeShown,
+            isShown,
             staleDataText,
             staleDataThreshold,
         } = staleDataSettings;
@@ -158,7 +160,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         this.renderIcon({
             backgroundColor: backgroundColor.value.value,
             color: color.value.value,
-            isShown: shouldBeShown && isDataStale,
+            isShown: isShown && isDataStale,
             selector: this.dataAgeSelector,
             tooltipItems,
         });
@@ -176,7 +178,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     public getTitle(stringTemplate: string, dateDifference: number, staleDataThreshold: number): string {
         const days: number = dateDifference - staleDataThreshold;
-        return stringTemplate && stringTemplate.replace
+        return stringTemplate?.replace
             ? stringTemplate.replace("${1}", `${days}`)
             : stringTemplate;
     }
@@ -188,19 +190,11 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         selector,
         tooltipItems,
     }: IIcon): void {
-        const iconSelection: Selection<any, any, any, any> = this.element
+        const iconSelection: Selection = this.element
             .selectAll(selector.selectorName)
-            .data(isShown ? [1] : []);
-
-        iconSelection
-            .exit()
-            .remove();
-
-        iconSelection
-            .enter()
-            .append("div")
+            .data(isShown ? [1] : [])
+            .join("div")
             .classed(selector.className, true)
-            .merge(iconSelection)
             .style("color", color || null)
             .style("background-color", backgroundColor || null);
 

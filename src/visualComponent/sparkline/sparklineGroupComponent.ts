@@ -109,7 +109,7 @@ export class SparklineGroupComponent
             (component: IVisualComponent<ISparklineComponentRenderOptions>, componentIndex: number) => {
                 const data: IDataRepresentationSeries = series[componentIndex];
 
-                const position: number = data && data.settings.sparkline.position.value
+                const position: number = data?.settings?.sparkline.position.value
                     ? data.settings.sparkline.position.value
                     : data
                         ? data.index

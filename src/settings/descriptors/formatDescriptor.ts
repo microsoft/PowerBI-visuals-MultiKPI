@@ -29,28 +29,14 @@ import TextInput = formattingSettings.TextInput;
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class FormatDescriptor extends BaseDescriptor {
-    public defaultFormat: string = null;
     public defaultPlaceholderFormat: string = "Auto";
-    public columnFormat: string = null;
 
     public format: TextInput = new TextInput({
         name: "format",
         displayNameKey: "Visual_Format",
-        value: this.defaultFormat,
+        value: null,
         placeholder: this.defaultPlaceholderFormat
     });
-
-    public getFormat(): string {
-        return this.format.value || this.columnFormat || this.defaultFormat;
-    }
-
-    public setColumnFormat(format: string) {
-        if (!format) {
-            return;
-        }
-
-        this.columnFormat = format;
-    }
 
     constructor(defaultFormatDescriptor?: FormatDescriptor){
         super(defaultFormatDescriptor);

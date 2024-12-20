@@ -25,6 +25,7 @@
  */
 import powerbi from "powerbi-visuals-api";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import FormattingSettingsSlice = formattingSettings.Slice;
@@ -83,6 +84,17 @@ export class ChartDescriptor extends BaseDescriptor implements IDescriptor {
                 this.thickness,
             ),
         );
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+
+        this.slices.forEach((slice) => {
+            if (slice instanceof ColorPicker){
+                slice.visible = isHighContrast ? false : slice.visible;
+                slice.value = isHighContrast ? colorPalette.foreground : slice.value;
+            }
+        })
     }
 
     public setLocalizedDisplayName(localizationManager: ILocalizationManager): void {

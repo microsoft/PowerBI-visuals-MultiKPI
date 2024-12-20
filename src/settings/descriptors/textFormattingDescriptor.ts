@@ -34,6 +34,7 @@ import ColorPicker = formattingSettings.ColorPicker;
 import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import ValidatorType = powerbi.visuals.ValidatorType;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { NumericDescriptor } from "./numericDescriptor";
 
@@ -43,10 +44,6 @@ export class TextFormattingDescriptor extends NumericDescriptor {
     public defaultFontSize: number = 8;
     public defaultFontFamily: string = "Segoe UI, wf_segoe-ui_normal, helvetica, arial, sans-serif";
     public defaultFontColor: string = "#666666";
-
-    public isBold: boolean = false;
-    public isItalic: boolean = false;
-    public isUnderlined: boolean = false;
 
     protected minFontSize: number = 4;
     protected maxFontSize: number = 72;
@@ -68,14 +65,33 @@ export class TextFormattingDescriptor extends NumericDescriptor {
 
     public fontFamily: FontPicker = new FontPicker({
         name: "fontFamily",
+        displayNameKey: "Visual_FontFamily",
         value: this.defaultFontFamily
+    });
+
+    public isBold: ToggleSwitch = new ToggleSwitch({
+        name: "bold",
+        value: false
+    });
+
+    public isItalic: ToggleSwitch = new ToggleSwitch({
+        name: "italic",
+        value: false
+    });
+
+    public isUnderlined: ToggleSwitch = new ToggleSwitch({
+        name: "underline",
+        value: false,
     });
 
     public font: FontControl = new FontControl({
         name: "font",
         displayNameKey: "Visual_Font",
         fontFamily: this.fontFamily,
-        fontSize: this.fontSize
+        fontSize: this.fontSize,
+        bold: this.isBold,
+        italic: this.isItalic,
+        underline: this.isUnderlined
     });
 
     public color: ColorPicker = new ColorPicker({
@@ -93,6 +109,12 @@ export class TextFormattingDescriptor extends NumericDescriptor {
     public parse(): void {
         super.parse();
         this.font.fontSize.value = this.getValidFontSize(this.font.fontSize.value);
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+        this.color.visible = isHighContrast ? false : this.color.visible;
+        this.color.value = isHighContrast ? colorPalette.foreground : this.color.value;
     }
 
     public get fontSizePx(): string {
@@ -123,6 +145,9 @@ export class TextFormattingDescriptor extends NumericDescriptor {
         if (defaultTextDescriptor){
             this.fontSize.value = defaultTextDescriptor.fontSize.value;
             this.fontFamily.value = defaultTextDescriptor.fontFamily.value;
+            this.isBold.value = defaultTextDescriptor.isBold.value;
+            this.isItalic.value = defaultTextDescriptor.isItalic.value;
+            this.isUnderlined.value = defaultTextDescriptor.isUnderlined.value;
             this.color.value = defaultTextDescriptor.color.value;
             this.autoAdjustFontSize.value = defaultTextDescriptor.autoAdjustFontSize.value;
         }

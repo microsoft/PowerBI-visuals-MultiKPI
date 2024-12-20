@@ -36,7 +36,7 @@ import { GridDescriptor } from "../gridDescriptor";
 import { BaseContainerDescriptor } from "../container/baseContainerDescriptor";
 
 export class SparklineContainerItem extends BaseDescriptor implements IDescriptor{
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     private minPosition: number = 1;
     private maxPosition: number = GridDescriptor.MaxColumns + 1;

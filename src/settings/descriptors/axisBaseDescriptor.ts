@@ -31,13 +31,11 @@ import {BaseContainerDescriptor} from "../descriptors/container/baseContainerDes
 import { TextFormattingDescriptor } from "./textFormattingDescriptor";
 
 export class AxisBaseContainerItem extends TextFormattingDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
+    public defaultDomainColor: string = "#4F4F4F"
     
     public axisLabelX: number = 3;
     public axisLabelY: number = 6;
-
-    public defaultMin: number = null;
-    public defaultMax: number = null;
 
     public min = new NumUpDown({
         name: "min",
@@ -56,18 +54,6 @@ export class AxisBaseContainerItem extends TextFormattingDescriptor {
         this.precision, this.font, this.color,
         this.min, this.max
     ];
-
-    public getMin(): number {
-        return this.min.value == null
-            ? this.defaultMin
-            : this.min.value;
-    }
-
-    public getMax(): number {
-        return this.max.value == null
-            ? this.defaultMax
-            : this.max.value;
-    }
 
     constructor(defaultAxisContainerItem?: AxisBaseContainerItem){
         super(defaultAxisContainerItem);

@@ -33,6 +33,7 @@ import NumUpDown = formattingSettings.NumUpDown;
 import { TextFormattingDescriptor } from "../textFormattingDescriptor";
 
 import ValidatorType = powerbi.visuals.ValidatorType;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 export class KpiBaseDescriptor extends TextFormattingDescriptor {
     public defaultIsShown: boolean = true;
@@ -211,6 +212,18 @@ export class KpiBaseDescriptor extends TextFormattingDescriptor {
     public parse(): void{
         super.parse();
         this.setValidFontSize();
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        super.processHighContrastMode(colorPalette);
+
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+        this.slices.forEach((slice) => {
+            if (slice instanceof ColorPicker){
+                slice.visible = isHighContrast ? false : slice.visible;
+                slice.value = isHighContrast ? colorPalette.foreground : slice.value
+            }
+        });
     }
 
     private setValidFontSize(): void {

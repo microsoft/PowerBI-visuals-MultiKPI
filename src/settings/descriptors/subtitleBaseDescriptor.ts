@@ -26,9 +26,12 @@
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import TextInput = formattingSettings.TextInput;
 import ColorPicker = formattingSettings.ColorPicker;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 import AlignmentGroup = formattingSettings.AlignmentGroup;
 
 import { TextFormattingDescriptor } from "./textFormattingDescriptor";
+
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 export enum SubtitleAlignment {
     left = "left",
@@ -37,7 +40,7 @@ export enum SubtitleAlignment {
 }
 
 export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     public defaultTitleText: string = "";
     public defaultBackgroundColor: string = "";
@@ -75,6 +78,12 @@ export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
         value: this.defaultWarningText,
         placeholder: this.defaultWarningText
     });
+
+    public show: ToggleSwitch = new ToggleSwitch({
+        name: "show",
+        displayNameKey: "Visual_Show",
+        value: true
+    });
     
     constructor(defaultSubtitleDescriptor?: SubtitleBaseContainerItem){
         super(defaultSubtitleDescriptor);
@@ -84,10 +93,19 @@ export class SubtitleBaseContainerItem extends TextFormattingDescriptor {
             this.backgroundColor.value = defaultSubtitleDescriptor.backgroundColor.value;
             this.alignment.value = defaultSubtitleDescriptor.alignment.value;
             this.warningText.value = defaultSubtitleDescriptor.warningText.value;
+            this.show.value = defaultSubtitleDescriptor.show.value;
         }
         else {
             this.color.value.value = this.defaultFontColor;
             this.font.fontFamily.value = this.defaultFontFamily;
         }
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        super.processHighContrastMode(colorPalette);
+
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+        this.backgroundColor.visible = isHighContrast ? false : this.backgroundColor.visible;
+        this.backgroundColor.value = isHighContrast ? colorPalette.background : this.backgroundColor.value;
     }
 }

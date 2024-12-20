@@ -102,7 +102,7 @@ export class MainChartComponent extends BaseContainerComponent<
     }
 
     private initMouseEvents(): void {
-        const eventDispatcher: Dispatch<any> = this.constructorOptions.eventDispatcher;
+        const eventDispatcher: Dispatch<object> = this.constructorOptions.eventDispatcher;
 
         function onMouseMove(event) {
             event.preventDefault();

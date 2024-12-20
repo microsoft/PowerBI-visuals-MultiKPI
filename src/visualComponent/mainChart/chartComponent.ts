@@ -25,8 +25,9 @@
  */
 
 import { bisector } from "d3-array";
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType } from "d3-selection";
 import { line } from "d3-shape";
+type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
 
 import powerbi from "powerbi-visuals-api";
 import IViewport = powerbi.IViewport;
@@ -98,7 +99,7 @@ export class ChartComponent extends BaseContainerComponent<
 
     private className: string = "chartComponent";
 
-    private zeroLineSelection: Selection<any, any, any, any>;
+    private zeroLineSelection: Selection;
 
     private axisComponent: IVisualComponent<IAxisComponentRenderOptions>;
     private lineComponent: IVisualComponent<ILineComponentRenderOptions>;
@@ -153,9 +154,7 @@ export class ChartComponent extends BaseContainerComponent<
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onMouseOut}.${this.className}`,
             () => {
-                const latestDataPoint: IDataRepresentationPoint = this.renderOptions
-                    && this.renderOptions.series
-                    && this.renderOptions.series.current;
+                const latestDataPoint: IDataRepresentationPoint = this.renderOptions?.series?.current;
 
                 this.constructorOptions.eventDispatcher.call(
                     EventName.onCurrentDataPointIndexReset,
@@ -246,7 +245,7 @@ export class ChartComponent extends BaseContainerComponent<
     private hideComponents(): void {
         this.forEach(
             this.dynamicComponents,
-            (component: IVisualComponent<any>) => {
+            (component: IVisualComponent<IVerticalReferenceLineComponentRenderOptions>) => {
                 component.hide();
             });
     }

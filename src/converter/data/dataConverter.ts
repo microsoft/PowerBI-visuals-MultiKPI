@@ -27,7 +27,7 @@
 import powerbi from "powerbi-visuals-api";
 import DataView = powerbi.DataView;
 import IViewport = powerbi.IViewport;
-import DataViewObjects = powerbi.DataViewObjects;
+import PrimitiveValue = powerbi.PrimitiveValue;
 import DataViewValueColumn = powerbi.DataViewValueColumn;
 import DataViewValueColumns = powerbi.DataViewValueColumns;
 import DataViewCategoryColumn= powerbi.DataViewCategoryColumn;
@@ -73,7 +73,7 @@ import {
 
 export interface IColumnGroup {
     name: string;
-    values: any[];
+    values: PrimitiveValue[];
     columns: (DataViewValueColumn | DataViewCategoryColumn)[];
 }
 
@@ -164,15 +164,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     public isDataViewValid(dataView: DataView): boolean {
-        return !!(dataView
-            && dataView.categorical
-            && dataView.categorical.categories
-            && dataView.categorical.categories[0]
-            && dataView.categorical.categories[0].values
-            && dataView.categorical.categories[0].values.length
-            && dataView.categorical.values
-            && dataView.categorical.values.length
-        );
+        return !!(dataView?.categorical?.categories?.[0]?.values?.length && dataView?.categorical?.values?.length);
     }
 
     protected getColumnGroupByRole(
@@ -253,7 +245,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
             return;
         }
 
-        settings.date.setColumnFormat(dateColumnGroup.columns[0].source.format);
+        settings.date.format.value = settings.date.format.value ?? dateColumnGroup.columns[0].source.format;
 
         const tooltipColumnGroup: IColumnGroup = columnGroupByRole[tooltipColumn.name];
 
@@ -314,26 +306,24 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                 seriesItem.x.min = this.getMin(seriesItem.x.min, x);
                 seriesItem.x.max = this.getMax(seriesItem.x.max, x);
                 this.setupYMinMax(y, seriesItem);
-                const tooltip: string = tooltipColumnGroup && tooltipColumnGroup.values && tooltipColumnGroup.values[columnIndex] || undefined;
+                const tooltip: string = tooltipColumnGroup?.values?.[columnIndex].toString();
                 dataRepresentation.series[columnIndex].tooltip = tooltip;
             }
         });
 
         const subtitleColumnGroup: IColumnGroup = columnGroupByRole[subtitleColumn.name];
         if (subtitleColumnGroup) {
-            dataRepresentation.subtitle = subtitleColumnGroup.values[0];
+            dataRepresentation.subtitle = subtitleColumnGroup.values[0].toString();
         }
 
         const warningColumnGroup: IColumnGroup = columnGroupByRole[warningStateColumn.name];
         if (warningColumnGroup) {
-            dataRepresentation.warningState = warningColumnGroup.values[0];
+            dataRepresentation.warningState = <number>warningColumnGroup.values[0];
         }
 
         const changeStartDateColumnGroup: IColumnGroup = columnGroupByRole[changeStartDateColumn.name];
         if (changeStartDateColumnGroup) {
-            const date: Date = changeStartDateColumnGroup
-                && changeStartDateColumnGroup.values
-                && changeStartDateColumnGroup.values[0];
+            const date: Date = <Date>changeStartDateColumnGroup?.values?.[0];
 
             dataRepresentation.percentCalcDate = date instanceof Date ? date : dataRepresentation.percentCalcDate;
         }
@@ -422,7 +412,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         dataRepresentation.staleDateDifference = 0;
 
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
-            if (series.current && series.current.x) {
+            if (series?.current?.x) {
                 series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
                 if (series.staleDateDifference > dataRepresentation.staleDateDifference) {
                     dataRepresentation.staleDateDifference = series.staleDateDifference;
@@ -446,8 +436,8 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
             this.applyScale(series.y, series.settings.yAxis);
 
             if (series.settings.sparklineYAxis.shouldInheritValues.value) {
-                series.settings.sparklineYAxis.defaultMin = series.settings.yAxis.getMin();
-                series.settings.sparklineYAxis.defaultMax = series.settings.yAxis.getMax();
+                series.settings.sparklineYAxis.min.value = series.settings.sparklineYAxis.min.value ?? series.settings.yAxis.min.value;
+                series.settings.sparklineYAxis.max.value = series.settings.sparklineYAxis.max.value ?? series.settings.yAxis.max.value;
             }
 
             this.applyScale(series.ySparkline, series.settings.sparklineYAxis);
@@ -466,7 +456,7 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
                     secondDataPoint: endDataPoint,
                 });
 
-            series.formattedDate = getFormattedDate(startDataPoint.x, settings.date.getFormat());
+            series.formattedDate = getFormattedDate(startDataPoint.x, settings.date.format.value);
             series.formattedVariance = getFormattedValueWithFallback(series.variance, series.settings.variance);
 
             series.dateDifference = this.getDaysBetween(endDataPoint.x, startDataPoint.x);
@@ -507,20 +497,18 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         axis: IDataRepresentationAxis,
         axisDescriptor: AxisBaseContainerItem,
     ) {
-        if ((!isNaN(<number>(axisDescriptor.min.value)) && axisDescriptor.min.value !== null)
-            || (!isNaN(<number>(axisDescriptor.defaultMin)) && axisDescriptor.defaultMin !== null)) {
-            axis.min = axisDescriptor.getMin();
+        if (!isNaN(<number>(axisDescriptor.min.value)) && axisDescriptor.min.value !== null) {
+            axis.min = axisDescriptor.min.value;
         }
         else if (!isNaN(<number>(axis.min)) && axis.min !== null) {
-            axisDescriptor.defaultMin = <number>axis.min;
+            axisDescriptor.min.value = <number>axis.min;
         }
 
-        if ((!isNaN(<number>(axisDescriptor.max.value)) && axisDescriptor.max.value !== null)
-            || (!isNaN(<number>(axisDescriptor.defaultMax)) && axisDescriptor.defaultMax !== null)) {
-            axis.max = axisDescriptor.getMax();
+        if (!isNaN(<number>(axisDescriptor.max.value)) && axisDescriptor.max.value !== null) {
+            axis.max = axisDescriptor.max.value;
         } else if (!isNaN(<number>(axis.max)) && axis.max !== null) {
-            axisDescriptor.defaultMax = (<number>(axis.max)) + (<number>(axis.max)) * this.increasedDomainValueInPercentage;
-            axis.max = axisDescriptor.defaultMax;
+            axisDescriptor.max.value = (<number>(axis.max)) + (<number>(axis.max)) * this.increasedDomainValueInPercentage;
+            axis.max = axisDescriptor.max.value;
         }
 
         if (axis.min > axis.max) {
@@ -577,9 +565,9 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         return value != null;
     }
 
-    private parseValue(value: number, treatEmptyValuesAsZero: boolean): number {
-        if (isFinite(value) && value != null) {
-            return value;
+    private parseValue(value: PrimitiveValue, treatEmptyValuesAsZero: boolean): number {
+        if (isFinite(<number>value) && value != null) {
+            return <number>value;
         }
 
         if (treatEmptyValuesAsZero) {

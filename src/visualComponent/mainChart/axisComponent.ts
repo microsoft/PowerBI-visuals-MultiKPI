@@ -57,6 +57,8 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
     constructor(options: IVisualComponentConstructorOptions) {
         super();
 
+        this.constructorOptions = options;
+
         this.initElement(
             options.element,
             "axisComponent",
@@ -67,7 +69,7 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
     public render(options: IAxisComponentRenderOptions): void {
         const { settings } = options;
 
-        if (settings.shouldBeShown) {
+        if (settings.isShown.value) {
             this.show();
             this.renderComponent(options);
         } else {
@@ -90,12 +92,12 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
 
         const axisValueFormatter: valueFormatter.IValueFormatter = valueFormatter.create({
             displayUnitSystemType: 2,
-            format: settings.getFormat(),
+            format: settings.format.value,
             precision: detectPrecision(domain[1] || domain[0], settings),
             value: settings.displayUnits.value || domain[1] || domain[0],
         });
 
-        const yAxis = axisRight(<ScaleLinear<number, number>>(yScale.getScale()))
+        const yAxis: (selection) => void = axisRight(<ScaleLinear<number, number>>(yScale.getScale()))
             .tickValues(domain)
             .tickFormat((value: number) => {
                 return axisValueFormatter.format(value);
@@ -111,8 +113,16 @@ export class AxisComponent extends BaseComponent<IVisualComponentConstructorOpti
                     .attr("y", elementIndex
                         ? settings.axisLabelY
                         : -settings.axisLabelY)
-                    .style("fill", settings.color.value.value);
+                    .style("fill", settings.color.value.value)
+                    .style("font-weight", settings.isBold.value ? "bold" : "normal")
+                    .style("font-style", settings.isItalic.value ? "italic" : "normal")
+                    .style("text-decoration", settings.isUnderlined.value ? "underline" : "none")
             });
+
+        const isHighContrast: boolean = this.constructorOptions.colorPalette.isHighContrast;
+        this.element
+            .select("path.domain")
+            .style("stroke", isHighContrast ? settings.color.value.value : settings.defaultDomainColor);
 
         this.updateFormatting(this.element, settings);
     }

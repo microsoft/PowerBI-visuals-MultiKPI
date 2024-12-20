@@ -24,8 +24,6 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
-
 import powerbi from "powerbi-visuals-api";
 import IViewport = powerbi.IViewport;
 
@@ -63,7 +61,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     public render(options: ISubtitleComponentRenderOptions): void {
         const { subtitleSettings: settings, subtitle } = options;
 
-        if (settings.shouldBeShown) {
+        if (settings.show.value && settings.isShown.value) {
             this.show();
             this.renderComponent(settings, subtitle);
         } else {
@@ -83,21 +81,14 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     }
 
     private renderComponent(settings: SubtitleBaseContainerItem, subtitle?: string): void {
-        const subtitleSelection: Selection<any, any, any, any> = this.element
-            .selectAll(this.subtitleSelector.selectorName)
-            .data(settings.shouldBeShown ? [[]] : []);
-
-        subtitleSelection
-            .exit()
-            .remove();
-    
         const subtitleText: string = `${settings.titleText.value}${(subtitle ?? "")}`;
 
-        subtitleSelection
-            .enter()
-            .append("div")
+        // subtitle selection
+        this.element
+            .selectAll(this.subtitleSelector.selectorName)
+            .data(settings.show.value && settings.isShown.value ? [[]] : [])
+            .join("div")
             .classed(this.subtitleSelector.className, true)
-            .merge(subtitleSelection)
             .text(subtitleText)
             .style("text-align", settings.alignment.value);
 

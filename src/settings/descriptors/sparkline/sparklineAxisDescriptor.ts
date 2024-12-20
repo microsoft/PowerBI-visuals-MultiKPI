@@ -48,7 +48,7 @@ export class SparklineAxisContainerItem extends AxisBaseContainerItem {
 
 export class SparklineAxisDescriptor extends AxisBaseDescriptor<SparklineAxisContainerItem> {
     public name: string = "sparklineYAxis";
-    public displayNameKey: string = "VIsual_SparklineYAxis";
+    public displayNameKey: string = "Visual_SparklineYAxis";
 
     public getNewContainerItem(defaultContainerItem: SparklineAxisContainerItem): SparklineAxisContainerItem {
         return new SparklineAxisContainerItem(defaultContainerItem);

@@ -31,7 +31,7 @@ import { NumericDescriptor } from "./numericDescriptor";
 import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
 export class VarianceContainerItem extends NumericDescriptor {
-    public displayName: string = "All";
+    public displayNameKey: string = "Visual_All";
 
     public shouldCalculateDifference: ToggleSwitch = new ToggleSwitch({
         name: "shouldCalculateDifference",

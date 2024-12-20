@@ -30,6 +30,8 @@ import NumUpDown = formattingSettings.NumUpDown;
 import ColorPicker = formattingSettings.ColorPicker;
 import TextInput = formattingSettings.TextInput;
 
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
+
 import { BaseDescriptor } from "./baseDescriptor";
 
 export class StaleDataDescriptor extends BaseDescriptor {
@@ -79,4 +81,14 @@ export class StaleDataDescriptor extends BaseDescriptor {
         this.staleDataText, this.deductThresholdDays,
         this.staleDataThreshold, this.color, this.backgroundColor
     ];
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+
+        this.color.visible = isHighContrast ? false : this.color.visible;
+        this.color.value = isHighContrast ? colorPalette.foreground : this.color.value;
+
+        this.backgroundColor.visible = isHighContrast ? false : this.backgroundColor.visible;
+        this.backgroundColor.value = isHighContrast ? colorPalette.foreground : this.backgroundColor.value;
+    }
 }

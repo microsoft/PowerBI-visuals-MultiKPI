@@ -123,16 +123,11 @@ export class RootComponent extends BaseContainerComponent<
     }
 
     public render(options: IVisualComponentRenderOptions) {
-        const previousViewportSize: ViewportSize = this.renderOptions
-            && this.renderOptions.data
-            && this.renderOptions.data.viewportSize;
+        const previousViewportSize: ViewportSize = this.renderOptions?.data?.viewportSize;
 
         this.renderOptions = options;
 
-        if (options
-            && options.data
-            && options.data.series
-            && options.data.series.length
+        if (options?.data?.series?.length
         ) {
             this.show();
             this.renderComponent(options);
@@ -144,12 +139,6 @@ export class RootComponent extends BaseContainerComponent<
             options.data.viewportSize,
             previousViewportSize,
         );
-
-        if (this.isExecutedInPhantomJs()) {
-            this.turnOnPrintMode();
-        } else {
-            this.turnOffPrintMode();
-        }
     }
 
     public destroy(): void {
@@ -303,33 +292,15 @@ export class RootComponent extends BaseContainerComponent<
     }
 
     private bindPrintEvents(): void {
-        try {
-            if (!window
-                || !window.addEventListener
-                || !("onbeforeprint" in <any>window)
-                || !("onafterprint" in <any>window)
-            ) {
-                return;
-            }
+        if (!window?.addEventListener
+            || !("onbeforeprint" in window)
+            || !("onafterprint" in window)
+        ) {
+            return;
+        }
 
-            window.addEventListener("beforeprint", this.turnOnPrintMode.bind(this));
-            window.addEventListener("afterprint", this.turnOffPrintMode.bind(this));
-        }
-        catch (_) {
-            // No need to handle this exception as CVs do not have any logger so far
-        }
-    }
-
-    /**
-     * We detect Phantom JS in order to detect PBI Snapshot Service
-     * This is required to force Print Mode in Snapshot Service
-     */
-    private isExecutedInPhantomJs(): boolean {
-        try {
-            return /PhantomJS/.test(window.navigator.userAgent);
-        } catch (_) {
-            return false;
-        }
+        window.addEventListener("beforeprint", this.turnOnPrintMode.bind(this));
+        window.addEventListener("afterprint", this.turnOffPrintMode.bind(this));
     }
 
     private onChartChangeClickHandler(seriesName: string): void {
@@ -349,10 +320,7 @@ export class RootComponent extends BaseContainerComponent<
         seriesName: string,
         coordinates: number[],
     ): void {
-        const toggleSparklineOnHover: boolean = this.renderOptions
-            && this.renderOptions.settings
-            && this.renderOptions.settings.grid
-            && this.renderOptions.settings.grid.toggleSparklineOnHover.value;
+        const toggleSparklineOnHover: boolean = this.renderOptions?.settings?.grid?.toggleSparklineOnHover.value;
 
         if (!toggleSparklineOnHover) {
             return;

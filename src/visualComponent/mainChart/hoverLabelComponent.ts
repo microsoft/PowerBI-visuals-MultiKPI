@@ -103,7 +103,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
         );
 
         const isVarianceValid: boolean = isValueValid(variance);
-        const tooltipText: string = series && series.formattedTooltip || null;
+        const tooltipText: string = series?.formattedTooltip || null;
         let tooltipDataItems: VisualTooltipDataItem[];
 
         if (tooltipText) {
@@ -155,7 +155,7 @@ export class HoverLabelComponent extends ChartLabelBaseComponent<IHoverLabelComp
             },
             {
                 color: kpiOnHoverSettings.dateColor.value.value,
-                data: getFormattedDate(dataPoint.x, dateSettings.getFormat()),
+                data: getFormattedDate(dataPoint.x, dateSettings.format.value),
                 fontSizeInPt: kpiOnHoverSettings.autoAdjustFontSize.value
                     ? null
                     : kpiOnHoverSettings.dateFontSize.value,

@@ -147,13 +147,13 @@ describe("Multi KPI", () => {
                 expect(actualValue).toBe(expectedValue);
             });
 
-            it("should return 1.23K% for 12.34312 if precision is auto and display units are thousand and default format in percents", () => {
+            it("should return 1.23K% for 12.34312 if precision is auto and display units are thousand and format in percents", () => {
                 const value: number = 12.34312;
                 const expectedValue: string = "+1.23K%";
                 const numericDescriptor: NumericDescriptor = new NumericDescriptor();
                 numericDescriptor.autoPrecision = true;
                 numericDescriptor.displayUnits.value = 1000;
-                numericDescriptor.defaultFormat = "+0.00%;-0.00%;0.00%";
+                numericDescriptor.format.value = "+0.00%;-0.00%;0.00%";
                 numericDescriptor.precision.value = 5;
 
                 const actualValue: string = getFormattedValueWithFallback(
@@ -180,12 +180,12 @@ describe("Multi KPI", () => {
                 expect(actualValue).toBe(expectedValue);
             });
 
-            it("should return 87.7% for 0.87712 if precision is auto and display units are auto and default format in percents", () => {
+            it("should return 87.7% for 0.87712 if precision is auto and display units are auto and format in percents", () => {
                 const value: number = 0.87712;
                 const expectedValue: string = "+87.7%";
                 const numericDescriptor: NumericDescriptor = new NumericDescriptor();
                 numericDescriptor.autoPrecision = true;
-                numericDescriptor.defaultFormat = "+0.00%;-0.00%;0.00%";
+                numericDescriptor.format.value = "+0.00%;-0.00%;0.00%";
                 numericDescriptor.precision.value = 5;
 
                 const actualValue: string = getFormattedValueWithFallback(
@@ -196,12 +196,12 @@ describe("Multi KPI", () => {
                 expect(actualValue).toBe(expectedValue);
             });
 
-            it("should return 7.43% for 0.0742712 if precision is auto and display units are auto and column format in percents", () => {
+            it("should return 7.43% for 0.0742712 if precision is auto and display units are auto and format in percents", () => {
                 const value: number = 0.0742712;
                 const expectedValue: string = "+7.43%";
                 const numericDescriptor: NumericDescriptor = new NumericDescriptor();
                 numericDescriptor.autoPrecision = true;
-                numericDescriptor.columnFormat = "+0.00%;-0.00%;0.00%";
+                numericDescriptor.format.value = "+0.00%;-0.00%;0.00%";
                 numericDescriptor.precision.value = 5;
 
                 const actualValue: string = getFormattedValueWithFallback(
@@ -212,12 +212,12 @@ describe("Multi KPI", () => {
                 expect(actualValue).toBe(expectedValue);
             });
 
-            it("should return -0.02% for -0.00293312 if precision is auto and display units are auto and column format in percents", () => {
+            it("should return -0.02% for -0.00293312 if precision is auto and display units are auto and format in percents", () => {
                 const value: number = -0.000243312;
                 const expectedValue: string = "-0.02%";
                 const numericDescriptor: NumericDescriptor = new NumericDescriptor();
                 numericDescriptor.autoPrecision = true;
-                numericDescriptor.columnFormat = "+0.00%;-0.00%;0.00%";
+                numericDescriptor.format.value = "+0.00%;-0.00%;0.00%";
                 numericDescriptor.precision.value = 5;
 
                 const actualValue: string = getFormattedValueWithFallback(
@@ -1018,7 +1018,9 @@ describe("Multi KPI", () => {
     describe("DataFormatter", () => {
         describe("getFormattedVariance", () => {
             it("should return N/A if a variance is not valid", () => {
-                expect(getFormattedValueWithFallback(NaN, null)).toBe("N/A");
+                const numericDescriptor: NumericDescriptor = new NumericDescriptor();
+                numericDescriptor.noValueLabel.value = null;
+                expect(getFormattedValueWithFallback(NaN, numericDescriptor)).toBe("N/A");
             });
 
             it("should return 12.34K if precision is 2 and display units are 1000", () => {

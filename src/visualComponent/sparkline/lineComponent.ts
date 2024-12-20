@@ -24,7 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType } from "d3-selection";
+type Selection<T> = d3Selection<BaseType, T, BaseType, unknown>;
 import { area, Area, line, Line } from "d3-shape";
 
 import powerbi from "powerbi-visuals-api";
@@ -73,7 +74,7 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
     private lineSelector: CssConstants.ClassAndSelector = this.getSelectorWithPrefix("line");
 
     private gradientId: string = `${this.className}_gradient${this.getId()}`;
-    private gradientSelection: Selection<any, any, any, any>;
+    private gradientSelection: Selection<unknown>;
 
     constructor(options: IVisualComponentConstructorOptions) {
         super();
@@ -209,18 +210,12 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             .copy()
             .range([viewport.height, 0]);
 
-        const lineSelection = this.element
+        // line selection
+        this.element
             .selectAll(this.lineSelector.selectorName)
-            .data([options]);
-
-        lineSelection
-            .exit()
-            .remove();
-
-        lineSelection.enter()
-            .append("svg:path")
+            .data([options])
+            .join("svg:path")
             .classed(this.lineSelector.className, true)
-            .merge(lineSelection)
             .attr("d", (lineRenderOptions: ILineComponentRenderOptions) => {
                 const points: IDataRepresentationPoint[] = this.getValidPoints(lineRenderOptions.points);
 
@@ -317,25 +312,18 @@ export class LineComponent extends BaseComponent<IVisualComponentConstructorOpti
             return;
         }
 
-        const stopSelection: Selection<any, ILineComponentGradient, any, any> = this.gradientSelection
+        //stop selection
+        this.gradientSelection
             .selectAll("stop")
-            .data(gradients);
-
-        stopSelection
-            .exit()
-            .remove();
-
-        stopSelection
-            .enter()
-            .append("stop")
-            .merge(stopSelection)
+            .data(gradients)
+            .join("stop")
             .attr("offset", (gradient: ILineComponentGradient) => gradient.offset)
             .style("stop-color", (gradient: ILineComponentGradient) => gradient.color)
             .style("stop-opacity", 1);
     }
 
     private getId(): string {
-        const crypto: Crypto = window.crypto || (<any>window).msCrypto;
+        const crypto: Crypto = window.crypto;
         const generatedIds: Uint32Array = new Uint32Array(2);
 
         crypto.getRandomValues(generatedIds);

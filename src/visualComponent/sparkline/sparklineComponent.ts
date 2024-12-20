@@ -47,12 +47,12 @@ export interface ISparklineComponentRenderOptions {
     position: number;
 }
 
-type SparklineComponentsRenderOptions = ISubtitleComponentRenderOptions | ISubtitleComponentRenderOptions;
+type SparklineComponentsRenderOptions = ISparklineComponentRenderOptions | ISubtitleComponentRenderOptions;
 export class SparklineComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, ISparklineComponentRenderOptions, SparklineComponentsRenderOptions> {
     private className: string = "sparklineComponent";
 
     private topLabelComponent: IVisualComponent<ISubtitleComponentRenderOptions>;
-    private plotComponent: IVisualComponent<any>;
+    private plotComponent: IVisualComponent<ISparklineComponentRenderOptions>;
     private bottomLabelComponent: IVisualComponent<ISubtitleComponentRenderOptions>;
 
     constructor(options: IVisualComponentConstructorOptions) {
@@ -76,7 +76,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             this.constructorOptions.eventDispatcher.call(
                 EventName.onChartChangeClick,
                 undefined,
-                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name,
+                this.renderOptions?.current?.name,
             );
         });
 
@@ -123,7 +123,7 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
             }
             this.renderComponent(this.renderOptions);
 
-            const tooltipText: string = current && current.formattedTooltip || null;
+            const tooltipText: string = current?.formattedTooltip || null;
 
             this.constructorOptions.tooltipServiceWrapper.addTooltip(
                 this.element,
@@ -165,24 +165,13 @@ export class SparklineComponent extends BaseContainerComponent<IVisualComponentC
     }
 
     private onCurrentDataPointIndexChange(index: number): void {
-        const current: IDataRepresentationPoint = this.renderOptions
-            && this.renderOptions.current
-            && this.renderOptions.current.points
-            && this.renderOptions.current.points[index];
+        const current: IDataRepresentationPoint = this.renderOptions?.current?.points?.[index];
 
-        const sparklineValue: SparklineValueContainerItem = this.renderOptions
-            && this.renderOptions.current
-            && this.renderOptions.current.settings
-            && this.renderOptions.current.settings.sparklineValue;
+        const sparklineValue: SparklineValueContainerItem = this.renderOptions?.current?.settings?.sparklineValue;
 
-        const viewportSize: ViewportSize = this.renderOptions
-            && this.renderOptions.dataRepresentation
-            && this.renderOptions.dataRepresentation.viewportSize;
+        const viewportSize: ViewportSize = this.renderOptions?.dataRepresentation?.viewportSize;
 
-        const valuesSettings: ValuesContainerItem = this.renderOptions
-            && this.renderOptions.current
-            && this.renderOptions.current.settings
-            && this.renderOptions.current.settings.values;
+        const valuesSettings: ValuesContainerItem = this.renderOptions?.current?.settings?.values;
 
         if (current && sparklineValue) {
             setTimeout(this.renderBottomLabel.bind(this, current.y, viewportSize, sparklineValue, valuesSettings));

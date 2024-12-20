@@ -27,6 +27,7 @@ import powerbi from "powerbi-visuals-api";
 import DataViewMetadataColumn = powerbi.DataViewMetadataColumn;
 import ISelectionId = powerbi.visuals.ISelectionId;
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import FormattingSettingsModel = formattingSettings.Model;
@@ -45,15 +46,13 @@ import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDe
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
 import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
-import { SubtitleItemContainer } from "./descriptors/subtitleDescriptor";
+import { SubtitleContainerItem } from "./descriptors/subtitleDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
 import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
 import { IDescriptor } from "./descriptors/descriptor";
-import { AxisBaseContainerItem } from "./descriptors/axisBaseDescriptor";
 import { BaseContainerDescriptor } from "./descriptors/container/baseContainerDescriptor";
 import { SeriesSettings } from "./seriesSettings";
-import { FormatDescriptor } from "./descriptors/formatDescriptor";
 
 export class Settings extends FormattingSettingsModel {
     public date: DateDescriptor = new DateDescriptor();
@@ -70,7 +69,7 @@ export class Settings extends FormattingSettingsModel {
     public sparklineChart: SparklineChartDescriptor = new SparklineChartDescriptor();
     public sparklineYAxis: SparklineAxisDescriptor = new SparklineAxisDescriptor();
     public sparklineValue: SparklineValueDescriptor = new SparklineValueDescriptor();
-    public subtitle: SubtitleItemContainer = new SubtitleItemContainer();
+    public subtitle: SubtitleContainerItem = new SubtitleContainerItem();
     public staleData: StaleDataDescriptor = new StaleDataDescriptor();
     public printMode: PrintDescriptor = new PrintDescriptor();
 
@@ -83,15 +82,14 @@ export class Settings extends FormattingSettingsModel {
         this.subtitle, this.staleData, this.printMode
     ]
 
-    public parse(): void {
+    public parse(colorPalette: ISandboxExtendedColorPalette, localizationManager: ILocalizationManager): void {
         if (this.staleData.staleDataText.value === "") {
             this.staleData.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
         }
 
-        if (!this.subtitle.shouldBeShown) {
+        if (!this.subtitle.show.value) {
             this.staleData.isShown.value = false;
         }
-
 
         this.cards.forEach((card) => {
             const settings: IDescriptor = card as IDescriptor;
@@ -99,22 +97,15 @@ export class Settings extends FormattingSettingsModel {
             if (settings.parse) {
                 settings.parse();
             }
-        });
-    }
 
-    public updateFormatPropertyValue(): void {
-        this.cards.forEach((card) => {
-            if (card instanceof BaseContainerDescriptor){
-                card.container.containerItems.forEach((item) => {
-                    if (item instanceof FormatDescriptor){
-                        item.format.value = item.getFormat();
-                    }
-                    if (item instanceof AxisBaseContainerItem){
-                        item.min.value = item.getMin();
-                        item.max.value = item.getMax();   
-                    }
-                })
+            if (settings.processHighContrastMode) {
+                settings.processHighContrastMode(colorPalette);
             }
+
+            if (settings.setLocalizedDisplayName) {
+                settings.setLocalizedDisplayName(localizationManager);
+            }
+
         });
     }
 
@@ -138,15 +129,5 @@ export class Settings extends FormattingSettingsModel {
         
         currentSettings.staleData = this.staleData;
         return currentSettings;
-    }
-
-    public setLocalizedOptions(localizationManager: ILocalizationManager): void {
-        this.cards.forEach((card) => {
-            const settings: IDescriptor = card as IDescriptor;
-    
-            if (settings.setLocalizedDisplayName) {
-                settings.setLocalizedDisplayName(localizationManager);
-            }
-        });
     }
 }

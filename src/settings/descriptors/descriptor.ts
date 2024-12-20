@@ -25,9 +25,11 @@
  */
 import powerbi from "powerbi-visuals-api";
 import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 export interface IDescriptor {
     parse?(): void;
     setDefault?(): void;
     setLocalizedDisplayName?(localizationManager: ILocalizationManager): void;
+    processHighContrastMode?(colorPalette: ISandboxExtendedColorPalette): void;
 }
