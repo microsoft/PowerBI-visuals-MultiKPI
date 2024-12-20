@@ -90,14 +90,6 @@ export class KpiOnHoverDescriptor extends KpiBaseDescriptor {
         this.currentValueFontSize.value = this.getValidFontSize(this.currentValueFontSize.value);
     }
 
-    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
-        super.processHighContrastMode(colorPalette);
-
-        const isHighContrast: boolean = colorPalette.isHighContrast;
-        this.currentValueColor.visible = isHighContrast ? false : this.currentValueColor.visible;
-        this.currentValueColor.value = isHighContrast ? colorPalette.foreground : this.currentValueColor.value;
-    }
-
     onPreProcess(): void {
         super.onPreProcess();
 
