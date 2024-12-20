@@ -1,3 +1,10 @@
+## 3.0.0.0
+* API 5.11.0
+* Migrate to formatting model
+* Add high contrast mode
+* Add localization
+* Update packages
+
 ## 2.3.1
 * FIX (Regression): Hovering on sparklines did not cause changing of main grap for preview
 

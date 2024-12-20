@@ -1,41 +1,48 @@
 {
-  "dataRoles": [{
-    "displayName": "Date",
-    "name": "dateColumn",
-    "kind": "Grouping"
-  }, {
-    "displayName": "Values",
-    "name": "valueColumn",
-    "kind": "Measure",
-    "requiredTypes": [{
-      "numeric": true
-    }, {
-      "integer": true
-    }]
-  }, {
-    "displayName": "Warning state",
-    "name": "warningStateColumn",
-    "kind": "Measure"
-  }, {
-    "displayName": "Tooltip",
-    "name": "tooltipColumn",
-    "kind": "GroupingOrMeasure"
-  }, {
-    "displayName": "Change start date",
-    "name": "changeStartDateColumn",
-    "kind": "Grouping"
-  }, {
-    "displayName": "Subtitle",
-    "name": "subtitleColumn",
-    "kind": "Measure"
-  }],
+  "dataRoles": [
+    {
+      "displayName": "Date",
+      "name": "dateColumn",
+      "kind": "Grouping"
+    },
+    {
+      "displayName": "Values",
+      "name": "valueColumn",
+      "kind": "Measure",
+      "requiredTypes": [
+        {
+          "numeric": true
+        },
+        {
+          "integer": true
+        }
+      ]
+    },
+    {
+      "displayName": "Warning state",
+      "name": "warningStateColumn",
+      "kind": "Measure"
+    },
+    {
+      "displayName": "Tooltip",
+      "name": "tooltipColumn",
+      "kind": "GroupingOrMeasure"
+    },
+    {
+      "displayName": "Change start date",
+      "name": "changeStartDateColumn",
+      "kind": "Grouping"
+    },
+    {
+      "displayName": "Subtitle",
+      "name": "subtitleColumn",
+      "kind": "Measure"
+    }
+  ],
   "objects": {
     "date": {
-      "displayName": "Date",
       "properties": {
         "format": {
-          "displayName": "Format",
-          "placeHolderText": "Auto",
           "type": {
             "text": true
           }
@@ -43,17 +50,13 @@
       }
     },
     "values": {
-      "displayName": "Values",
       "properties": {
         "format": {
-          "displayName": "Format",
-          "placeHolderText": "Auto",
           "type": {
             "text": true
           }
         },
         "displayUnits": {
-          "displayName": "Display Units",
           "type": {
             "formatting": {
               "labelDisplayUnits": true
@@ -61,31 +64,26 @@
           }
         },
         "autoPrecision": {
-          "displayName": "Auto precision",
           "type": {
             "bool": true
           }
         },
         "precision": {
-          "displayName": "Precision",
           "type": {
             "numeric": true
           }
         },
         "treatEmptyValuesAsZero": {
-          "displayName": "Treat Empty/Missing Values As Zero",
           "type": {
             "bool": true
           }
         },
         "showLatterAvailableValue": {
-          "displayName": "Show Latest Available As Current Value",
           "type": {
             "bool": true
           }
         },
         "noValueLabel": {
-          "displayName": "Missing Value Label",
           "placeHolderText": "N/A",
           "type": {
             "text": true
@@ -94,17 +92,13 @@
       }
     },
     "variance": {
-      "displayName": "Variance",
       "properties": {
         "format": {
-          "displayName": "Format",
-          "placeHolderText": "Auto",
           "type": {
             "text": true
           }
         },
         "displayUnits": {
-          "displayName": "Display Units",
           "type": {
             "formatting": {
               "labelDisplayUnits": true
@@ -112,27 +106,21 @@
           }
         },
         "autoPrecision": {
-          "displayName": "Auto precision",
           "type": {
             "bool": true
           }
         },
         "precision": {
-          "displayName": "Precision",
           "type": {
             "numeric": true
           }
         },
         "shouldCalculateDifference": {
-          "displayName": "Calculate Difference",
-          "description": "Calculates a difference instead of growth",
           "type": {
             "bool": true
           }
         },
         "noValueLabel": {
-          "displayName": "Missing Variance Label",
-          "placeHolderText": "N/A",
           "type": {
             "text": true
           }
@@ -140,16 +128,13 @@
       }
     },
     "yAxis": {
-      "displayName": "Y Axis",
       "properties": {
         "isShown": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "color": {
-          "displayName": "Font Color",
           "type": {
             "fill": {
               "solid": {
@@ -159,28 +144,38 @@
           }
         },
         "fontSize": {
-          "displayName": "Text Size",
           "type": {
             "numeric": true
           }
         },
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
             }
           }
         },
+        "bold": {
+          "type": {
+            "bool": true
+          }
+        },
+        "italic": {
+          "type": {
+            "bool": true
+          }
+        },
+        "underline": {
+          "type": {
+            "bool": true
+          }
+        },
         "format": {
-          "displayName": "Format",
-          "placeHolderText": "Auto",
           "type": {
             "text": true
           }
         },
         "displayUnits": {
-          "displayName": "Display Units",
           "type": {
             "formatting": {
               "labelDisplayUnits": true
@@ -188,25 +183,21 @@
           }
         },
         "autoPrecision": {
-          "displayName": "Auto precision",
           "type": {
             "bool": true
           }
         },
         "precision": {
-          "displayName": "Precision",
           "type": {
             "numeric": true
           }
         },
         "min": {
-          "displayName": "Min",
           "type": {
             "numeric": true
           }
         },
         "max": {
-          "displayName": "Max",
           "type": {
             "numeric": true
           }
@@ -214,22 +205,13 @@
       }
     },
     "chart": {
-      "displayName": "Main Chart",
       "properties": {
         "chartType": {
-          "displayName": "Type",
           "type": {
-            "enumeration": [{
-              "value": "area",
-              "displayName": "Area"
-            }, {
-              "value": "line",
-              "displayName": "Line"
-            }]
+            "enumeration": []
           }
         },
         "color": {
-          "displayName": "Color",
           "type": {
             "fill": {
               "solid": {
@@ -239,7 +221,6 @@
           }
         },
         "alternativeColor": {
-          "displayName": "Alternative Color",
           "type": {
             "fill": {
               "solid": {
@@ -249,7 +230,6 @@
           }
         },
         "shouldRenderZeroLine": {
-          "displayName": "Zero line",
           "type": {
             "bool": true
           }
@@ -257,34 +237,28 @@
       }
     },
     "tooltip": {
-      "displayName": "Tooltip",
       "properties": {
         "isShown": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "label": {
-          "displayName": "Label",
           "type": {
             "text": true
           }
         },
         "showDateDifference": {
-          "displayName": "Date Difference",
           "type": {
             "bool": true
           }
         },
         "showVariance": {
-          "displayName": "Variance",
           "type": {
             "bool": true
           }
         },
         "showDate": {
-          "displayName": "Date",
           "type": {
             "bool": true
           }
@@ -292,10 +266,8 @@
       }
     },
     "kpi": {
-      "displayName": "KPI",
       "properties": {
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
@@ -303,25 +275,21 @@
           }
         },
         "autoAdjustFontSize": {
-          "displayName": "Auto Font Size",
           "type": {
             "bool": true
           }
         },
         "percentCalcDateStr": {
-          "displayName": "Change start date",
           "type": {
             "text": true
           }
         },
         "isSeriesNameShown": {
-          "displayName": "Name",
           "type": {
             "bool": true
           }
         },
         "seriesNameColor": {
-          "displayName": "Name Color",
           "type": {
             "fill": {
               "solid": {
@@ -331,19 +299,16 @@
           }
         },
         "seriesNameFontSize": {
-          "displayName": "Series Name Font Size",
           "type": {
             "numeric": true
           }
         },
         "isValueShown": {
-          "displayName": "Value ",
           "type": {
             "bool": true
           }
         },
         "valueColor": {
-          "displayName": "Value Color",
           "type": {
             "fill": {
               "solid": {
@@ -353,19 +318,16 @@
           }
         },
         "valueFontSize": {
-          "displayName": "Value Font Size",
           "type": {
             "numeric": true
           }
         },
         "isVarianceShown": {
-          "displayName": "Variance",
           "type": {
             "bool": true
           }
         },
         "varianceColor": {
-          "displayName": "Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -375,7 +337,6 @@
           }
         },
         "varianceNotAvailableColor": {
-          "displayName": "Missing Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -385,25 +346,21 @@
           }
         },
         "varianceFontSize": {
-          "displayName": "Variance Font Size",
           "type": {
             "numeric": true
           }
         },
         "varianceNotAvailableFontSize": {
-          "displayName": "Missing Variance Font Size",
           "type": {
             "numeric": true
           }
         },
         "isDateShown": {
-          "displayName": "Date",
           "type": {
             "bool": true
           }
         },
         "dateColor": {
-          "displayName": "Date Color",
           "type": {
             "fill": {
               "solid": {
@@ -413,7 +370,6 @@
           }
         },
         "dateFontSize": {
-          "displayName": "Date Font Size",
           "type": {
             "numeric": true
           }
@@ -421,10 +377,8 @@
       }
     },
     "kpiOnHover": {
-      "displayName": "KPI On Hover",
       "properties": {
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
@@ -432,25 +386,21 @@
           }
         },
         "autoAdjustFontSize": {
-          "displayName": "Auto Font Size",
           "type": {
             "bool": true
           }
         },
         "percentCalcDateStr": {
-          "displayName": "Change start date",
           "type": {
             "text": true
           }
         },
         "isSeriesNameShown": {
-          "displayName": "Name",
           "type": {
             "bool": true
           }
         },
         "seriesNameColor": {
-          "displayName": "Name Color",
           "type": {
             "fill": {
               "solid": {
@@ -460,19 +410,16 @@
           }
         },
         "seriesNameFontSize": {
-          "displayName": "Series Name Font Size",
           "type": {
             "numeric": true
           }
         },
         "isValueShown": {
-          "displayName": "Value ",
           "type": {
             "bool": true
           }
         },
         "valueColor": {
-          "displayName": "Value Color",
           "type": {
             "fill": {
               "solid": {
@@ -482,19 +429,16 @@
           }
         },
         "valueFontSize": {
-          "displayName": "Value Font Size",
           "type": {
             "numeric": true
           }
         },
         "isVarianceShown": {
-          "displayName": "Variance",
           "type": {
             "bool": true
           }
         },
         "varianceColor": {
-          "displayName": "Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -504,7 +448,6 @@
           }
         },
         "varianceNotAvailableColor": {
-          "displayName": "Missing Variance Color",
           "type": {
             "fill": {
               "solid": {
@@ -514,25 +457,21 @@
           }
         },
         "varianceFontSize": {
-          "displayName": "Variance Font Size",
           "type": {
             "numeric": true
           }
         },
         "varianceNotAvailableFontSize": {
-          "displayName": "Missing Variance Font Size",
           "type": {
             "numeric": true
           }
         },
         "isDateShown": {
-          "displayName": "Date",
           "type": {
             "bool": true
           }
         },
         "dateColor": {
-          "displayName": "Date Color",
           "type": {
             "fill": {
               "solid": {
@@ -542,31 +481,26 @@
           }
         },
         "dateFontSize": {
-          "displayName": "Date Font Size",
           "type": {
             "numeric": true
           }
         },
         "isCurrentValueLeftAligned": {
-          "displayName": "Current Value Is Left Aligned",
           "type": {
             "bool": true
           }
         },
         "isCurrentValueShown": {
-          "displayName": "Current Value",
           "type": {
             "bool": true
           }
         },
         "currentValueFontSize": {
-          "displayName": "Current Value Font Size",
           "type": {
             "numeric": true
           }
         },
         "currentValueColor": {
-          "displayName": "Current Value Color",
           "type": {
             "fill": {
               "solid": {
@@ -578,18 +512,14 @@
       }
     },
     "grid": {
-      "displayName": "Sparkline Grid",
       "properties": {
         "columns": {
-          "displayName": "Columns",
           "placeHolderText": "Auto",
           "type": {
             "numeric": true
           }
         },
         "toggleSparklineOnHover": {
-          "displayName": "Toggle Sparkline On Hover",
-          "description": "Toggle Sparkline to the main chart on hover event",
           "type": {
             "bool": true
           }
@@ -597,10 +527,8 @@
       }
     },
     "sparkline": {
-      "displayName": "Sparkline",
       "properties": {
         "position": {
-          "displayName": "Position",
           "type": {
             "numeric": true
           }
@@ -608,16 +536,13 @@
       }
     },
     "sparklineLabel": {
-      "displayName": "Sparkline Name",
       "properties": {
         "isShown": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "color": {
-          "displayName": "Font Color",
           "type": {
             "fill": {
               "solid": {
@@ -627,7 +552,6 @@
           }
         },
         "alignment": {
-          "displayName": "Alignment",
           "type": {
             "formatting": {
               "alignment": true
@@ -635,27 +559,38 @@
           }
         },
         "autoAdjustFontSize": {
-          "displayName": "Auto Font Size",
           "type": {
             "bool": true
           }
         },
         "fontSize": {
-          "displayName": "Text Size",
           "type": {
             "numeric": true
           }
         },
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
             }
           }
         },
+        "bold": {
+          "type": {
+            "bool": true
+          }
+        },
+        "italic": {
+          "type": {
+            "bool": true
+          }
+        },
+        "underline": {
+          "type": {
+            "bool": true
+          }
+        },
         "position": {
-          "displayName": "Position",
           "type": {
             "numeric": true
           }
@@ -663,10 +598,8 @@
       }
     },
     "sparklineChart": {
-      "displayName": "Sparkline Chart",
       "properties": {
         "color": {
-          "displayName": "Color",
           "type": {
             "fill": {
               "solid": {
@@ -676,7 +609,6 @@
           }
         },
         "alternativeColor": {
-          "displayName": "Alternative Color",
           "type": {
             "fill": {
               "solid": {
@@ -686,7 +618,6 @@
           }
         },
         "shouldInterpolate": {
-          "displayName": "Interpolate",
           "type": {
             "bool": true
           }
@@ -694,16 +625,13 @@
       }
     },
     "sparklineValue": {
-      "displayName": "Sparkline Value",
       "properties": {
         "isShown": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "color": {
-          "displayName": "Font Color",
           "type": {
             "fill": {
               "solid": {
@@ -713,7 +641,6 @@
           }
         },
         "alignment": {
-          "displayName": "Alignment",
           "type": {
             "formatting": {
               "alignment": true
@@ -721,19 +648,16 @@
           }
         },
         "autoAdjustFontSize": {
-          "displayName": "Auto Font Size",
           "type": {
             "bool": true
           }
         },
         "fontSize": {
-          "displayName": "Text Size",
           "type": {
             "numeric": true
           }
         },
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
@@ -741,14 +665,11 @@
           }
         },
         "format": {
-          "displayName": "Format",
-          "placeHolderText": "Auto",
           "type": {
             "text": true
           }
         },
         "displayUnits": {
-          "displayName": "Display Units",
           "type": {
             "formatting": {
               "labelDisplayUnits": true
@@ -756,13 +677,11 @@
           }
         },
         "autoPrecision": {
-          "displayName": "Auto precision",
           "type": {
             "bool": true
           }
         },
         "precision": {
-          "displayName": "Precision",
           "type": {
             "numeric": true
           }
@@ -770,16 +689,13 @@
       }
     },
     "sparklineYAxis": {
-      "displayName": "Sparkline Y Axis",
       "properties": {
         "isShown": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "color": {
-          "displayName": "Font Color",
           "type": {
             "fill": {
               "solid": {
@@ -789,28 +705,38 @@
           }
         },
         "fontSize": {
-          "displayName": "Text Size",
           "type": {
             "numeric": true
           }
         },
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
             }
           }
         },
+        "bold": {
+          "type": {
+            "bool": true
+          }
+        },
+        "italic": {
+          "type": {
+            "bool": true
+          }
+        },
+        "underline": {
+          "type": {
+            "bool": true
+          }
+        },
         "format": {
-          "displayName": "Format",
-          "placeHolderText": "Auto",
           "type": {
             "text": true
           }
         },
         "displayUnits": {
-          "displayName": "Display Units",
           "type": {
             "formatting": {
               "labelDisplayUnits": true
@@ -818,31 +744,26 @@
           }
         },
         "autoPrecision": {
-          "displayName": "Auto precision",
           "type": {
             "bool": true
           }
         },
         "precision": {
-          "displayName": "Precision",
           "type": {
             "numeric": true
           }
         },
         "shouldInheritValues": {
-          "displayName": "Inherit Min/Max from Y Axis",
           "type": {
             "bool": true
           }
         },
         "min": {
-          "displayName": "Min",
           "type": {
             "numeric": true
           }
         },
         "max": {
-          "displayName": "Max",
           "type": {
             "numeric": true
           }
@@ -850,23 +771,19 @@
       }
     },
     "subtitle": {
-      "displayName": "Subtitle",
       "properties": {
         "show": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "titleText": {
-          "displayName": "Title Text",
           "type": {
             "text": true
           },
           "suppressFormatPainterCopy": true
         },
         "color": {
-          "displayName": "Font Color",
           "type": {
             "fill": {
               "solid": {
@@ -876,7 +793,6 @@
           }
         },
         "background": {
-          "displayName": "Background Color",
           "type": {
             "fill": {
               "solid": {
@@ -888,7 +804,6 @@
           }
         },
         "alignment": {
-          "displayName": "Alignment",
           "type": {
             "formatting": {
               "alignment": true
@@ -896,27 +811,38 @@
           }
         },
         "fontSize": {
-          "displayName": "Text Size",
           "type": {
             "numeric": true
           }
         },
         "fontFamily": {
-          "displayName": "Font Family",
           "type": {
             "formatting": {
               "fontFamily": true
             }
           }
         },
+        "bold": {
+          "type": {
+            "bool": true
+          }
+        },
+        "italic": {
+          "type": {
+            "bool": true
+          }
+        },
+        "underline": {
+          "type": {
+            "bool": true
+          }
+        },
         "warningText": {
-          "displayName": "Warning",
           "type": {
             "text": true
           }
         },
         "staleDataText": {
-          "displayName": "Stale Data Text",
           "type": {
             "text": true
           }
@@ -924,37 +850,28 @@
       }
     },
     "staleData": {
-      "displayName": "Stale Data",
-      "description": "To turn on Stale Data make sure to turn on Subtitle first",
       "properties": {
         "isShown": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
         },
         "staleDataText": {
-          "displayName": "Title",
-          "description": "Use ${1} to indicate where to put a date difference to indicate how old data is",
           "type": {
             "text": true
           }
         },
         "staleDataThreshold": {
-          "displayName": "Threshold (days)",
-          "description": "Data is stale if data is older than some number of days from now",
           "type": {
             "numeric": true
           }
         },
         "deductThresholdDays": {
-          "displayName": "Deduct Threshold Days",
           "type": {
             "bool": true
           }
         },
         "color": {
-          "displayName": "Color (for all only)",
           "type": {
             "fill": {
               "solid": {
@@ -964,7 +881,6 @@
           }
         },
         "background": {
-          "displayName": "Background Color (for all only)",
           "type": {
             "fill": {
               "solid": {
@@ -978,11 +894,8 @@
       }
     },
     "printMode": {
-      "displayName": "Print Mode",
-      "description": "Print Mode forces black color in Snapshot Service and Browser Print View",
       "properties": {
         "show": {
-          "displayName": "Show",
           "type": {
             "bool": true
           }
@@ -990,93 +903,109 @@
       }
     }
   },
-  "dataViewMappings": [{
-    "conditions": [{
-      "dateColumn": {
-        "max": 1
-      },
-      "valueColumn": {
-        "max": 0
-      },
-      "warningStateColumn": {
-        "max": 0
-      },
-      "tooltipColumn": {
-        "max": 0
-      },
-      "changeStartDateColumn": {
-        "max": 0
-      },
-      "subtitleColumn": {
-        "max": 0
-      }
-    }, {
-      "dateColumn": {
-        "max": 1
-      },
-      "valueColumn": {
-        "min": 0,
-        "max": 16
-      },
-      "warningStateColumn": {
-        "max": 1
-      },
-      "tooltipColumn": {
-        "min": 0,
-        "max": 16
-      },
-      "changeStartDateColumn": {
-        "max": 1
-      },
-      "subtitleColumn": {
-        "max": 1
-      }
-    }],
-    "categorical": {
-      "categories": {
-        "select": [{
-          "for": {
-            "in": "dateColumn"
+  "dataViewMappings": [
+    {
+      "conditions": [
+        {
+          "dateColumn": {
+            "max": 1
+          },
+          "valueColumn": {
+            "max": 0
+          },
+          "warningStateColumn": {
+            "max": 0
+          },
+          "tooltipColumn": {
+            "max": 0
+          },
+          "changeStartDateColumn": {
+            "max": 0
+          },
+          "subtitleColumn": {
+            "max": 0
           }
-        }, {
-          "for": {
-            "in": "tooltipColumn"
-          }
-        }, {
-          "for": {
-            "in": "changeStartDateColumn"
-          }
-        }, {
-          "for": {
-            "in": "subtitleColumn"
-          }
-        }],
-        "dataReductionAlgorithm": {
-          "top": {
-            "count": 30000
+        },
+        {
+          "dateColumn": {
+            "max": 1
+          },
+          "valueColumn": {
+            "min": 0,
+            "max": 16
+          },
+          "warningStateColumn": {
+            "max": 1
+          },
+          "tooltipColumn": {
+            "min": 0,
+            "max": 16
+          },
+          "changeStartDateColumn": {
+            "max": 1
+          },
+          "subtitleColumn": {
+            "max": 1
           }
         }
-      },
-      "values": {
-        "select": [{
-          "for": {
-            "in": "valueColumn"
+      ],
+      "categorical": {
+        "categories": {
+          "select": [
+            {
+              "for": {
+                "in": "dateColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "tooltipColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "changeStartDateColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "subtitleColumn"
+              }
+            }
+          ],
+          "dataReductionAlgorithm": {
+            "top": {
+              "count": 30000
+            }
           }
-        }, {
-          "for": {
-            "in": "warningStateColumn"
-          }
-        }]
+        },
+        "values": {
+          "select": [
+            {
+              "for": {
+                "in": "valueColumn"
+              }
+            },
+            {
+              "for": {
+                "in": "warningStateColumn"
+              }
+            }
+          ]
+        }
       }
     }
-  }],
+  ],
   "sorting": {
     "implicit": {
-      "clauses": [{
-        "role": "dateColumn",
-        "direction": 1
-      }]
+      "clauses": [
+        {
+          "role": "dateColumn",
+          "direction": 1
+        }
+      ]
     }
   },
-  "supportsMultiVisualSelection": true
+  "supportsMultiVisualSelection": true,
+  "privileges": []
 }

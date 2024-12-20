@@ -24,20 +24,18 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
-
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { pixelConverter } from "powerbi-visuals-utils-typeutils";
 
-import { SubtitleDescriptor } from "../settings/descriptors/subtitleDescriptor";
-
 import { BaseComponent } from "./baseComponent";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
+import { SubtitleBaseContainerItem } from "../settings/descriptors/subtitleBaseDescriptor";
 
 export interface ISubtitleComponentRenderOptions {
-    subtitleSettings: SubtitleDescriptor;
+    subtitleSettings: SubtitleBaseContainerItem;
     subtitle?: string;
 }
 
@@ -63,7 +61,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
     public render(options: ISubtitleComponentRenderOptions): void {
         const { subtitleSettings: settings, subtitle } = options;
 
-        if (settings.shouldBeShown) {
+        if (settings.show.value && settings.isShown.value) {
             this.show();
             this.renderComponent(settings, subtitle);
         } else {
@@ -71,7 +69,7 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
         }
     }
 
-    public getViewport(): powerbiVisualsApi.IViewport {
+    public getViewport(): IViewport {
         const height: number = this.element && this.isShown
             ? (<HTMLElement>(this.element.node())).clientHeight
             : 0;
@@ -82,29 +80,22 @@ export class SubtitleComponent extends BaseComponent<IVisualComponentConstructor
         };
     }
 
-    private renderComponent(settings: SubtitleDescriptor, subtitle?: string): void {
-        const subtitleSelection: Selection<any, any, any, any> = this.element
+    private renderComponent(settings: SubtitleBaseContainerItem, subtitle?: string): void {
+        const subtitleText: string = `${settings.titleText.value}${(subtitle ?? "")}`;
+
+        // subtitle selection
+        this.element
             .selectAll(this.subtitleSelector.selectorName)
-            .data(settings.shouldBeShown ? [[]] : []);
-
-        subtitleSelection
-            .exit()
-            .remove();
-
-        const subtitleText: string = `${settings.titleText}${(subtitle ?? "")}`;
-
-        subtitleSelection
-            .enter()
-            .append("div")
+            .data(settings.show.value && settings.isShown.value ? [[]] : [])
+            .join("div")
             .classed(this.subtitleSelector.className, true)
-            .merge(subtitleSelection)
             .text(subtitleText)
-            .style("text-align", settings.alignment);
+            .style("text-align", settings.alignment.value);
 
         this.updateFormatting(this.element, settings);
 
         this.element
-            .style("background-color", settings.background)
+            .style("background-color", settings.backgroundColor.value.value)
             .style("padding-top", settings.paddingTop ?
                 pixelConverter.toString(settings.paddingTop)
                 : null,

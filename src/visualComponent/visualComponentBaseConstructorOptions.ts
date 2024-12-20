@@ -24,8 +24,9 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType} from "d3-selection";
+type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
 
 export interface IVisualComponentBaseConstructorOptions {
-    element?: Selection<any, any, any, any>;
+    element?: Selection;
 }

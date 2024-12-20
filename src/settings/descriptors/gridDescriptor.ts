@@ -23,22 +23,54 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import powerbi from "powerbi-visuals-api";
+import ValidatorType = powerbi.visuals.ValidatorType;
+
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import NumUpDown = formattingSettings.NumUpDown;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import { BaseDescriptor } from "./baseDescriptor";
+import { IDescriptor } from "./descriptor";
 
-export class GridDescriptor extends BaseDescriptor {
+export class GridDescriptor extends BaseDescriptor implements IDescriptor{
     public static MaxColumns: number = 15;
-
-    public columns: number = null;
-    public toggleSparklineOnHover: boolean = true;
+    public name: string = "grid";
+    public displayNameKey: string = "Visual_SparklineGrid";
 
     private minColumns: number = 1;
 
-    public parse() {
-        this.columns = isNaN(this.columns) || this.columns === null
-            ? this.columns
+    public columns: NumUpDown = new NumUpDown({
+        name: "columns",
+        displayNameKey: "Visual_Columns",
+        value: null,
+        options: {
+            minValue: {
+                type: ValidatorType.Min,
+                value: this.minColumns
+            },
+            maxValue: {
+                type: ValidatorType.Max,
+                value: GridDescriptor.MaxColumns
+            }
+        }
+    });
+
+    public toggleSparklineOnHover: ToggleSwitch = new ToggleSwitch({
+        name: "toggleSparklineOnHover",
+        displayNameKey: "Visual_ToggleSparklineOnHover",
+        descriptionKey: "Visual_ToggleSparklineOnHoverDescription",
+        value: true
+    });
+
+    public slices: FormattingSettingsSlice[] = [this.columns, this.toggleSparklineOnHover];
+
+    public parse(): void {
+        this.columns.value = isNaN(this.columns.value) || this.columns.value === null
+            ? this.columns.value
             : Math.max(
-                Math.min(this.columns, GridDescriptor.MaxColumns),
+                Math.min(this.columns.value, GridDescriptor.MaxColumns),
                 this.minColumns,
             );
     }

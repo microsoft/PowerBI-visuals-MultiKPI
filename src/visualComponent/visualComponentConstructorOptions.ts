@@ -25,7 +25,8 @@
  */
 
 import { Dispatch } from "d3-dispatch";
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { ScaleService } from "../services/scaleService";
 import { Settings } from "../settings/settings";
@@ -33,10 +34,10 @@ import { IVisualComponentBaseConstructorOptions } from "./visualComponentBaseCon
 import { ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 
 export interface IVisualComponentConstructorOptions extends IVisualComponentBaseConstructorOptions {
-    eventDispatcher?: Dispatch<any>; // TODO
+    eventDispatcher?: Dispatch<object>; // TODO
     id?: number | string;
     scaleService?: ScaleService;
-    style?: powerbiVisualsApi.extensibility.IColorPalette; // TODO: must be renamed
+    colorPalette?: IColorPalette;
     getSettings?: () => Settings;
     tooltipServiceWrapper?: ITooltipServiceWrapper;
 }

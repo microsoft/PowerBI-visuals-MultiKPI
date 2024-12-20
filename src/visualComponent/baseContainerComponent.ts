@@ -32,7 +32,7 @@ export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptio
 
     protected components: IVisualComponent<ComponentsRenderOptions>[] = [];
 
-    public getComponents(): IVisualComponent<any>[] {
+    public getComponents(): IVisualComponent<ComponentsRenderOptions>[] {
         return this.components;
     }
 
@@ -50,7 +50,7 @@ export abstract class BaseContainerComponent<ConstructorOptionsType, RenderOptio
     public destroy(components: IVisualComponent<ComponentsRenderOptions>[] = this.components): void {
         this.forEach(
             components.splice(0, components.length),
-            (component: IVisualComponent<any>) => {
+            (component: IVisualComponent<ComponentsRenderOptions>) => {
                 component.destroy();
             },
         );

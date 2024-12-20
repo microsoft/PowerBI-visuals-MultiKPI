@@ -23,20 +23,58 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import powerbi from "powerbi-visuals-api";
+import ILocalizationManager = powerbi.extensibility.ILocalizationManager;
+import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
-import { DataRepresentationPointGradientType } from "../../converter/data/dataRepresentation";
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import ItemDropdown = formattingSettings.ItemDropdown;
+import ColorPicker = formattingSettings.ColorPicker;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
+
+import { dataRepresentationOptions, IEnumMemberWithDisplayNameKey } from "../../converter/data/dataRepresentation";
 import { BaseDescriptor } from "./baseDescriptor";
+import { IDescriptor } from "./descriptor";
 
-export class ChartDescriptor extends BaseDescriptor {
-    public chartType: DataRepresentationPointGradientType = DataRepresentationPointGradientType.area;
-    public color: string = "#c8d9ec";
-    public alternativeColor: string = "#f1f5fa";
+export class ChartDescriptor extends BaseDescriptor implements IDescriptor {
+    public name: string = "chart";
+    public displayNameKey: string = "Visual_MainChart";
+
+    public defaultChartType: IEnumMemberWithDisplayNameKey = dataRepresentationOptions[0];
+    public defaultColor: string = "#c8d9ec";
+    public defaultAlternativeColor: string = "#f1f5fa";
     public thickness: number = 2;
-
-    public shouldRenderZeroLine: boolean = false;
 
     private minThickness: number = 0.25;
     private maxThickness: number = 25;
+
+    public chartType: ItemDropdown = new ItemDropdown({
+        name: "chartType",
+        displayNameKey: "Visual_Type",
+        items: dataRepresentationOptions,
+        value: this.defaultChartType
+    });
+
+    public color: ColorPicker = new ColorPicker({
+        name: "color",
+        displayNameKey: "Visual_Color",
+        value: {value: this.defaultColor}
+    });
+
+    public alternativeColor: ColorPicker = new ColorPicker({
+        name: "alternativeColor",
+        displayNameKey: "Visual_AlternativeColor",
+        value: {value: this.defaultAlternativeColor}
+    });
+
+    public shouldRenderZeroLine: ToggleSwitch = new ToggleSwitch({
+        name: "shouldRenderZeroLine",
+        displayNameKey: "Visual_ZeroLine",
+        value: false
+    });
+
+    public slices: FormattingSettingsSlice[] = [this.chartType, this.color, this.alternativeColor, this.shouldRenderZeroLine];
 
     public parse(): void {
         this.thickness = Math.max(
@@ -46,5 +84,22 @@ export class ChartDescriptor extends BaseDescriptor {
                 this.thickness,
             ),
         );
+    }
+
+    public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
+        const isHighContrast: boolean = colorPalette.isHighContrast;
+
+        this.slices.forEach((slice) => {
+            if (slice instanceof ColorPicker){
+                slice.visible = isHighContrast ? false : slice.visible;
+                slice.value = isHighContrast ? colorPalette.foreground : slice.value;
+            }
+        })
+    }
+
+    public setLocalizedDisplayName(localizationManager: ILocalizationManager): void {
+        dataRepresentationOptions.forEach(option => {
+            option.displayName = localizationManager.getDisplayName(option.key)
+        });
     }
 }

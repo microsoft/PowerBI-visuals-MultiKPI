@@ -23,9 +23,49 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import FormattingSettingsSlice = formattingSettings.Slice;
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
 import { NumericDescriptor } from "./numericDescriptor";
+import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
-export class VarianceDescriptor extends NumericDescriptor {
-    public shouldCalculateDifference: boolean = false;
+export class VarianceContainerItem extends NumericDescriptor {
+    public displayNameKey: string = "Visual_All";
+
+    public shouldCalculateDifference: ToggleSwitch = new ToggleSwitch({
+        name: "shouldCalculateDifference",
+        displayNameKey: "Visual_CalculateDifference",
+        descriptionKey: "Visual_CalculateDifferenceDescription",
+        value: false
+    });
+
+    public slices: FormattingSettingsSlice[] = [
+        this.format, this.noValueLabel, this.displayUnits,
+        this.precision, this.shouldCalculateDifference
+    ];
+
+    constructor(defaultVarianceContainerItem?: VarianceContainerItem){
+        super(defaultVarianceContainerItem);
+        this.noValueLabel.displayNameKey = "Visual_NoVarianceLabel";
+
+        if (defaultVarianceContainerItem){
+            this.shouldCalculateDifference.value = defaultVarianceContainerItem.shouldCalculateDifference.value;
+        }
+    }
+}
+
+export class VarianceDescriptor extends BaseContainerDescriptor<VarianceContainerItem> {
+    public name: string = "variance";
+    public displayNameKey: string = "Visual_Variance";
+
+    constructor(){
+        super();
+        this.defaultContainerItem.format.value = "+0.00%;-0.00%;0.00%";
+        this.defaultContainerItem.precision.value = 2; // It's different because we need to keep the existing behavior
+    }
+
+    public getNewContainerItem(defaultContainerItem: VarianceContainerItem): VarianceContainerItem {
+        return new VarianceContainerItem(defaultContainerItem);
+    }
 }

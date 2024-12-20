@@ -24,7 +24,10 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IEnumMember = powerbi.IEnumMember;
+import IViewport = powerbi.IViewport;
+import ISelectionId = powerbi.visuals.ISelectionId;
 
 import { SeriesSettings } from "../../settings/seriesSettings";
 import { DataRepresentationScale } from "./dataRepresentationScale";
@@ -39,6 +42,15 @@ export enum DataRepresentationPointGradientType {
     line = "line",
     area = "area",
 }
+
+export interface IEnumMemberWithDisplayNameKey extends IEnumMember{
+    key: string;
+}
+
+export const dataRepresentationOptions : IEnumMemberWithDisplayNameKey[] = [
+    {value : DataRepresentationPointGradientType[DataRepresentationPointGradientType.area], displayName : "Area", key: "Visual_Area"},
+    {value : DataRepresentationPointGradientType[DataRepresentationPointGradientType.line], displayName : "Line", key: "Visual_Line"}
+];
 
 export type DataRepresentationAxisValueType = Date | number;
 
@@ -66,7 +78,7 @@ export interface IDataRepresentationSeries {
     staleDateDifference?: number;
     tooltip: string;
     formattedTooltip: string;
-    selectionId: powerbiVisualsApi.visuals.ISelectionId;
+    selectionId: ISelectionId;
     settings: SeriesSettings;
     isLine: boolean; // There is a bag in SVG that hide line that has gradient attachment. The mark indicate to apply workaround
 }
@@ -89,6 +101,6 @@ export interface IDataRepresentation {
     staleDateDifference?: number;
     percentCalcDate: Date;
     subtitle?: string;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
     viewportSize: ViewportSize;
 }

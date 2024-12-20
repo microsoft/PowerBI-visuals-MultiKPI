@@ -77,9 +77,9 @@ export class SparklineGroupComponent
 
         const seriesLength: number = series.length;
 
-        const amountOfComponents: number = isNaN(grid.columns) || !grid.columns
+        const amountOfComponents: number = isNaN(grid.columns.value) || !grid.columns.value
             ? seriesLength
-            : grid.columns;
+            : grid.columns.value;
 
         this.element.style(
             "padding",
@@ -109,8 +109,8 @@ export class SparklineGroupComponent
             (component: IVisualComponent<ISparklineComponentRenderOptions>, componentIndex: number) => {
                 const data: IDataRepresentationSeries = series[componentIndex];
 
-                const position: number = data && data.settings.sparkline.position
-                    ? data.settings.sparkline.position
+                const position: number = data?.settings?.sparkline.position.value
+                    ? data.settings.sparkline.position.value
                     : data
                         ? data.index
                         : componentIndex;

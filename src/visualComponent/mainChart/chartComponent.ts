@@ -25,10 +25,12 @@
  */
 
 import { bisector } from "d3-array";
-import { Selection } from "d3-selection";
+import { Selection as d3Selection, BaseType } from "d3-selection";
 import { line } from "d3-shape";
+type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { IMargin } from "powerbi-visuals-utils-svgutils";
 
@@ -72,12 +74,12 @@ import { HoverLabelComponent } from "./hoverLabelComponent";
 export interface IZeroLineRenderOptions {
     series: IDataRepresentationSeries;
     chart: ChartDescriptor;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
 }
 
 export interface IChartComponentRenderOptions {
     series: IDataRepresentationSeries;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
     settings: Settings;
     viewportSize: ViewportSize;
 }
@@ -86,16 +88,18 @@ export interface IChartComponentInnerRenderOptions extends ILineComponentRenderO
     settings: ChartDescriptor;
 }
 
+export type RootComponentsRenderOptions = IHoverLabelComponentRenderOptions | IAxisComponentRenderOptions | ILineComponentRenderOptions;
+
 export class ChartComponent extends BaseContainerComponent<
     IVisualComponentConstructorOptions,
     IChartComponentRenderOptions,
-    {}
+    RootComponentsRenderOptions
     > {
     private dataBisector = bisector((d: IDataRepresentationPoint) => d.x).left;
 
     private className: string = "chartComponent";
 
-    private zeroLineSelection: Selection<any, any, any, any>;
+    private zeroLineSelection: Selection;
 
     private axisComponent: IVisualComponent<IAxisComponentRenderOptions>;
     private lineComponent: IVisualComponent<ILineComponentRenderOptions>;
@@ -150,9 +154,7 @@ export class ChartComponent extends BaseContainerComponent<
         this.constructorOptions.eventDispatcher.on(
             `${EventName.onMouseOut}.${this.className}`,
             () => {
-                const latestDataPoint: IDataRepresentationPoint = this.renderOptions
-                    && this.renderOptions.series
-                    && this.renderOptions.series.current;
+                const latestDataPoint: IDataRepresentationPoint = this.renderOptions?.series?.current;
 
                 this.constructorOptions.eventDispatcher.call(
                     EventName.onCurrentDataPointIndexReset,
@@ -202,13 +204,13 @@ export class ChartComponent extends BaseContainerComponent<
         });
 
         this.lineComponent.render({
-            alternativeColor: settings.chart.alternativeColor,
-            color: settings.chart.color,
+            alternativeColor: settings.chart.alternativeColor.value.value,
+            color: settings.chart.color.value.value,
             current: series.current,
             isLine: series.isLine,
             points: series.points,
             thickness: settings.chart.thickness,
-            type: series.isLine ? DataRepresentationPointGradientType.line : settings.chart.chartType,
+            type: series.isLine ? DataRepresentationPointGradientType.line : DataRepresentationPointGradientType[settings.chart.chartType.value.value],
             viewport,
             x: series.x,
             y: series.y,
@@ -243,7 +245,7 @@ export class ChartComponent extends BaseContainerComponent<
     private hideComponents(): void {
         this.forEach(
             this.dynamicComponents,
-            (component: IVisualComponent<any>) => {
+            (component: IVisualComponent<IVerticalReferenceLineComponentRenderOptions>) => {
                 component.hide();
             });
     }
@@ -253,7 +255,7 @@ export class ChartComponent extends BaseContainerComponent<
             return NaN;
         }
 
-        const areaScale: powerbiVisualsApi.IViewport = this.constructorOptions.scaleService.getScale();
+        const areaScale: IViewport = this.constructorOptions.scaleService.getScale();
 
         const width: number = this.width;
 
@@ -321,7 +323,7 @@ export class ChartComponent extends BaseContainerComponent<
             .copy()
             .range([viewport.height, 0]);
 
-        if (chart.shouldRenderZeroLine) {
+        if (chart.shouldRenderZeroLine.value) {
             const axisLine = line<IDataRepresentationPoint>()
                 .x((d: IDataRepresentationPoint) => xScale.scale(d.x))
                 .y(() => yScale.scale(0));

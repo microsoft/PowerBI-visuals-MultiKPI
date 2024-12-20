@@ -23,28 +23,26 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-
-import { SettingsBase } from "./settingsBase";
-
-import { AxisDescriptor } from "./descriptors/axisDescriptor";
-import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
-import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
-import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
-import { SubtitleDescriptor } from "./descriptors/subtitleDescriptor";
-import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
-import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
-import { VarianceDescriptor } from "./descriptors/varianceDescriptor";
+import { SparklineAxisContainerItem } from "./descriptors/sparkline/sparklineAxisDescriptor";
+import { SparklineChartContainerItem } from "./descriptors/sparkline/sparklineChartDescriptor";
+import { SparklineContainerItem } from "./descriptors/sparkline/sparklineDescriptor";
+import { TooltipContainerItem } from "./descriptors/tooltipDescriptor";
+import { ValuesContainerItem } from "./descriptors/valuesDescriptor";
+import { VarianceContainerItem } from "./descriptors/varianceDescriptor";
 import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
+import { AxisBaseContainerItem } from "./descriptors/axisBaseDescriptor";
+import { SparklineValueContainerItem } from "./descriptors/sparklineValueDescriptor";
+import { SparklineNameContainerItem } from "./descriptors/sparklineNameDescriptor";
 
-export class SeriesSettings extends SettingsBase {
-    public values: ValuesDescriptor = new ValuesDescriptor();
-    public variance: VarianceDescriptor = new VarianceDescriptor();
-    public yAxis: AxisDescriptor = new AxisDescriptor();
-    public tooltip: TooltipDescriptor = new TooltipDescriptor();
-    public sparkline: SparklineDescriptor = new SparklineDescriptor();
-    public sparklineLabel: SubtitleDescriptor = new SubtitleDescriptor();
-    public sparklineChart: SparklineChartDescriptor = new SparklineChartDescriptor();
-    public sparklineYAxis: SparklineAxisDescriptor = new SparklineAxisDescriptor();
-    public sparklineValue: SubtitleDescriptor = new SubtitleDescriptor();
+export class SeriesSettings {
+    public values: ValuesContainerItem = new ValuesContainerItem();
+    public variance: VarianceContainerItem = new VarianceContainerItem();
+    public yAxis: AxisBaseContainerItem = new AxisBaseContainerItem();
+    public tooltip: TooltipContainerItem = new TooltipContainerItem();
+    public sparkline: SparklineContainerItem = new SparklineContainerItem();
+    public sparklineLabel: SparklineNameContainerItem = new SparklineNameContainerItem();
+    public sparklineChart: SparklineChartContainerItem = new SparklineChartContainerItem();
+    public sparklineYAxis: SparklineAxisContainerItem = new SparklineAxisContainerItem();
+    public sparklineValue: SparklineValueContainerItem = new SparklineValueContainerItem();
     public staleData: StaleDataDescriptor = new StaleDataDescriptor();
 }

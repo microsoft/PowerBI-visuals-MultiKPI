@@ -23,21 +23,23 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import { Selection } from "d3-selection";
-import powerbiVisualsApi from "powerbi-visuals-api";
+import { Selection as d3Selection, BaseType} from "d3-selection";
+type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
+
+import powerbi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { IDataRepresentationSeries } from "../converter/data/dataRepresentation";
 import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor";
-import { SubtitleWarningDescriptor } from "../settings/descriptors/subtitleWarningDescriptor";
 import { ISubtitleComponentRenderOptions, SubtitleComponent } from "./subtitleComponent";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
 
-import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
+import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
+import { SubtitleBaseContainerItem } from "../settings/descriptors/subtitleBaseDescriptor";
 
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
     staleDataDifference: number;
-    subtitleSettings: SubtitleWarningDescriptor;
+    subtitleSettings: SubtitleBaseContainerItem;
     staleDataSettings: StaleDataDescriptor;
     series: IDataRepresentationSeries[];
 }
@@ -69,7 +71,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             staleDataDifference,
         } = options;
 
-        this.renderWarningMessage(warningState, subtitleSettings.warningText);
+        this.renderWarningMessage(warningState, subtitleSettings.warningText.value);
         super.render(options);
         this.renderStaleData(staleDataSettings, series, staleDataDifference);
     }
@@ -94,9 +96,9 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         series: IDataRepresentationSeries[],
         staleDataDifference: number): void {
         const {
-            background,
+            backgroundColor,
             color,
-            shouldBeShown,
+            isShown,
             staleDataText,
             staleDataThreshold,
         } = staleDataSettings;
@@ -109,11 +111,11 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         let tooltipItems: VisualTooltipDataItem[] = [];
 
         const filterItemsFunc = (x: IDataRepresentationSeries) => {
-            if (!x.settings.staleData.isShown) {
+            if (!x.settings.staleData.isShown.value) {
                 return false;
             }
             if (x.staleDateDifference) {
-                return (x.staleDateDifference - x.settings.staleData.staleDataThreshold > 0);
+                return (x.staleDateDifference - x.settings.staleData.staleDataThreshold.value > 0);
             }
             return false;
         };
@@ -132,9 +134,9 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         if (!isTheSameStaledays) {
             tooltipItems = series.filter(filterItemsFunc).map((s) => {
                 const title: string = this.getTitle(
-                    s.settings.staleData.staleDataText,
+                    s.settings.staleData.staleDataText.value,
                     s.staleDateDifference,
-                    s.settings.staleData.deductThresholdDays ? s.settings.staleData.staleDataThreshold : 0,
+                    s.settings.staleData.deductThresholdDays.value ? s.settings.staleData.staleDataThreshold.value : 0,
                 );
 
                 return {
@@ -147,18 +149,18 @@ export class SubtitleWarningComponent extends SubtitleComponent {
                 {
                     displayName: null,
                     value: this.getTitle(
-                        staleDataText,
+                        staleDataText.value,
                         staleDataDifference,
-                        staleDataSettings.deductThresholdDays ? staleDataThreshold : 0,
+                        staleDataSettings.deductThresholdDays.value ? staleDataThreshold.value : 0,
                     ),
                 },
             ];
         }
 
         this.renderIcon({
-            backgroundColor: background,
-            color,
-            isShown: shouldBeShown && isDataStale,
+            backgroundColor: backgroundColor.value.value,
+            color: color.value.value,
+            isShown: isShown && isDataStale,
             selector: this.dataAgeSelector,
             tooltipItems,
         });
@@ -166,8 +168,8 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     private isDataStale(dateDifference: number, series: IDataRepresentationSeries[]): boolean {
         let isStale: boolean = false;
-        series.forEach((s) => {
-            if (dateDifference > s.settings.staleData.staleDataThreshold) {
+        series.forEach((s: IDataRepresentationSeries) => {
+            if (dateDifference > +s.settings.staleData.staleDataThreshold.value) {
                 isStale = true;
             }
         })
@@ -176,7 +178,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
 
     public getTitle(stringTemplate: string, dateDifference: number, staleDataThreshold: number): string {
         const days: number = dateDifference - staleDataThreshold;
-        return stringTemplate && stringTemplate.replace
+        return stringTemplate?.replace
             ? stringTemplate.replace("${1}", `${days}`)
             : stringTemplate;
     }
@@ -188,25 +190,17 @@ export class SubtitleWarningComponent extends SubtitleComponent {
         selector,
         tooltipItems,
     }: IIcon): void {
-        const iconSelection: Selection<any, any, any, any> = this.element
+        const iconSelection: Selection = this.element
             .selectAll(selector.selectorName)
-            .data(isShown ? [1] : []);
-
-        iconSelection
-            .exit()
-            .remove();
-
-        iconSelection
-            .enter()
-            .append("div")
+            .data(isShown ? [1] : [])
+            .join("div")
             .classed(selector.className, true)
-            .merge(iconSelection)
             .style("color", color || null)
             .style("background-color", backgroundColor || null);
 
         this.constructorOptions.tooltipServiceWrapper.addTooltip(
             iconSelection,
-            (data) => tooltipItems ? tooltipItems : null
+            () => tooltipItems ? tooltipItems : null
         );
     }
 }

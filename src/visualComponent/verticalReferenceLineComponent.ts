@@ -24,9 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
-
-import { Selection } from "d3-selection";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
@@ -46,7 +45,7 @@ import { DataRepresentationScale } from "../converter/data/dataRepresentationSca
 
 export interface IVerticalReferenceLineComponentRenderOptions {
     offset: number;
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
     series: IDataRepresentationSeries;
     dataPoint: IDataRepresentationPoint;
     kpiSettings: KpiDescriptor;
@@ -79,21 +78,14 @@ export class VerticalReferenceLineComponent
             .copy()
             .range([offset, viewport.width]);
 
-        const xPosition: number = xScale.scale(dataPoint && dataPoint.x);
+        const xPosition: number = xScale.scale(dataPoint?.x);
 
-        const lineSelection: Selection<any, IDataRepresentationPoint, any, any> = this.element
+        // line selection
+        this.element
             .selectAll(this.lineSelector.selectorName)
-            .data(dataPoint ? [dataPoint] : []);
-
-        lineSelection
-            .exit()
-            .remove();
-
-        lineSelection
-            .enter()
-            .append("line")
+            .data(dataPoint ? [dataPoint] : [])
+            .join("line")
             .classed(this.lineSelector.className, true)
-            .merge(lineSelection)
             .attr("x1", xPosition)
             .attr("x2", xPosition)
             .attr("y1", 0)

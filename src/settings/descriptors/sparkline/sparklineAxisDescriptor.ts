@@ -23,9 +23,42 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import ToggleSwitch = formattingSettings.ToggleSwitch;
 
-import { AxisDescriptor } from "../axisDescriptor";
+import { AxisBaseContainerItem, AxisBaseDescriptor } from "../axisBaseDescriptor";
 
-export class SparklineAxisDescriptor extends AxisDescriptor {
-    public shouldInheritValues: boolean = false;
+export class SparklineAxisContainerItem extends AxisBaseContainerItem {
+    public name: string = "sparklineYAxis";
+
+    public shouldInheritValues: ToggleSwitch = new ToggleSwitch({
+        name: "shouldInheritValues",
+        displayNameKey: "Visual_ShouldInheritValues",
+        value: false
+    });
+
+    constructor(defaultAxisContainerItem?: SparklineAxisContainerItem){
+        super(defaultAxisContainerItem);
+        if (defaultAxisContainerItem){
+            this.shouldInheritValues.value = defaultAxisContainerItem.shouldInheritValues.value;
+        }
+        this.slices.push(this.shouldInheritValues);
+    }
+}
+
+export class SparklineAxisDescriptor extends AxisBaseDescriptor<SparklineAxisContainerItem> {
+    public name: string = "sparklineYAxis";
+    public displayNameKey: string = "Visual_SparklineYAxis";
+
+    public getNewContainerItem(defaultContainerItem: SparklineAxisContainerItem): SparklineAxisContainerItem {
+        return new SparklineAxisContainerItem(defaultContainerItem);
+    }
+
+    constructor(){
+        super();
+
+        this.defaultContainerItem.axisLabelX = 8;
+        this.defaultContainerItem.axisLabelY = 2;
+        this.defaultContainerItem.isShown.value = false;
+    }
 }

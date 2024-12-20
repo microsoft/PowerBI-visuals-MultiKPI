@@ -24,7 +24,9 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
+
 import { IMargin } from "powerbi-visuals-utils-svgutils";
 
 import {
@@ -53,10 +55,11 @@ import { MultiLineComponent } from "./multiLineComponent";
 
 import { isValueValid } from "../../utils/isValueValid";
 
+type SvgComponentsRenderOptions = ISparklineComponentRenderOptions | IAxisComponentRenderOptions | IDotsComponentRenderOptions;
 export class SvgComponent extends BaseContainerComponent<
     IVisualComponentConstructorOptions,
     ISparklineComponentRenderOptions,
-    {}
+    SvgComponentsRenderOptions
     > {
     private className: string = "svgComponentContainer";
 
@@ -106,7 +109,7 @@ export class SvgComponent extends BaseContainerComponent<
                 EventName.onChartChangeHover,
                 undefined,
                 event,
-                this.renderOptions && this.renderOptions.current && this.renderOptions.current.name
+                this.renderOptions?.current?.name
             );
         });
     }
@@ -120,7 +123,7 @@ export class SvgComponent extends BaseContainerComponent<
 
         const margin: IMargin = this.getMarginByThickness(maxThickness);
 
-        const viewport: powerbiVisualsApi.IViewport = {
+        const viewport: IViewport = {
             height: Math.max(0, options.viewport.height - margin.top - margin.bottom),
             width: Math.max(0, options.viewport.width - margin.left - margin.right),
         };
@@ -146,12 +149,7 @@ export class SvgComponent extends BaseContainerComponent<
             y: this.renderOptions.current.ySparkline,
         });
 
-        this.onCurrentDataPointIndexChange(
-            this.renderOptions
-            && this.renderOptions.current
-            && this.renderOptions.current.current
-            && this.renderOptions.current.current.index,
-        );
+        this.onCurrentDataPointIndexChange(this.renderOptions?.current?.current?.index);
     }
 
     public destroy(): void {
@@ -202,9 +200,8 @@ export class SvgComponent extends BaseContainerComponent<
         points: IDataRepresentationPoint[],
         pointIndex: number,
     ): IDataRepresentationPoint {
-        if (points
-            && points.length
-            && pointIndex < points.length
+        if (points?.length
+            && pointIndex < points?.length
         ) {
             for (let index = pointIndex; index >= 0; index--) {
                 const point: IDataRepresentationPoint = points[index];

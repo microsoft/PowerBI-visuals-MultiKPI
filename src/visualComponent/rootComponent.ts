@@ -24,7 +24,8 @@
  *  THE SOFTWARE.
  */
 
-import powerbiVisualsApi from "powerbi-visuals-api";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
 import { pointer as d3Mouse } from "d3-selection";
 
@@ -44,7 +45,13 @@ import { SubtitleWarningComponent } from "./subtitleWarningComponent";
 
 import { ViewportSize } from "../converter/data/dataRepresentation";
 
-export class RootComponent extends BaseContainerComponent<IVisualComponentConstructorOptions, IVisualComponentRenderOptions, any> {
+export type RootComponentsRenderOptions = IVisualComponentRenderOptions | ISubtitleWarningComponentRenderOptions;
+
+export class RootComponent extends BaseContainerComponent<
+    IVisualComponentConstructorOptions,
+    IVisualComponentRenderOptions,
+    RootComponentsRenderOptions
+    > {
     private className: string = "multiKpi";
 
     private printModeClassName: string = this.getClassNameWithPrefix("printMode");
@@ -55,7 +62,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
     private isPrintModeActivated: boolean = false;
 
-    private mainChartComponentViewport: powerbiVisualsApi.IViewport;
+    private mainChartComponentViewport: IViewport;
 
     private onChartChangeDelay: number = 300;
     private onChartChangeTimer: number = null;
@@ -116,16 +123,11 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
     }
 
     public render(options: IVisualComponentRenderOptions) {
-        const previousViewportSize: ViewportSize = this.renderOptions
-            && this.renderOptions.data
-            && this.renderOptions.data.viewportSize;
+        const previousViewportSize: ViewportSize = this.renderOptions?.data?.viewportSize;
 
         this.renderOptions = options;
 
-        if (options
-            && options.data
-            && options.data.series
-            && options.data.series.length
+        if (options?.data?.series?.length
         ) {
             this.show();
             this.renderComponent(options);
@@ -137,12 +139,6 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             options.data.viewportSize,
             previousViewportSize,
         );
-
-        if (this.isExecutedInPhantomJs()) {
-            this.turnOnPrintMode();
-        } else {
-            this.turnOffPrintMode();
-        }
     }
 
     public destroy(): void {
@@ -187,7 +183,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
     }
 
     private getOnChartChangeDelay([x, y]): number {
-        const scale: powerbiVisualsApi.IViewport = this.constructorOptions.scaleService.getScale();
+        const scale: IViewport = this.constructorOptions.scaleService.getScale();
 
         const scaledX: number = x / scale.width;
         const scaledY: number = y / scale.height;
@@ -222,7 +218,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
 
         const viewportFactor: number = this.getViewportFactorByViewportSize(data.viewportSize);
 
-        const viewport: powerbiVisualsApi.IViewport = {
+        const viewport: IViewport = {
             height: options.viewport.height / viewportFactor,
             width: options.viewport.width,
         };
@@ -275,7 +271,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
             || !this.renderOptions
             || !this.renderOptions.settings
             || !this.renderOptions.settings.printMode
-            || !this.renderOptions.settings.printMode.show
+            || !this.renderOptions.settings.printMode.show.value
         ) {
             return;
         }
@@ -296,33 +292,15 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
     }
 
     private bindPrintEvents(): void {
-        try {
-            if (!window
-                || !window.addEventListener
-                || !("onbeforeprint" in <any>window)
-                || !("onafterprint" in <any>window)
-            ) {
-                return;
-            }
+        if (!window?.addEventListener
+            || !("onbeforeprint" in window)
+            || !("onafterprint" in window)
+        ) {
+            return;
+        }
 
-            window.addEventListener("beforeprint", this.turnOnPrintMode.bind(this));
-            window.addEventListener("afterprint", this.turnOffPrintMode.bind(this));
-        }
-        catch (_) {
-            // No need to handle this exception as CVs do not have any logger so far
-        }
-    }
-
-    /**
-     * We detect Phantom JS in order to detect PBI Snapshot Service
-     * This is required to force Print Mode in Snapshot Service
-     */
-    private isExecutedInPhantomJs(): boolean {
-        try {
-            return /PhantomJS/.test(window.navigator.userAgent);
-        } catch (_) {
-            return false;
-        }
+        window.addEventListener("beforeprint", this.turnOnPrintMode.bind(this));
+        window.addEventListener("afterprint", this.turnOffPrintMode.bind(this));
     }
 
     private onChartChangeClickHandler(seriesName: string): void {
@@ -342,10 +320,7 @@ export class RootComponent extends BaseContainerComponent<IVisualComponentConstr
         seriesName: string,
         coordinates: number[],
     ): void {
-        const toggleSparklineOnHover: boolean = this.renderOptions
-            && this.renderOptions.settings
-            && this.renderOptions.settings.grid
-            && this.renderOptions.settings.grid.toggleSparklineOnHover;
+        const toggleSparklineOnHover: boolean = this.renderOptions?.settings?.grid?.toggleSparklineOnHover.value;
 
         if (!toggleSparklineOnHover) {
             return;

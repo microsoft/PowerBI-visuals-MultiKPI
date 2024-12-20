@@ -24,9 +24,9 @@
  *  THE SOFTWARE.
  */
 
-import { Selection } from "d3-selection";
+import powerbi from "powerbi-visuals-api";
+import IViewport = powerbi.IViewport;
 
-import powerbiVisualsApi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 
 import {
@@ -34,7 +34,7 @@ import {
     IDataRepresentationPoint,
 } from "../../converter/data/dataRepresentation";
 
-import { SparklineChartDescriptor } from "../../settings/descriptors/sparkline/sparklineChartDescriptor";
+import { SparklineChartContainerItem } from "../../settings/descriptors/sparkline/sparklineChartDescriptor";
 
 import { BaseComponent } from "../baseComponent";
 import { IVisualComponentConstructorOptions } from "../visualComponentConstructorOptions";
@@ -44,11 +44,11 @@ import { DataRepresentationScale } from "../../converter/data/dataRepresentation
 import { isValueValid } from "../../utils/isValueValid";
 
 export interface IDotsComponentRenderOptions {
-    viewport: powerbiVisualsApi.IViewport;
+    viewport: IViewport;
     x: IDataRepresentationAxis;
     y: IDataRepresentationAxis;
     points: IDataRepresentationPoint[];
-    settings: SparklineChartDescriptor;
+    settings: SparklineChartContainerItem;
 }
 
 export class DotsComponent extends BaseComponent<IVisualComponentConstructorOptions, IDotsComponentRenderOptions> {
@@ -81,25 +81,18 @@ export class DotsComponent extends BaseComponent<IVisualComponentConstructorOpti
             .copy()
             .range([viewport.height, 0]);
 
-        const dotSelection: Selection<any, IDataRepresentationPoint, any, any> = this.element
+        // dots selection
+        this.element
             .selectAll(this.dotSelector.selectorName)
             .data(points.filter((point: IDataRepresentationPoint) => {
                 return point && isValueValid(point.y);
-            }));
-
-        dotSelection
-            .exit()
-            .remove();
-
-        dotSelection
-            .enter()
-            .append("circle")
+            }))
+            .join("circle")
             .classed(this.dotSelector.className, true)
-            .merge(dotSelection)
             .attr("cx", (point: IDataRepresentationPoint) => xScale.scale(point.x))
             .attr("cy", (point: IDataRepresentationPoint) => yScale.scale(point.y))
             .attr("r", settings.getRadius())
-            .style("fill", settings.color);
+            .style("fill", settings.color.value.value);
     }
 
     public clear(): void {

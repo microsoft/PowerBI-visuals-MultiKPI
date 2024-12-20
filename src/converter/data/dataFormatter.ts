@@ -32,10 +32,7 @@ const wholeUnits: displayUnitSystemType.DisplayUnitSystemType = displayUnitSyste
 
 export function getFormattedValueWithFallback(variance: number, settings: NumericDescriptor): string {
     if (!isValueValid(variance)) {
-        if (settings && settings.noValueLabel) {
-            return settings.noValueLabel;
-        }
-        return "N/A";
+        return settings.noValueLabel.value || "N/A";
     }
 
     return getFormattedValue(variance, settings);
@@ -54,17 +51,17 @@ export function getFormattedValue(value: number, settings: NumericDescriptor): s
 export function getValueFormatter(value: number, settings: NumericDescriptor): valueFormatter.IValueFormatter {
     return valueFormatter.create({
         displayUnitSystemType: wholeUnits,
-        format: settings.getFormat(),
+        format: settings.format.value,
         precision: detectPrecision(value, settings),
-        value: settings.displayUnits || value,
+        value: settings.displayUnits.value || value,
     });
 }
 
 export function detectPrecision(inputValue: number, settings: NumericDescriptor): number {
     if (settings.autoPrecision) {
-        const format = settings.format || settings.defaultFormat || settings.columnFormat;
-        return valueFormatter.calculateExactDigitsPrecision(inputValue, format, settings.displayUnits, 3);
+        const format = settings.format.value;
+        return valueFormatter.calculateExactDigitsPrecision(inputValue, format, +settings.displayUnits.value, 3);
     }
 
-    return settings.precision;
+    return settings.precision.value;
 }

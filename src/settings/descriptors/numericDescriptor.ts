@@ -23,24 +23,61 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
+import NumUpDown = formattingSettings.NumUpDown;
+import AutoDropdown = formattingSettings.AutoDropdown;
+import TextInput = formattingSettings.TextInput;
 
 import { IDescriptor } from "./descriptor";
 import { FormatDescriptor } from "./formatDescriptor";
 
-export class NumericDescriptor
-    extends FormatDescriptor
-    implements IDescriptor {
+export enum DisplayUnitsType {
+    Auto = 0,
+    None = 1,
+    Thousands = 1000,
+    Millions = 1000000,
+    Billions = 1000000000,
+    Trillions = 1000000000000
+}
 
-    public noValueLabel: string = "N/A";
-    public displayUnits: number = 0;
-    public precision: number = 0;
+export class NumericDescriptor extends FormatDescriptor implements IDescriptor {
     public autoPrecision: boolean = false;
+    public defaultNoValueLabel: string = "N/A";
 
     protected minPrecision: number = 0;
     protected maxPrecision: number = 17;
 
-    public parse() {
-        this.precision = this.getValidPrecision(this.precision);
+    public noValueLabel: TextInput = new TextInput({
+        name: "noValueLabel",
+        displayNameKey: "Visual_NoValueLabel",
+        value: this.defaultNoValueLabel,
+        placeholder: this.defaultNoValueLabel
+    });
+
+    public displayUnits: AutoDropdown = new AutoDropdown({
+        name: "displayUnits",
+        displayNameKey: "Visual_DisplayUnits",
+        value: DisplayUnitsType.Auto
+    });
+
+    public precision: NumUpDown = new NumUpDown({
+        name: "precision",
+        displayNameKey: "Visual_Precision",
+        value: 0,
+        options: {
+            minValue: {
+                type: powerbi.visuals.ValidatorType.Min,
+                value: this.minPrecision,
+            },
+            maxValue: {
+                type: powerbi.visuals.ValidatorType.Max,
+                value: this.maxPrecision,
+            },
+        }
+    });
+
+    public parse(): void {
+        this.precision.value = this.getValidPrecision(this.precision.value);
     }
 
     protected getValidPrecision(precision: number): number {
@@ -54,16 +91,13 @@ export class NumericDescriptor
         );
     }
 
-    protected hideNumericProperties(): void {
-        Object.defineProperties(this, {
-            displayUnits: {
-                configurable: true,
-                enumerable: false,
-            },
-            precision: {
-                configurable: true,
-                enumerable: false,
-            },
-        });
+    constructor(defaultNumericDescriptor?: NumericDescriptor){
+        super(defaultNumericDescriptor);
+
+        if (defaultNumericDescriptor){
+            this.noValueLabel.value = defaultNumericDescriptor.noValueLabel.value;
+            this.displayUnits.value = defaultNumericDescriptor.displayUnits.value;
+            this.precision.value = defaultNumericDescriptor.precision.value;
+        }
     }
 }

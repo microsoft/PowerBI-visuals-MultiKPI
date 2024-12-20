@@ -79,8 +79,8 @@ export class MultiLineComponent
                 const currentSeries: IDataRepresentationSeries = series[componentIndex];
 
                 component.render({
-                    alternativeColor: currentSeries.settings.sparklineChart.alternativeColor,
-                    color: currentSeries.settings.sparklineChart.color,
+                    alternativeColor: currentSeries.settings.sparklineChart.alternativeColor.value.value,
+                    color: currentSeries.settings.sparklineChart.color.value.value,
                     current: currentSeries.current,
                     isLine: currentSeries.isLine,
                     points: currentSeries.smoothedPoints,

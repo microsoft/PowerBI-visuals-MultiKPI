@@ -28,49 +28,54 @@ import { VisualBuilderBase } from "powerbi-visuals-utils-testutils";
 
 import { MultiKpi } from "../src/multiKpi";
 
-import * as $ from "jquery";
+import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 
 export class MultiKpiBuilder extends VisualBuilderBase<MultiKpi> {
-    protected build(): MultiKpi {
-        return new MultiKpi({
-            element: $(this.element).get(0),
-            host: this.visualHost,
-        });
+    constructor(width: number, height: number) {
+        super(width, height, "multiKpiEA8DA325489E436991F0E411F2D85FF3");
+    }
+
+    protected build(options: VisualConstructorOptions): MultiKpi {
+        return new MultiKpi(options);
     }
 
     public get instance(): MultiKpi {
         return this.visual;
     }
 
-    public get $root(): JQuery {
-        return $(this.element).find(".multiKpi_multiKpi");
+    public get root(): HTMLElement | null {
+        return this.element.querySelector(".multiKpi_multiKpi");
     }
 
-    public get $sparkline(): JQuery {
-        return this.$root.find(".multiKpi_sparklineComponent");
+    public get sparkline(): NodeListOf<HTMLElement> {
+        return this.element.querySelectorAll(".multiKpi_sparklineComponent");
     }
 
-    public get $sparklineSubtitle(): JQuery {
-        return this.$sparkline.find(".multiKpi_subtitleComponent");
+    public get sparklineSubtitle(): NodeListOf<HTMLElement> {
+        return this.element.querySelectorAll(".multiKpi_subtitleComponent");
     }
 
-    public get $sparklineLine(): JQuery {
-        return this.$sparkline.find(".multiKpi_line");
+    public get line(): HTMLElement {
+        return this.element.querySelector(".multiKpi_lineComponent");
     }
 
-    public get $mainChart(): JQuery {
-        return this.$root.find(".multiKpi_mainChartComponent");
+    public get sparklineLine(): NodeListOf<HTMLElement> {
+        return this.element.querySelectorAll(".multiKpi_line");
     }
 
-    public get $mainChartNAVarance(): JQuery {
-        return this.$root.find(".multiKpi_mainChartComponent .multiKpi_chartLabelBaseComponent_body_variance_na");
+    public get mainChart(): HTMLElement | null {
+        return this.element.querySelector(".multiKpi_mainChartComponent");
     }
 
-    public get $subtitle(): JQuery {
-        return this.$root.find(".multiKpi_subtitleWarningComponent");
+    public get mainChartNAVarance(): HTMLElement {
+        return this.element.querySelector(".multiKpi_mainChartComponent .multiKpi_chartLabelBaseComponent_body_variance_na");
     }
 
-    public get $staleIcon(): JQuery {
-        return this.$root.find(".multiKpi_subtitleWarningComponent .multiKpi_dataAge");
+    public get subtitle(): HTMLElement | null {
+        return this.element.querySelector(".multiKpi_subtitleWarningComponent");
+    }
+
+    public get staleIcon(): HTMLElement | null {
+        return this.element.querySelector(".multiKpi_subtitleWarningComponent .multiKpi_dataAge");
     }
 }
