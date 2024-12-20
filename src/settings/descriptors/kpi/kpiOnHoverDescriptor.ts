@@ -25,7 +25,6 @@
  */
 import powerbi from "powerbi-visuals-api";
 import ValidatorType = powerbi.visuals.ValidatorType;
-import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { formattingSettings } from "powerbi-visuals-utils-formattingmodel";
 import ToggleSwitch = formattingSettings.ToggleSwitch;
