@@ -664,6 +664,21 @@
             }
           }
         },
+         "bold": {
+          "type": {
+            "bool": true
+          }
+        },
+        "italic": {
+          "type": {
+            "bool": true
+          }
+        },
+        "underline": {
+          "type": {
+            "bool": true
+          }
+        },
         "format": {
           "type": {
             "text": true
