@@ -1,3 +1,7 @@
+## 3.0.1.0
+### Fixes
+* Add bold, italic and underline to sparkline value
+
 ## 3.0.0.0
 * API 5.11.0
 * Migrate to formatting model
