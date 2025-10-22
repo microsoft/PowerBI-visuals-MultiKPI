@@ -1021,6 +1021,15 @@
       ]
     }
   },
+   "tooltips": {
+        "supportedTypes": {
+            "default": true,
+            "canvas": true
+        },
+        "roles": [
+            "tooltips"
+        ]
+    },
   "supportsMultiVisualSelection": true,
   "privileges": []
 }
