@@ -1,3 +1,26 @@
+## 3.1.1.0
+### Testing
+* Migrate tests from Karma + Webpack to Vite + Vitest (browser mode with Playwright/Chromium)
+* Stub `powerbi-visuals-api` in specs so the ambient `const enum`s survive the esbuild transform
+* Replace Jasmine `done` callbacks with async/await tests built on the new `TestWrapper.render()` helper
+* Replace Istanbul coverage with V8 coverage
+* Remove obsolete specs for per-metric stale data settings, which the formatting model no longer supports
+
+### Scripts
+* Add `test:watch`, `test:coverage` and `test:typecheck` scripts
+* Run the spec type check before every test run
+* Install the Chromium binary from a dedicated `browsers` script (`browsers:ci` adds the Linux system packages) so test runs stay offline-friendly
+
+### CI
+* Provision the browser in its own workflow step before running the tests
+* Scope the audit to shipped dependencies (`npm audit --audit-level=high --omit=dev`)
+* Update the GitHub actions to v6
+
+### Dependencies
+* Move linting packages to `devDependencies` and drop the unused `regenerator-runtime`
+* Drop the direct `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` entries, which `typescript-eslint` already provides
+* Update ESLint to v10, `powerbi-visuals-tools` to 7.2.1, `powerbi-visuals-api` to 5.11.1 and the visual utils to their 7.x releases
+
 ## 3.1.0.0
 ### New feature
 * Add new option "Data Gaps" to detect missing days in time-series data and display a warning icon when gaps are found. The icon is shown by default and appears automatically whenever gaps are detected.

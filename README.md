@@ -21,6 +21,19 @@ Sparkline Interpolation: Interpolate sparkline values to get rid of noisy points
 
 See also [MultiKPI at Microsoft AppSource](https://appsource.microsoft.com/en-us/product/power-bi-visuals/WA104381763)
 
+# Testing
+
+Tests run on [Vitest](https://vitest.dev/) in browser mode (Playwright, headless Chromium). Run `npm run browsers` once after cloning to download the Chromium binary; the test scripts themselves never reach out to the network.
+
+| Command | Description |
+| --- | --- |
+| `npm run browsers` | Downloads the Chromium binary used by the suite (one-time setup) |
+| `npm run browsers:ci` | Same download plus the Linux system packages, for CI images |
+| `npm test` | Type checks the specs and runs the whole suite once |
+| `npm run test:watch` | Runs the suite in watch mode |
+| `npm run test:coverage` | Runs the suite and collects V8 coverage into `coverage/` |
+| `npm run test:typecheck` | Type checks `specs` and `src` without emitting |
+
 # Version 2.2.0 New Functionality
 ## A new option "Show Latest Available As Current Value" inside "Values" option group
 

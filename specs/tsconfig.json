@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "skipLibCheck": true,
+        "types": ["vitest/globals"]
+    },
+    "files": [],
+    "include": [
+        "../src/**/*.ts",
+        "./**/*.ts"
+    ]
+}

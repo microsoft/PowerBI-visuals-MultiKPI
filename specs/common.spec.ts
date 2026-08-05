@@ -26,11 +26,10 @@
 import powerbi from "powerbi-visuals-api";
 
 import { dispatch } from "d3-dispatch";
-import { select as d3Select, Selection } from "d3-selection";
+import { select as d3Select } from "d3-selection";
 
 import {
     createSelectionIdBuilder,
-    testDom,
 } from "powerbi-visuals-utils-testutils";
 
 import { EventName } from "../src/event/eventName";
@@ -61,8 +60,6 @@ import { KpiBaseDescriptor } from "../src/settings/descriptors/kpi/kpiBaseDescri
 import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor";
 
 import { TestWrapper } from "./testWrapper";
-import { SubtitleWarningComponent } from "../src/visualComponent/subtitleWarningComponent";
-import { MultiKpiBuilder } from "./multiKpiBuilder";
 
 describe("Multi KPI", () => {
       describe("Version 2.4.0 Changes", () => {
@@ -356,213 +353,7 @@ describe("Multi KPI", () => {
             });
         });
 
-        // it("stale data is set up for a metric", (done) => {
-        //     const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
-        //     castZeroToNullOrReturnBack(testWrapper.dataView);
-
-        //     testWrapper.dataView.metadata.objects = {
-        //         staleData: {
-        //             show: true,
-        //             staleDataText: "label {$1}",
-        //             staleDataThreshold: 1,
-        //         },
-        //         subtitle: {
-        //             show: true,
-        //         },
-        //         values: {
-        //             showLatterAvailableValue: true,
-        //             treatEmptyValuesAsZero: false,
-        //         },
-        //     };
-
-        //     // This call will be skipped because of isShown = false
-        //     testWrapper.dataView.metadata.columns[2].objects = {
-        //         staleData: {
-        //             isShown: false,
-        //         },
-        //     };
-        //     // This call will be skipped because of threshold days
-        //     testWrapper.dataView.metadata.columns[3].objects = {
-        //         staleData: {
-        //             staleDataText: "unique {$1}",
-        //             staleDataThreshold: 5,
-        //         },
-        //     };
-        //     testWrapper.dataView.metadata.columns[4].objects = {
-        //         staleData: {
-        //             staleDataText: "custom label {$1}",
-        //             staleDataThreshold: 0,
-        //         },
-        //     };
-
-        //     const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-        //     const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-        //     spyOn(warningComponent, "getTitle");
-
-        //     testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-        //         expect(warningComponent.getTitle).toHaveBeenCalledWith("label {$1}", 4, 0);
-        //         expect(warningComponent.getTitle).toHaveBeenCalledWith("custom label {$1}", 1, 0);
-        //         expect(warningComponent.getTitle).toHaveBeenCalledTimes(2);
-        //         done();
-        //     });
-        // });
-
-    //     it("stale data is set up for a metric with staleDataText from susbtitles (compatibility support)", (done) => {
-    //         const testWrapper: TestWrapper = new TestWrapper(true, 0, 2);
-    //         castZeroToNullOrReturnBack(testWrapper.dataView);
-
-    //         testWrapper.dataView.metadata.objects = {
-    //             staleData: {
-    //                 show: true,
-    //             },
-    //             subtitle: {
-    //                 show: true,
-    //                 staleDataText: "Compatibility title"
-    //             },
-    //             values: {
-    //                 showLatterAvailableValue: true,
-    //                 treatEmptyValuesAsZero: false,
-    //             },
-    //         };
-
-    //         testWrapper.dataView.metadata.columns[2].objects = {
-    //             staleData: {
-    //                 isShown: false,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[3].objects = {
-    //             staleData: {
-    //                 staleDataText: "unique {$1}",
-    //                 staleDataThreshold: 1,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[4].objects = {
-    //             staleData: {
-    //                 staleDataText: "custom label {$1}",
-    //                 staleDataThreshold: 1,
-    //             },
-    //         };
-
-    //         const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-    //         const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-    //         spyOn(warningComponent, "getTitle");
-
-    //         testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.Compatibility title", 5, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("unique {$1}", 2, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("custom label {$1}", 2, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
-    //             done();
-    //         });
-    //     });
-
-    //     it("stale data with goup threshold days deduction option", (done) => {
-    //         const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
-    //         castZeroToNullOrReturnBack(testWrapper.dataView);
-
-    //         testWrapper.dataView.metadata.objects = {
-    //             staleData: {
-    //                 show: true,
-    //                 staleDataThreshold: 0,
-    //                 deductThresholdDays: true,
-    //             },
-    //             subtitle: {
-    //                 show: true,
-    //             },
-    //             values: {
-    //                 showLatterAvailableValue: true,
-    //                 treatEmptyValuesAsZero: false,
-    //             },
-    //         };
-
-    //         testWrapper.dataView.metadata.columns[1].objects = {
-    //             staleData: {
-    //                 staleDataText: "first label {$1}",
-    //                 staleDataThreshold: 2,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[2].objects = {
-    //             staleData: {
-    //                 staleDataText: "second label {$1}",
-    //             },
-    //         };
-
-    //         // because of high threshold days limit, this item is actual and will not be shown in stale data block
-    //         testWrapper.dataView.metadata.columns[3].objects = {
-    //             staleData: {
-    //                 staleDataText: "third label {$1}",
-    //                 staleDataThreshold: 33,
-    //             },
-    //         };
-
-    //         const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-    //         const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-    //         spyOn(warningComponent, "getTitle");
-
-    //         testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("first label {$1}", 4, 2);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("second label {$1}", 1, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.", 1, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
-    //             done();
-    //         });
-    //     });
-
-    //     it("stale data with threshold deduction per metric", (done) => {
-    //         const testWrapper: TestWrapper = new TestWrapper(true, 0, 5);
-    //         castZeroToNullOrReturnBack(testWrapper.dataView);
-
-    //         testWrapper.dataView.metadata.objects = {
-    //             staleData: {
-    //                 show: true,
-    //                 staleDataThreshold: 1,
-    //                 deductThresholdDays: false,
-    //             },
-    //             subtitle: {
-    //                 show: true,
-    //             },
-    //             values: {
-    //                 showLatterAvailableValue: true,
-    //                 treatEmptyValuesAsZero: false,
-    //             },
-    //         };
-
-    //         testWrapper.dataView.metadata.columns[1].objects = {
-    //             staleData: {
-    //                 staleDataText: "first label {$1}",
-    //                 staleDataThreshold: 2,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[2].objects = {
-    //             staleData: {
-    //                 staleDataText: "second label {$1}",
-    //                 staleDataThreshold: 3,
-    //                 deductThresholdDays: true,
-    //             },
-    //         };
-
-    //         // because of high threshold days limit, this item is actual and will not be shown in stale data block
-    //         testWrapper.dataView.metadata.columns[3].objects = {
-    //             staleData: {
-    //                 staleDataText: "third label {$1}",
-    //                 staleDataThreshold: 33,
-    //             },
-    //         };
-
-    //         const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-    //         const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-    //         spyOn(warningComponent, "getTitle");
-
-    //         testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("first label {$1}", 8, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("second label {$1}", 5, 3);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.", 5, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
-    //             done();
-    //         });
-    //     });
-
-        it("subtitle shouldn't be rendered if it's turned off in Format Panel explicitly", (done) => {
+        it("subtitle shouldn't be rendered if it's turned off in Format Panel explicitly", async () => {
             const testWrapper: TestWrapper = new TestWrapper();
 
             testWrapper.dataView.metadata.objects = {
@@ -572,14 +363,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
-                expect(displayStatus).toEqual("none");
-                done();
-            });
+            await testWrapper.render();
+
+            const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
+            expect(displayStatus).toEqual("none");
         });
 
-        it("merged subtitle should be rendered if it's turned on in Format Panel and provided as data field", (done) => {
+        it("merged subtitle should be rendered if it's turned on in Format Panel and provided as data field", async () => {
             const testWrapper: TestWrapper = new TestWrapper(undefined, undefined, undefined, true);
 
             testWrapper.dataView.metadata.objects = {
@@ -589,16 +379,15 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
-                expect(displayStatus).toEqual("flex");
-                const subtitleElm = testWrapper.visualBuilder.subtitle?.querySelector(".multiKpi_subtitle");
-                expect(subtitleElm?.textContent).toEqual("Power BI rocksSubtitle form data");
-                done();
-            });
+            await testWrapper.render();
+
+            const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
+            expect(displayStatus).toEqual("flex");
+            const subtitleElm = testWrapper.visualBuilder.subtitle?.querySelector(".multiKpi_subtitle");
+            expect(subtitleElm?.textContent).toEqual("Power BI rocksSubtitle form data");
         });
 
-        it("subtitle from data should be rendered if it's turned on in Format Panel and provided only as data field", (done) => {
+        it("subtitle from data should be rendered if it's turned on in Format Panel and provided only as data field", async () => {
             const testWrapper: TestWrapper = new TestWrapper(undefined, undefined, undefined, true);
 
             testWrapper.dataView.metadata.objects = {
@@ -607,18 +396,17 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
-                expect(displayStatus).toEqual("flex");
-                const subtitleElm = testWrapper.visualBuilder.subtitle?.querySelector(".multiKpi_subtitle");
-                expect(subtitleElm?.textContent).toEqual("Subtitle form data");
-                done();
-            });
+            await testWrapper.render();
+
+            const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
+            expect(displayStatus).toEqual("flex");
+            const subtitleElm = testWrapper.visualBuilder.subtitle?.querySelector(".multiKpi_subtitle");
+            expect(subtitleElm?.textContent).toEqual("Subtitle form data");
         });
     });
 
     describe("Version 2.2.0 Changes", () => {
-        it("Treat Empty/Missing Values As Zero is enabled", (done) => {
+        it("Treat Empty/Missing Values As Zero is enabled", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 2);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -629,14 +417,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
-                expect(secondSparklineValue).toEqual("0");
-                done();
-            });
+            await testWrapper.render();
+
+            const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
+            expect(secondSparklineValue).toEqual("0");
         });
 
-        it("Treat Empty/Missing Values As Zero is disabled", (done) => {
+        it("Treat Empty/Missing Values As Zero is disabled", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 2);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -647,14 +434,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
-                expect(secondSparklineValue).toEqual("N/A");
-                done();
-            });
+            await testWrapper.render();
+
+            const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
+            expect(secondSparklineValue).toEqual("N/A");
         });
 
-        it("Treat Empty/Missing Values As Zero is disabled but Show Latest Available As Current Value is enabled", (done) => {
+        it("Treat Empty/Missing Values As Zero is disabled but Show Latest Available As Current Value is enabled", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 2);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -666,14 +452,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
-                expect(secondSparklineValue).toEqual("25");
-                done();
-            });
+            await testWrapper.render();
+
+            const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
+            expect(secondSparklineValue).toEqual("25");
         });
 
-        it("Treat Empty/Missing Values As Zero is enabled and Show Latest Available As Current Value is enabled", (done) => {
+        it("Treat Empty/Missing Values As Zero is enabled and Show Latest Available As Current Value is enabled", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 2);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -685,14 +470,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
-                expect(secondSparklineValue).toEqual("0");
-                done();
-            });
+            await testWrapper.render();
+
+            const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
+            expect(secondSparklineValue).toEqual("0");
         });
 
-        it("Missing Value label is customized", (done) => {
+        it("Missing Value label is customized", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 2);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -704,16 +488,15 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
-                const fourthSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[7].innerText;
-                expect(secondSparklineValue).toEqual("no data");
-                expect(fourthSparklineValue).toEqual("no data");
-                done();
-            });
+            await testWrapper.render();
+
+            const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
+            const fourthSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[7].innerText;
+            expect(secondSparklineValue).toEqual("no data");
+            expect(fourthSparklineValue).toEqual("no data");
         });
 
-        it("Missing Value label is customized generally and for certain series", (done) => {
+        it("Missing Value label is customized generally and for certain series", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 2);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -731,16 +514,15 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
-                const fourthSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[7].innerText;
-                expect(secondSparklineValue).toEqual("[-]");
-                expect(fourthSparklineValue).toEqual("no data");
-                done();
-            });
+            await testWrapper.render();
+
+            const secondSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[3].innerText;
+            const fourthSparklineValue = testWrapper.visualBuilder.sparklineSubtitle[7].innerText;
+            expect(secondSparklineValue).toEqual("[-]");
+            expect(fourthSparklineValue).toEqual("no data");
         });
 
-        it("Missing Variance label is customized", (done) => {
+        it("Missing Variance label is customized", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -754,14 +536,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const naVariance = testWrapper.visualBuilder.mainChartNAVarance.textContent;
-                expect(naVariance).toEqual("(no data)");
-                done();
-            });
+            await testWrapper.render();
+
+            const naVariance = testWrapper.visualBuilder.mainChartNAVarance.textContent;
+            expect(naVariance).toEqual("(no data)");
         });
 
-        it("Missing Variance label is customized generally and for certain series", (done) => {
+        it("Missing Variance label is customized generally and for certain series", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -781,14 +562,13 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const naVariance = testWrapper.visualBuilder.mainChartNAVarance.textContent;
-                expect(naVariance).toEqual("(-)");
-                done();
-            });
+            await testWrapper.render();
+
+            const naVariance = testWrapper.visualBuilder.mainChartNAVarance.textContent;
+            expect(naVariance).toEqual("(-)");
         });
 
-        it("Stale Data is enabled but Dates are actual", (done) => {
+        it("Stale Data is enabled but Dates are actual", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -807,14 +587,12 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const sdIcon = testWrapper.visualBuilder.staleIcon;
-                expect(sdIcon).toBeNull;
-                done();
-            });
+            await testWrapper.render();
+
+            expect(testWrapper.visualBuilder.staleIcon).toBeNull();
         });
 
-        it("Stale Data is enabled and be shown", (done) => {
+        it("Stale Data is enabled and be shown", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -829,15 +607,14 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const sdIcon = testWrapper.visualBuilder.staleIcon;
-                expect(document.body.contains(sdIcon)).toBeTruthy();
-                expect(sdIcon).not.toBeNull();
-                done();
-            });
+            await testWrapper.render();
+
+            const sdIcon = testWrapper.visualBuilder.staleIcon;
+            expect(sdIcon).not.toBeNull();
+            expect(document.body.contains(sdIcon)).toBeTruthy();
         });
 
-        it("Stale Data is enabled but Threshold Days are actual", (done) => {
+        it("Stale Data is enabled but Threshold Days are actual", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -853,14 +630,12 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const sdIcon = testWrapper.visualBuilder.staleIcon;
-                expect(sdIcon).toBeNull();
-                done();
-            });
+            await testWrapper.render();
+
+            expect(testWrapper.visualBuilder.staleIcon).toBeNull();
         });
 
-        it("Stale Data is enabled but One of the metrics have more obsolete data than others", (done) => {
+        it("Stale Data is enabled but One of the metrics have more obsolete data than others", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -880,15 +655,14 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const sdIcon = testWrapper.visualBuilder.staleIcon;
-                expect(document.body.contains(sdIcon)).toBeTruthy();
-                expect(sdIcon).not.toBeNull;
-                done();
-            });
+            await testWrapper.render();
+
+            const sdIcon = testWrapper.visualBuilder.staleIcon;
+            expect(sdIcon).not.toBeNull();
+            expect(document.body.contains(sdIcon)).toBeTruthy();
         });
 
-        it("Stale Data is enabled and has sufficient threshold days to handle any metrics, even if one of them more obsolete", (done) => {
+        it("Stale Data is enabled and has sufficient threshold days to handle any metrics, even if one of them more obsolete", async () => {
             const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
 
             castZeroToNullOrReturnBack(testWrapper.dataView);
@@ -908,34 +682,28 @@ describe("Multi KPI", () => {
                 },
             };
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                const sdIcon = testWrapper.visualBuilder.staleIcon;
-                expect(sdIcon).toBeNull();
-                done();
-            });
+            await testWrapper.render();
+
+            expect(testWrapper.visualBuilder.staleIcon).toBeNull();
         });
     });
 
     describe("DOM", () => {
-        it("root element should be defined in DOM", (done) => {
+        it("root element should be defined in DOM", async () => {
             const testWrapper: TestWrapper = new TestWrapper();
 
-            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                expect(document.body.contains(testWrapper.visualBuilder.root)).toBeTruthy();
+            await testWrapper.render();
 
-                done();
-            });
+            expect(document.body.contains(testWrapper.visualBuilder.root)).toBeTruthy();
         });
 
         describe("Main Chart", () => {
-            it("the main chart should be rendered", (done) => {
+            it("the main chart should be rendered", async () => {
                 const testWrapper: TestWrapper = new TestWrapper();
 
-                testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                    expect(document.body.contains(testWrapper.visualBuilder.mainChart)).toBeTruthy();
+                await testWrapper.render();
 
-                    done();
-                });
+                expect(document.body.contains(testWrapper.visualBuilder.mainChart)).toBeTruthy();
             });
         });
 
@@ -1036,48 +804,43 @@ describe("Multi KPI", () => {
         });
 
         describe("Sparkline", () => {
-            it("sparkline component should be rendered", (done) => {
+            it("sparkline component should be rendered", async () => {
                 const testWrapper: TestWrapper = new TestWrapper();
-                testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                    Array.from(testWrapper.visualBuilder.sparkline).forEach(
-                        el => expect(document.body.contains(el)).toBeTrue()
-                    );
 
-                    done();
-                });
+                await testWrapper.render();
+
+                Array.from(testWrapper.visualBuilder.sparkline).forEach(
+                    el => expect(document.body.contains(el)).toBe(true)
+                );
             });
 
             describe("Subtitle", () => {
-                it("subtitle of each sparkline should be rendered", (done) => {
+                it("subtitle of each sparkline should be rendered", async () => {
                     const testWrapper: TestWrapper = new TestWrapper();
 
-                    testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                        Array.from(testWrapper.visualBuilder.sparklineSubtitle).forEach(
-                            el => expect(document.body.contains(el)).toBeTrue()
-                        );
+                    await testWrapper.render();
 
-                        done();
-                    });
+                    Array.from(testWrapper.visualBuilder.sparklineSubtitle).forEach(
+                        el => expect(document.body.contains(el)).toBe(true)
+                    );
                 });
             });
 
             describe("Line", () => {
-                it("line of each sparkline should be rendered", (done) => {
+                it("line of each sparkline should be rendered", async () => {
                     const testWrapper: TestWrapper = new TestWrapper();
 
-                    testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                        Array.from(testWrapper.visualBuilder.sparklineLine).forEach(
-                            el => expect(document.body.contains(el)).toBeTrue()
-                        );
+                    await testWrapper.render();
 
-                        done();
-                    });
+                    Array.from(testWrapper.visualBuilder.sparklineLine).forEach(
+                        el => expect(document.body.contains(el)).toBe(true)
+                    );
                 });
             });
         });
 
         describe("Subtitle", () => {
-            it("subtitle should be rendered if it's turned on via Format Panel explicitly", (done) => {
+            it("subtitle should be rendered if it's turned on via Format Panel explicitly", async () => {
                 const testWrapper: TestWrapper = new TestWrapper();
 
                 testWrapper.dataView.metadata.objects = {
@@ -1087,13 +850,12 @@ describe("Multi KPI", () => {
                     },
                 };
 
-                testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-                    const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
-                    expect(displayStatus).toEqual("flex");
-                    const subtitleElm = testWrapper.visualBuilder.subtitle?.querySelector(".multiKpi_subtitle");
-                    expect(subtitleElm?.textContent).toEqual("Power BI rocks");
-                    done();
-                });
+                await testWrapper.render();
+
+                const displayStatus = getComputedStyle(testWrapper.visualBuilder.subtitle).display;
+                expect(displayStatus).toEqual("flex");
+                const subtitleElm = testWrapper.visualBuilder.subtitle?.querySelector(".multiKpi_subtitle");
+                expect(subtitleElm?.textContent).toEqual("Power BI rocks");
             });
         });
     });

@@ -35,6 +35,9 @@ import {
     subtitleColumn,
 } from "../src/columns/columns";
 
+type CategoryColumnOptions = testDataViewBuilder.TestDataViewBuilderCategoryColumnOptions;
+type ValuesColumnOptions = testDataViewBuilder.DataViewBuilderAllColumnOptions["values"][number];
+
 export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     public amountOfSeries: number = 5;
 
@@ -70,7 +73,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
             for (let i: number = 0; i < this.amountOfSeries; i++) {
                 if (i === 4) {
                     const noDataArray: number[] = [];
-                    this.dates.forEach((d) => {
+                    this.dates.forEach(() => {
                         noDataArray.push(undefined);
                     });
                     this.seriesValues.push(noDataArray);
@@ -115,7 +118,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
         const datesCategory = this.buildDatesCategory(this.dates);
         const valuesCategory = this.buildValuesCategory(this.seriesValues);
         const repeatsNum: number = this.dates.length;
-        let subtitleArr: string[] = [];
+        const subtitleArr: string[] = [];
         for (let i = 0; i < repeatsNum; i++) {
             subtitleArr.push("Subtitle form data");
         }
@@ -137,7 +140,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
     }
 
 
-    private buildDatesCategory(dates: Date[]): any {
+    private buildDatesCategory(dates: Date[]): CategoryColumnOptions {
         return {
             source: {
                 displayName: dateColumn.name,
@@ -149,7 +152,7 @@ export class MultiKpiData extends testDataViewBuilder.TestDataViewBuilder {
         }
     }
 
-    private buildValuesCategory(seriesValues: number[][]): any {
+    private buildValuesCategory(seriesValues: number[][]): ValuesColumnOptions[] {
         return seriesValues
             .map((values: number[], index: number) => {
                 return {

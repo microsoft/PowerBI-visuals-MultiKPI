@@ -54,4 +54,10 @@ export class TestWrapper {
             this.dataView = this.dataViewBuilder.getDataView();
         }
     }
+
+    public render(): Promise<void> {
+        return new Promise<void>((resolve) => {
+            this.visualBuilder.updateRenderTimeout(this.dataView, resolve);
+        });
+    }
 }
