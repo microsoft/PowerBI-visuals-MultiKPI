@@ -29,7 +29,7 @@ import { SparklineContainerItem } from "./descriptors/sparkline/sparklineDescrip
 import { TooltipContainerItem } from "./descriptors/tooltipDescriptor";
 import { ValuesContainerItem } from "./descriptors/valuesDescriptor";
 import { VarianceContainerItem } from "./descriptors/varianceDescriptor";
-import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
+import { StaleDataContainerItem } from "./descriptors/staleDataDescriptor";
 import { AxisBaseContainerItem } from "./descriptors/axisBaseDescriptor";
 import { SparklineValueContainerItem } from "./descriptors/sparklineValueDescriptor";
 import { SparklineNameContainerItem } from "./descriptors/sparklineNameDescriptor";
@@ -44,5 +44,5 @@ export class SeriesSettings {
     public sparklineChart: SparklineChartContainerItem = new SparklineChartContainerItem();
     public sparklineYAxis: SparklineAxisContainerItem = new SparklineAxisContainerItem();
     public sparklineValue: SparklineValueContainerItem = new SparklineValueContainerItem();
-    public staleData: StaleDataDescriptor = new StaleDataDescriptor();
+    public staleData: StaleDataContainerItem = new StaleDataContainerItem();
 }

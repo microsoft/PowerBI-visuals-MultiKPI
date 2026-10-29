@@ -59,6 +59,7 @@ import { getFormattedValueWithFallback } from "../src/converter/data/dataFormatt
 
 import { KpiBaseDescriptor } from "../src/settings/descriptors/kpi/kpiBaseDescriptor";
 import { NumericDescriptor } from "../src/settings/descriptors/numericDescriptor";
+import { Settings } from "../src/settings/settings";
 
 import { TestWrapper } from "./testWrapper";
 import { SubtitleWarningComponent } from "../src/visualComponent/subtitleWarningComponent";
@@ -1322,6 +1323,29 @@ describe("Multi KPI", () => {
                 expect(textFormattingDescriptor.varianceNotAvailableFontSize.visible).toBeFalsy();
                 expect(textFormattingDescriptor.dateFontSize.visible).toBeFalsy();
             });
+        });
+    });
+
+    describe("Per-metric stale data", () => {
+        const getSelectionId = (key: string): powerbi.visuals.ISelectionId => ({
+            getSelector: () => ({ metadata: key }),
+        } as unknown as powerbi.visuals.ISelectionId);
+
+        const createColumn = (displayName: string, staleDataText?: string): powerbi.DataViewMetadataColumn => ({
+            displayName,
+            queryName: displayName,
+            objects: staleDataText ? { staleData: { staleDataText } } : undefined,
+        });
+
+        it("uses the message set for a metric and the default one for other metrics", () => {
+            const settings: Settings = new Settings();
+            settings.staleData.defaultContainerItem.staleDataText.value = "Default ${1}";
+
+            settings.populateContainers(createColumn("Sales"), getSelectionId("Sales"));
+            settings.populateContainers(createColumn("Profit", "Profit ETL is ${1} days late"), getSelectionId("Profit"));
+
+            expect(settings.getSettingsForSeries("Sales").staleData.staleDataText.value).toBe("Default ${1}");
+            expect(settings.getSettingsForSeries("Profit").staleData.staleDataText.value).toBe("Profit ETL is ${1} days late");
         });
     });
 });

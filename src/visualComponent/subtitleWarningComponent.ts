@@ -29,7 +29,7 @@ type Selection = d3Selection<BaseType, unknown, BaseType, unknown>;
 import powerbi from "powerbi-visuals-api";
 import { CssConstants } from "powerbi-visuals-utils-svgutils";
 import { IDataRepresentation, IDataRepresentationSeries } from "../converter/data/dataRepresentation";
-import { StaleDataDescriptor } from "../settings/descriptors/staleDataDescriptor";
+import { StaleDataContainerItem } from "../settings/descriptors/staleDataDescriptor";
 import { DataGapDescriptor } from "../settings/descriptors/dataGapDescriptor";
 import { ISubtitleComponentRenderOptions, SubtitleComponent } from "./subtitleComponent";
 import { IVisualComponentConstructorOptions } from "./visualComponentConstructorOptions";
@@ -42,9 +42,8 @@ import { SubtitleBaseContainerItem } from "../settings/descriptors/subtitleBaseD
 
 export interface ISubtitleWarningComponentRenderOptions extends ISubtitleComponentRenderOptions {
     warningState: number;
-    staleDataDifference: number;
     subtitleSettings: SubtitleBaseContainerItem;
-    staleDataSettings: StaleDataDescriptor;
+    staleDataSettings: StaleDataContainerItem;
     dataGapSettings: DataGapDescriptor;
     dateSettings: FormatDescriptor;
     series: IDataRepresentationSeries[];
@@ -78,14 +77,13 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             subtitleSettings,
             warningState,
             series,
-            staleDataDifference,
             dataRepresentation,
             dateSettings,
         } = options;
 
         this.renderWarningMessage(warningState, subtitleSettings.warningText.value);
         super.render(options);
-        this.renderStaleData(staleDataSettings, series, staleDataDifference);
+        this.renderStaleData(staleDataSettings, series);
         this.renderDataGapWarning(dataGapSettings, dataRepresentation);
         this.renderStartDateHint(dataRepresentation, dateSettings);
     }
@@ -146,88 +144,41 @@ export class SubtitleWarningComponent extends SubtitleComponent {
     }
 
     private renderStaleData(
-        staleDataSettings: StaleDataDescriptor,
-        series: IDataRepresentationSeries[],
-        staleDataDifference: number): void {
-        const {
-            backgroundColor,
-            color,
-            isShown,
-            staleDataText,
-            staleDataThreshold,
-        } = staleDataSettings;
+        defaultStaleDataSettings: StaleDataContainerItem,
+        series: IDataRepresentationSeries[]): void {
+        const staleSeries: IDataRepresentationSeries[] = series.filter((s) => {
+            const settings: StaleDataContainerItem = s.settings.staleData;
 
-        const isDataStale: boolean = this.isDataStale(
-            staleDataDifference,
-            series,
-        );
+            return settings.isShown.value
+                && !!s.staleDateDifference
+                && s.staleDateDifference - +settings.staleDataThreshold.value > 0;
+        });
 
-        let tooltipItems: VisualTooltipDataItem[] = [];
+        const titles: string[] = staleSeries.map((s) => {
+            const settings: StaleDataContainerItem = s.settings.staleData;
 
-        const filterItemsFunc = (x: IDataRepresentationSeries) => {
-            if (!x.settings.staleData.isShown.value) {
-                return false;
-            }
-            if (x.staleDateDifference) {
-                return (x.staleDateDifference - x.settings.staleData.staleDataThreshold.value > 0);
-            }
-            return false;
-        };
+            return this.getTitle(
+                settings.staleDataText.value,
+                s.staleDateDifference,
+                settings.deductThresholdDays.value ? +settings.staleDataThreshold.value : 0,
+            );
+        });
 
-        let isTheSameStaledays: boolean = true;
-        let currentStaleDays: number | undefined;
+        const isSameTitle: boolean = titles.every((title) => title === titles[0]);
 
-        for (const sr of series) {
-            if (currentStaleDays && sr.staleDateDifference && currentStaleDays !== sr.staleDateDifference) {
-                isTheSameStaledays = false;
-            } else {
-                currentStaleDays = sr.staleDateDifference;
-            }
-        }
+        const tooltipItems: VisualTooltipDataItem[] = isSameTitle
+            ? [{ displayName: null, value: titles[0] }]
+            : staleSeries.map((s, index) => ({ displayName: s.name, value: titles[index] }));
 
-        if (!isTheSameStaledays) {
-            tooltipItems = series.filter(filterItemsFunc).map((s) => {
-                const title: string = this.getTitle(
-                    s.settings.staleData.staleDataText.value,
-                    s.staleDateDifference,
-                    s.settings.staleData.deductThresholdDays.value ? s.settings.staleData.staleDataThreshold.value : 0,
-                );
-
-                return {
-                    displayName: s.name,
-                    value: title,
-                };
-            });
-        } else {
-            tooltipItems = [
-                {
-                    displayName: null,
-                    value: this.getTitle(
-                        staleDataText.value,
-                        staleDataDifference,
-                        staleDataSettings.deductThresholdDays.value ? staleDataThreshold.value : 0,
-                    ),
-                },
-            ];
-        }
+        const iconSettings: StaleDataContainerItem = staleSeries[0]?.settings.staleData ?? defaultStaleDataSettings;
 
         this.renderIcon({
-            backgroundColor: backgroundColor.value.value,
-            color: color.value.value,
-            isShown: isShown.value && isDataStale,
+            backgroundColor: iconSettings.backgroundColor.value.value,
+            color: iconSettings.color.value.value,
+            isShown: staleSeries.length > 0,
             selector: this.dataAgeSelector,
             tooltipItems,
         });
-    }
-
-    private isDataStale(dateDifference: number, series: IDataRepresentationSeries[]): boolean {
-        let isStale: boolean = false;
-        series.forEach((s: IDataRepresentationSeries) => {
-            if (dateDifference > +s.settings.staleData.staleDataThreshold.value) {
-                isStale = true;
-            }
-        })
-        return isStale;
     }
 
     public getTitle(stringTemplate: string, dateDifference: number, staleDataThreshold: number): string {
