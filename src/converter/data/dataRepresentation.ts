@@ -98,7 +98,6 @@ export interface IDataRepresentation {
     sortedSeries: IDataRepresentationSeries[];
     warningState: number;
     latestDate: Date;
-    staleDateDifference?: number;
     percentCalcDate: Date;
     subtitle?: string;
     viewport: IViewport;

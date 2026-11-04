@@ -206,7 +206,7 @@ export class RootComponent extends BaseContainerComponent<
             settings,
         } = options;
         this.subtitleComponent.render({
-            series: data.series,
+            series: data.sortedSeries,
             staleDataSettings: settings.staleData.defaultContainerItem,
             dataGapSettings: settings.dataGap,
             subtitleSettings: settings.subtitle,

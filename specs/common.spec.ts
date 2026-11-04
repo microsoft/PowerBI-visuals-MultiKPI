@@ -357,211 +357,162 @@ describe("Multi KPI", () => {
             });
         });
 
-        // it("stale data is set up for a metric", (done) => {
-        //     const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
-        //     castZeroToNullOrReturnBack(testWrapper.dataView);
+        it("stale data is set up for a metric", (done) => {
+            const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
+            castZeroToNullOrReturnBack(testWrapper.dataView);
 
-        //     testWrapper.dataView.metadata.objects = {
-        //         staleData: {
-        //             show: true,
-        //             staleDataText: "label {$1}",
-        //             staleDataThreshold: 1,
-        //         },
-        //         subtitle: {
-        //             show: true,
-        //         },
-        //         values: {
-        //             showLatterAvailableValue: true,
-        //             treatEmptyValuesAsZero: false,
-        //         },
-        //     };
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataText: "label {$1}",
+                    staleDataThreshold: 1,
+                },
+                subtitle: {
+                    show: true,
+                },
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: false,
+                },
+            };
 
-        //     // This call will be skipped because of isShown = false
-        //     testWrapper.dataView.metadata.columns[2].objects = {
-        //         staleData: {
-        //             isShown: false,
-        //         },
-        //     };
-        //     // This call will be skipped because of threshold days
-        //     testWrapper.dataView.metadata.columns[3].objects = {
-        //         staleData: {
-        //             staleDataText: "unique {$1}",
-        //             staleDataThreshold: 5,
-        //         },
-        //     };
-        //     testWrapper.dataView.metadata.columns[4].objects = {
-        //         staleData: {
-        //             staleDataText: "custom label {$1}",
-        //             staleDataThreshold: 0,
-        //         },
-        //     };
+            // This call will be skipped because of isShown = false
+            testWrapper.dataView.metadata.columns[2].objects = {
+                staleData: {
+                    isShown: false,
+                },
+            };
+            // This call will be skipped because of threshold days
+            testWrapper.dataView.metadata.columns[3].objects = {
+                staleData: {
+                    staleDataText: "unique {$1}",
+                    staleDataThreshold: 5,
+                },
+            };
+            testWrapper.dataView.metadata.columns[4].objects = {
+                staleData: {
+                    staleDataText: "custom label {$1}",
+                    staleDataThreshold: 0,
+                },
+            };
 
-        //     const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-        //     const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-        //     spyOn(warningComponent, "getTitle");
+            const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
+            const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
+            spyOn(warningComponent, "getTitle");
 
-        //     testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-        //         expect(warningComponent.getTitle).toHaveBeenCalledWith("label {$1}", 4, 0);
-        //         expect(warningComponent.getTitle).toHaveBeenCalledWith("custom label {$1}", 1, 0);
-        //         expect(warningComponent.getTitle).toHaveBeenCalledTimes(2);
-        //         done();
-        //     });
-        // });
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("label {$1}", 4, 0);
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("custom label {$1}", 1, 0);
+                expect(warningComponent.getTitle).toHaveBeenCalledTimes(2);
+                done();
+            });
+        });
 
-    //     it("stale data is set up for a metric with staleDataText from susbtitles (compatibility support)", (done) => {
-    //         const testWrapper: TestWrapper = new TestWrapper(true, 0, 2);
-    //         castZeroToNullOrReturnBack(testWrapper.dataView);
+        it("stale data with goup threshold days deduction option", (done) => {
+            const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
+            castZeroToNullOrReturnBack(testWrapper.dataView);
 
-    //         testWrapper.dataView.metadata.objects = {
-    //             staleData: {
-    //                 show: true,
-    //             },
-    //             subtitle: {
-    //                 show: true,
-    //                 staleDataText: "Compatibility title"
-    //             },
-    //             values: {
-    //                 showLatterAvailableValue: true,
-    //                 treatEmptyValuesAsZero: false,
-    //             },
-    //         };
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataThreshold: 0,
+                    deductThresholdDays: true,
+                },
+                subtitle: {
+                    show: true,
+                },
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: false,
+                },
+            };
 
-    //         testWrapper.dataView.metadata.columns[2].objects = {
-    //             staleData: {
-    //                 isShown: false,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[3].objects = {
-    //             staleData: {
-    //                 staleDataText: "unique {$1}",
-    //                 staleDataThreshold: 1,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[4].objects = {
-    //             staleData: {
-    //                 staleDataText: "custom label {$1}",
-    //                 staleDataThreshold: 1,
-    //             },
-    //         };
+            testWrapper.dataView.metadata.columns[1].objects = {
+                staleData: {
+                    staleDataText: "first label {$1}",
+                    staleDataThreshold: 2,
+                },
+            };
+            testWrapper.dataView.metadata.columns[2].objects = {
+                staleData: {
+                    staleDataText: "second label {$1}",
+                },
+            };
 
-    //         const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-    //         const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-    //         spyOn(warningComponent, "getTitle");
+            // because of high threshold days limit, this item is actual and will not be shown in stale data block
+            testWrapper.dataView.metadata.columns[3].objects = {
+                staleData: {
+                    staleDataText: "third label {$1}",
+                    staleDataThreshold: 33,
+                },
+            };
 
-    //         testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.Compatibility title", 5, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("unique {$1}", 2, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("custom label {$1}", 2, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
-    //             done();
-    //         });
-    //     });
+            const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
+            const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
+            spyOn(warningComponent, "getTitle");
 
-    //     it("stale data with goup threshold days deduction option", (done) => {
-    //         const testWrapper: TestWrapper = new TestWrapper(true, 0, 1);
-    //         castZeroToNullOrReturnBack(testWrapper.dataView);
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("first label {$1}", 4, 2);
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("second label {$1}", 1, 0);
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.", 1, 0);
+                expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
+                done();
+            });
+        });
 
-    //         testWrapper.dataView.metadata.objects = {
-    //             staleData: {
-    //                 show: true,
-    //                 staleDataThreshold: 0,
-    //                 deductThresholdDays: true,
-    //             },
-    //             subtitle: {
-    //                 show: true,
-    //             },
-    //             values: {
-    //                 showLatterAvailableValue: true,
-    //                 treatEmptyValuesAsZero: false,
-    //             },
-    //         };
+        it("stale data with threshold deduction per metric", (done) => {
+            const testWrapper: TestWrapper = new TestWrapper(true, 0, 5);
+            castZeroToNullOrReturnBack(testWrapper.dataView);
 
-    //         testWrapper.dataView.metadata.columns[1].objects = {
-    //             staleData: {
-    //                 staleDataText: "first label {$1}",
-    //                 staleDataThreshold: 2,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[2].objects = {
-    //             staleData: {
-    //                 staleDataText: "second label {$1}",
-    //             },
-    //         };
+            testWrapper.dataView.metadata.objects = {
+                staleData: {
+                    show: true,
+                    staleDataThreshold: 1,
+                    deductThresholdDays: false,
+                },
+                subtitle: {
+                    show: true,
+                },
+                values: {
+                    showLatterAvailableValue: true,
+                    treatEmptyValuesAsZero: false,
+                },
+            };
 
-    //         // because of high threshold days limit, this item is actual and will not be shown in stale data block
-    //         testWrapper.dataView.metadata.columns[3].objects = {
-    //             staleData: {
-    //                 staleDataText: "third label {$1}",
-    //                 staleDataThreshold: 33,
-    //             },
-    //         };
+            testWrapper.dataView.metadata.columns[1].objects = {
+                staleData: {
+                    staleDataText: "first label {$1}",
+                    staleDataThreshold: 2,
+                },
+            };
+            testWrapper.dataView.metadata.columns[2].objects = {
+                staleData: {
+                    staleDataText: "second label {$1}",
+                    staleDataThreshold: 3,
+                    deductThresholdDays: true,
+                },
+            };
 
-    //         const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-    //         const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-    //         spyOn(warningComponent, "getTitle");
+            // because of high threshold days limit, this item is actual and will not be shown in stale data block
+            testWrapper.dataView.metadata.columns[3].objects = {
+                staleData: {
+                    staleDataText: "third label {$1}",
+                    staleDataThreshold: 33,
+                },
+            };
 
-    //         testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("first label {$1}", 4, 2);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("second label {$1}", 1, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.", 1, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
-    //             done();
-    //         });
-    //     });
+            const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
+            const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
+            spyOn(warningComponent, "getTitle");
 
-    //     it("stale data with threshold deduction per metric", (done) => {
-    //         const testWrapper: TestWrapper = new TestWrapper(true, 0, 5);
-    //         castZeroToNullOrReturnBack(testWrapper.dataView);
-
-    //         testWrapper.dataView.metadata.objects = {
-    //             staleData: {
-    //                 show: true,
-    //                 staleDataThreshold: 1,
-    //                 deductThresholdDays: false,
-    //             },
-    //             subtitle: {
-    //                 show: true,
-    //             },
-    //             values: {
-    //                 showLatterAvailableValue: true,
-    //                 treatEmptyValuesAsZero: false,
-    //             },
-    //         };
-
-    //         testWrapper.dataView.metadata.columns[1].objects = {
-    //             staleData: {
-    //                 staleDataText: "first label {$1}",
-    //                 staleDataThreshold: 2,
-    //             },
-    //         };
-    //         testWrapper.dataView.metadata.columns[2].objects = {
-    //             staleData: {
-    //                 staleDataText: "second label {$1}",
-    //                 staleDataThreshold: 3,
-    //                 deductThresholdDays: true,
-    //             },
-    //         };
-
-    //         // because of high threshold days limit, this item is actual and will not be shown in stale data block
-    //         testWrapper.dataView.metadata.columns[3].objects = {
-    //             staleData: {
-    //                 staleDataText: "third label {$1}",
-    //                 staleDataThreshold: 33,
-    //             },
-    //         };
-
-    //         const components = testWrapper.visualBuilder.instance.rootComponent.getComponents();
-    //         const warningComponent = <SubtitleWarningComponent>(components.filter(c => c instanceof SubtitleWarningComponent)[0]);
-    //         spyOn(warningComponent, "getTitle");
-
-    //         testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("first label {$1}", 8, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("second label {$1}", 5, 3);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.", 5, 0);
-    //             expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
-    //             done();
-    //         });
-    //     });
+            testWrapper.visualBuilder.updateRenderTimeout(testWrapper.dataView, () => {
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("first label {$1}", 8, 0);
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("second label {$1}", 5, 3);
+                expect(warningComponent.getTitle).toHaveBeenCalledWith("Data is ${1} days late.", 5, 0);
+                expect(warningComponent.getTitle).toHaveBeenCalledTimes(3);
+                done();
+            });
+        });
 
         it("subtitle shouldn't be rendered if it's turned off in Format Panel explicitly", (done) => {
             const testWrapper: TestWrapper = new TestWrapper();

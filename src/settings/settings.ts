@@ -85,11 +85,16 @@ export class Settings extends FormattingSettingsModel {
     ]
 
     public parse(colorPalette: ISandboxExtendedColorPalette, localizationManager: ILocalizationManager): void {
+        const defaultStaleDataItem = this.staleData.defaultContainerItem;
+        if (!defaultStaleDataItem.staleDataText.value) {
+            defaultStaleDataItem.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
+        }
+
         this.staleData.container.containerItems.forEach((item) => {
             const staleDataItem = item as StaleDataContainerItem;
 
             if (!staleDataItem.staleDataText.value) {
-                staleDataItem.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
+                staleDataItem.staleDataText.value = defaultStaleDataItem.staleDataText.value;
             }
 
             if (!this.subtitle.show.value) {

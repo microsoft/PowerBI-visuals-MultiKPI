@@ -164,7 +164,7 @@ export class SubtitleWarningComponent extends SubtitleComponent {
             );
         });
 
-        const isSameTitle: boolean = titles.every((title) => title === titles[0]);
+        const isSameTitle: boolean = staleSeries.length === series.length && titles.every((title) => title === titles[0]);
 
         const tooltipItems: VisualTooltipDataItem[] = isSameTitle
             ? [{ displayName: null, value: titles[0] }]
