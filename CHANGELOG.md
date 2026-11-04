@@ -1,5 +1,6 @@
 ## 3.1.0.0
 ### New feature
+* Stale Data options (message, threshold, deduct threshold days, color and background) can be set per metric again, using the "Apply settings to" selector. The warning tooltip shows each metric's own message.
 * Add new option "Data Gaps" to detect missing days in time-series data and display a warning icon when gaps are found. The icon is shown by default and appears automatically whenever gaps are detected.
 * Add Data Gaps controls to toggle the icon, adjust its colors, and set a custom message.
 * Add a landing page (with the visual icon) shown when no fields are added, guiding the user to add Date and Values.

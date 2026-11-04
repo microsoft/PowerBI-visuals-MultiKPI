@@ -33,10 +33,10 @@ import TextInput = formattingSettings.TextInput;
 import ISandboxExtendedColorPalette = powerbi.extensibility.ISandboxExtendedColorPalette;
 
 import { BaseDescriptor } from "./baseDescriptor";
+import { BaseContainerDescriptor } from "./container/baseContainerDescriptor";
 
-export class StaleDataDescriptor extends BaseDescriptor {
-    public name: string = "staleData";
-    public displayNameKey: string = "Visual_StaleData";
+export class StaleDataContainerItem extends BaseDescriptor {
+    public displayNameKey: string = "Visual_All";
     public descriptionKey: string = "Visual_StaleDataDescription";
 
     public defaultColorValue: string = "#3599b8";
@@ -60,13 +60,13 @@ export class StaleDataDescriptor extends BaseDescriptor {
     public color: ColorPicker = new ColorPicker({
         name: "color",
         displayNameKey: "Visual_Color",
-        value: {value: this.defaultColorValue}
+        value: { value: this.defaultColorValue }
     });
 
     public backgroundColor: ColorPicker = new ColorPicker({
         name: "background",
         displayNameKey: "Visual_BackgroundColor",
-        value: {value: this.defaultBackgroundValue}
+        value: { value: this.defaultBackgroundValue }
     });
 
     public deductThresholdDays: ToggleSwitch = new ToggleSwitch({
@@ -75,12 +75,22 @@ export class StaleDataDescriptor extends BaseDescriptor {
         value: false
     });
 
-    topLevelSlice: ToggleSwitch = this.isShown;
-
     public slices: FormattingSettingsSlice[] = [
-        this.staleDataText, this.deductThresholdDays,
+        this.isShown, this.staleDataText, this.deductThresholdDays,
         this.staleDataThreshold, this.color, this.backgroundColor
     ];
+
+    constructor(defaultStaleDataContainerItem?: StaleDataContainerItem) {
+        super(defaultStaleDataContainerItem);
+
+        if (defaultStaleDataContainerItem) {
+            this.staleDataText.value = defaultStaleDataContainerItem.staleDataText.value;
+            this.staleDataThreshold.value = defaultStaleDataContainerItem.staleDataThreshold.value;
+            this.color.value = defaultStaleDataContainerItem.color.value;
+            this.backgroundColor.value = defaultStaleDataContainerItem.backgroundColor.value;
+            this.deductThresholdDays.value = defaultStaleDataContainerItem.deductThresholdDays.value;
+        }
+    }
 
     public processHighContrastMode(colorPalette: ISandboxExtendedColorPalette): void {
         const isHighContrast: boolean = colorPalette.isHighContrast;
@@ -90,5 +100,15 @@ export class StaleDataDescriptor extends BaseDescriptor {
 
         this.backgroundColor.visible = isHighContrast ? false : this.backgroundColor.visible;
         this.backgroundColor.value = isHighContrast ? colorPalette.foreground : this.backgroundColor.value;
+    }
+}
+
+export class StaleDataDescriptor extends BaseContainerDescriptor<StaleDataContainerItem> {
+    public name: string = "staleData";
+    public displayNameKey: string = "Visual_StaleData";
+    public descriptionKey: string = "Visual_StaleDataDescription";
+
+    public getNewContainerItem(defaultContainerItem: StaleDataContainerItem): StaleDataContainerItem {
+        return new StaleDataContainerItem(defaultContainerItem);
     }
 }

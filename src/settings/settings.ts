@@ -46,7 +46,7 @@ import { SparklineValueDescriptor } from "./descriptors/sparklineValueDescriptor
 import { SparklineAxisDescriptor } from "./descriptors/sparkline/sparklineAxisDescriptor";
 import { SparklineChartDescriptor } from "./descriptors/sparkline/sparklineChartDescriptor";
 import { SparklineDescriptor } from "./descriptors/sparkline/sparklineDescriptor";
-import { StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
+import { StaleDataContainerItem, StaleDataDescriptor } from "./descriptors/staleDataDescriptor";
 import { SubtitleContainerItem } from "./descriptors/subtitleDescriptor";
 import { TooltipDescriptor } from "./descriptors/tooltipDescriptor";
 import { ValuesDescriptor } from "./descriptors/valuesDescriptor";
@@ -85,12 +85,24 @@ export class Settings extends FormattingSettingsModel {
     ]
 
     public parse(colorPalette: ISandboxExtendedColorPalette, localizationManager: ILocalizationManager): void {
-        if (this.staleData.staleDataText.value === "") {
-            this.staleData.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
+        const defaultStaleDataItem = this.staleData.defaultContainerItem;
+        if (!defaultStaleDataItem.staleDataText.value) {
+            defaultStaleDataItem.staleDataText.value = "Data is ${1} days late." + (this.subtitle.staleDataText || "");
         }
 
+        this.staleData.container.containerItems.forEach((item) => {
+            const staleDataItem = item as StaleDataContainerItem;
+
+            if (!staleDataItem.staleDataText.value) {
+                staleDataItem.staleDataText.value = defaultStaleDataItem.staleDataText.value;
+            }
+
+            if (!this.subtitle.show.value) {
+                staleDataItem.isShown.value = false;
+            }
+        });
+
         if (!this.subtitle.show.value) {
-            this.staleData.isShown.value = false;
             this.dataGap.isShown.value = false;
         }
 
@@ -130,7 +142,6 @@ export class Settings extends FormattingSettingsModel {
             }
         });
         
-        currentSettings.staleData = this.staleData;
         return currentSettings;
     }
 }

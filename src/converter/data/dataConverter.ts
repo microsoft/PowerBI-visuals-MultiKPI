@@ -464,7 +464,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
     }
 
     private postProcessData(dataRepresentation: IDataRepresentation, settings: Settings): void {
-        dataRepresentation.staleDateDifference = 0;
         dataRepresentation.dataGapInfo = {
             hasGaps: false,
             totalMissingDays: 0,
@@ -480,9 +479,6 @@ export class DataConverter implements IConverter<IDataConverterOptions, IDataRep
         dataRepresentation.series.forEach((series: IDataRepresentationSeries) => {
             if (series?.current?.x) {
                 series.staleDateDifference = this.getDaysBetween(series.current.x, new Date());
-                if (series.staleDateDifference > dataRepresentation.staleDateDifference) {
-                    dataRepresentation.staleDateDifference = series.staleDateDifference;
-                }
             }
             if (series.points.length > 1) {                
                 const gapResult: IDataGapResult = DataGapDetector.detectGaps(series.points);
